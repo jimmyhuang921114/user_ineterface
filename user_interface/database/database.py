@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-# 替換為你實際使用的資料庫 URL
+# set the database url 
 DATABASE_URL = "sqlite:///./hospital.db"
 
 # 建立資料庫 engine

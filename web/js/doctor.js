@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("excelTable");
 
   const hot = new Handsontable(container, {
-    data: [
-      ["Paracetamol", "500mg", "3x/day", "口服", "飯後服用"],
-      ["Ibuprofen", "200mg", "2x/day", "口服", "避免空腹"],
-      ["Paracetamol", "30tablets", "3x/day", "口服", "飯後服用"],
-    ],
+    // data: [
+    //   ["Paracetamol", "500mg", "3x/day", "口服", "飯後服用"],
+    //   ["Ibuprofen", "200mg", "2x/day", "口服", "避免空腹"],
+    //   ["Paracetamol", "30tablets", "3x/day", "口服", "飯後服用"],
+    // ],
     colHeaders: ["藥物名稱", "總劑量", "使用頻率", "使用方式", "注意事項"],
     columns: [
       { type: 'text' },

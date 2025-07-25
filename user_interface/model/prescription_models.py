@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Patient model
 class Patient(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)  # ⬅️ 修正欄位名：medicine_id ➝ id
+    id: Optional[int] = Field(default=None, primary_key=True) 
     name: str
     sex: str
     age: int

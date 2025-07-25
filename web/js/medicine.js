@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const data = [
-    ['Amoxicillin', '30 tablets', '2025-12-31', 'A1-01'],
-    ['Paracetamol', '20 tablets', '2025-10-15', 'A2-03'],
-    ['Cough Syrup', '1 bottle (100ml)', '2025-08-31', 'B1-02'],
-  ];
+  // const data = [
+  //   ['Amoxicillin', '30 tablets', '2025-12-31', 'A1-01'],
+  //   ['Paracetamol', '20 tablets', '2025-10-15', 'A2-03'],
+  //   ['Cough Syrup', '1 bottle (100ml)', '2025-08-31', 'B1-02'],
+  // ];
 
   const container = document.getElementById('medicineTable');
   const hot = new Handsontable(container, {
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
     stretchH: 'all',
     rowHeaders: true,
-    minSpareRows: 1, // 供新增
+    minSpareRows: 1, 
     height: 300,
     licenseKey: 'non-commercial-and-evaluation'
   });

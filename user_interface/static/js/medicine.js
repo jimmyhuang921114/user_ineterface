@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     data = medicines.map(m => [
       m.name,
       `${m.amount} tablets`,
-      m.expiration_date || 'YYYY-MM-DD',  // 確保資料正確
+      m.expiration_date || 'YYYY-MM-DD', 
       m.position
     ]);
   } catch (err) {

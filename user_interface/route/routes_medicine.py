@@ -7,23 +7,23 @@ from schemas.medicine_schema import MedicineCreate  # 如果有 schema 分層
 
 router = APIRouter()
 
-# 新增藥物
+# add medicine
 @router.post("/medicine/")
 def add_medicine(medicine: MedicineCreate, db: Session = Depends(get_db)):
     return crud_medicine.create_medicine(db, medicine)
 
-# 取得所有藥物
+# get the medicine from medicine database
 @router.get("/medicine/")
 def list_all(db: Session = Depends(get_db)):
     return crud_medicine.get_all_medicines(db)
 
-# 根據藥品名稱查詢
+# get the medicine by name for medicine database
 @router.get("/medicine/{name}")
 def get_by_name(name: str, db: Session = Depends(get_db)):
     return crud_medicine.get_medicine_by_name(db, name)
 
-# 根據 ID 刪除藥品
-@router.delete("/medicine/{id}")
-def delete_by_id(id: int, db: Session = Depends(get_db)):
-    success = crud_medicine.delete_medicine_by_id(db, id)
+# delete the medicine by name
+@router.delete("/medicine/{name}")
+def delete_by_id(name: str, db: Session = Depends(get_db)):
+    success = crud_medicine.delete_medicine_by_id(db, name)
     return {"success": success}

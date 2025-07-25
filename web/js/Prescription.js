@@ -86,7 +86,7 @@ function renderTable() {
 
 function showDetails(index) {
   const p = patientList[index];
-  const msg = `🧾 ${p.name} 的處方內容：\n` + p.prescription.map(
+  const msg = `${p.name} 的處方內容：\n` + p.prescription.map(
     d => `- ${d[0]} (${d[1]}, ${d[2]})`
   ).join("\n");
   alert(msg);

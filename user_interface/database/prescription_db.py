@@ -1,10 +1,11 @@
 from sqlmodel import Session, SQLModel, create_engine
 
-DATABASE_URL = "sqlite:///./hospital.db"  # 共用資料庫
+#use same website with medicine
+DATABASE_URL = "sqlite:///./hospital.db" 
 engine = create_engine(DATABASE_URL, echo=True)
 
 def init_db():
-    SQLModel.metadata.create_all(engine)  # OK！現在所有表都建在同一個 DB
+    SQLModel.metadata.create_all(engine)  
 
 def get_session():
     return Session(engine)
