@@ -376,6 +376,67 @@ async def delete_record(record_id: int):
     
     return {"success": True, "message": "病例記錄已刪除", "record_id": record_id}
 
+# === 整合藥物管理 API ===
+@app.get("/api/medicine/integrated/{medicine_name}")
+async def get_integrated_medicine_info(medicine_name: str):
+    """獲取整合的藥物資訊 (庫存 + 詳細資訊)"""
+    result = {
+        "medicine_name": medicine_name,
+        "basic_info": None,
+        "detailed_info": None,
+        "status": "not_found"
+    }
+    
+    # 搜尋基本庫存資訊
+    for medicine in medicines_db:
+        if medicine["name"].lower() == medicine_name.lower():
+            result["basic_info"] = medicine
+            break
+    
+    # 搜尋詳細藥物資訊
+    if medicine_name in detailed_medicines_db:
+        result["detailed_info"] = detailed_medicines_db[medicine_name]
+    
+    # 決定狀態
+    if result["basic_info"] and result["detailed_info"]:
+        result["status"] = "complete"  # 有庫存也有詳細資訊
+    elif result["basic_info"]:
+        result["status"] = "basic_only"  # 只有庫存資訊
+    elif result["detailed_info"]:
+        result["status"] = "detailed_only"  # 只有詳細資訊
+    else:
+        raise HTTPException(status_code=404, detail="藥物未找到")
+    
+    return result
+
+@app.get("/api/medicine/integrated/")
+async def get_all_integrated_medicines():
+    """獲取所有藥物的整合資訊"""
+    integrated_medicines = {}
+    
+    # 從基本藥物開始
+    for medicine in medicines_db:
+        name = medicine["name"]
+        integrated_medicines[name] = {
+            "basic_info": medicine,
+            "detailed_info": detailed_medicines_db.get(name, None),
+            "status": "complete" if name in detailed_medicines_db else "basic_only"
+        }
+    
+    # 添加只有詳細資訊的藥物
+    for name in detailed_medicines_db:
+        if name not in integrated_medicines:
+            integrated_medicines[name] = {
+                "basic_info": None,
+                "detailed_info": detailed_medicines_db[name],
+                "status": "detailed_only"
+            }
+    
+    return {
+        "total_medicines": len(integrated_medicines),
+        "integrated_medicines": integrated_medicines
+    }
+
 # === JSON 導出功能 ===
 @app.get("/api/export/medicines/basic")
 async def export_basic_medicines():
@@ -435,6 +496,51 @@ async def export_records():
     return JSONResponse(
         content=export_data,
         headers={"Content-Disposition": "attachment; filename=patient_records.json"}
+    )
+
+@app.get("/api/export/medicines/integrated")
+async def export_integrated_medicines():
+    """導出整合的藥物資訊 (庫存 + 詳細資訊)"""
+    integrated_data = {}
+    
+    # 獲取所有整合資訊
+    all_integrated = await get_all_integrated_medicines()
+    
+    for name, data in all_integrated["integrated_medicines"].items():
+        medicine_export = {
+            "藥物名稱": name,
+            "庫存狀態": "有庫存" if data["basic_info"] else "無庫存",
+            "詳細資訊狀態": "有詳細資訊" if data["detailed_info"] else "無詳細資訊",
+            "整合狀態": data["status"]
+        }
+        
+        # 添加庫存資訊
+        if data["basic_info"]:
+            medicine_export["庫存資訊"] = {
+                "ID": data["basic_info"]["id"],
+                "數量": data["basic_info"]["amount"],
+                "位置": data["basic_info"]["position"],
+                "使用天數": data["basic_info"]["usage_days"],
+                "建立時間": data["basic_info"]["create_time"]
+            }
+        
+        # 添加詳細資訊
+        if data["detailed_info"]:
+            medicine_export["詳細資訊"] = data["detailed_info"]
+        
+        integrated_data[name] = medicine_export
+    
+    export_data = {
+        "export_type": "整合藥物資訊",
+        "total_count": len(integrated_data),
+        "export_date": datetime.now().isoformat(),
+        "description": "包含庫存管理和詳細藥物資訊的完整資料",
+        "data": integrated_data
+    }
+    
+    return JSONResponse(
+        content=export_data,
+        headers={"Content-Disposition": "attachment; filename=integrated_medicines.json"}
     )
 
 @app.get("/api/export/complete")
