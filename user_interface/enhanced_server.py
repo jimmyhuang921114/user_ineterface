@@ -205,6 +205,78 @@ async def search_detailed_medicines(query: str):
     
     return results
 
+@app.get("/api/medicine/search/code/{code}")
+async def search_medicine_by_code(code: str):
+    """根據包裝編號搜尋藥物"""
+    results = {}
+    code_upper = code.upper()
+    
+    for name, data in detailed_medicines_db.items():
+        packaging_codes = data.get("包裝編號", {})
+        
+        # 檢查所有包裝編號
+        for code_key, code_value in packaging_codes.items():
+            if code_upper in code_value.upper():
+                results[name] = {
+                    **data,
+                    "matched_code": {
+                        "type": code_key,
+                        "value": code_value,
+                        "search_term": code
+                    }
+                }
+                break
+    
+    if not results:
+        raise HTTPException(status_code=404, detail=f"找不到包裝編號包含 '{code}' 的藥物")
+    
+    return results
+
+@app.get("/api/medicine/search/exact-code/{code}")
+async def search_medicine_by_exact_code(code: str):
+    """根據完整包裝編號精確搜尋藥物"""
+    results = {}
+    
+    for name, data in detailed_medicines_db.items():
+        packaging_codes = data.get("包裝編號", {})
+        
+        # 檢查完全匹配的編號
+        for code_key, code_value in packaging_codes.items():
+            if code == code_value:
+                results[name] = {
+                    **data,
+                    "matched_code": {
+                        "type": code_key,
+                        "value": code_value,
+                        "match_type": "exact"
+                    }
+                }
+                break
+    
+    if not results:
+        raise HTTPException(status_code=404, detail=f"找不到包裝編號為 '{code}' 的藥物")
+    
+    return results
+
+@app.get("/api/medicine/codes/")
+async def get_all_medicine_codes():
+    """獲取所有藥物的包裝編號"""
+    all_codes = {}
+    
+    for name, data in detailed_medicines_db.items():
+        packaging_codes = data.get("包裝編號", {})
+        if packaging_codes:
+            all_codes[name] = {
+                "medicine_name": data.get("基本資訊", {}).get("名稱", name),
+                "manufacturer": data.get("基本資訊", {}).get("廠商", ""),
+                "codes": packaging_codes
+            }
+    
+    return {
+        "total_medicines": len(all_codes),
+        "medicines_with_codes": all_codes
+    }
+
 # === 病人管理 API ===
 @app.get("/api/patients/")
 async def get_all_patients():
