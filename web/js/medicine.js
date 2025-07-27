@@ -1,24 +1,477 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // const data = [
-  //   ['Amoxicillin', '30 tablets', '2025-12-31', 'A1-01'],
-  //   ['Paracetamol', '20 tablets', '2025-10-15', 'A2-03'],
-  //   ['Cough Syrup', '1 bottle (100ml)', '2025-08-31', 'B1-02'],
-  // ];
+// 藥物管理系統 JavaScript
+class MedicineManager {
+    constructor() {
+        this.apiBase = 'http://localhost:8000/api';
+        this.hot = null;
+        this.data = [];
+        this.init();
+    }
 
-  const container = document.getElementById('medicineTable');
-  const hot = new Handsontable(container, {
-    data: data,
-    colHeaders: ['藥品名稱', '藥物數量', '有效日期', '藥物位置'],
-    columns: [
-      { type: 'text', placeholder: '輸入藥名' },
-      { type: 'text', placeholder: '輸入數量' },
-      { type: 'date', dateFormat: 'YYYY-MM-DD', correctFormat: true, placeholder: 'YYYY-MM-DD' },
-      { type: 'text', placeholder: '儲位位置（如 A1-01）' }
-    ],
-    stretchH: 'all',
-    rowHeaders: true,
-    minSpareRows: 1, 
-    height: 300,
-    licenseKey: 'non-commercial-and-evaluation'
-  });
+    async init() {
+        await this.loadMedicines();
+        this.initTable();
+        this.setupEventListeners();
+    }
+
+    // 從後端載入藥物資料
+    async loadMedicines() {
+        try {
+            const response = await fetch(`${this.apiBase}/medicine/`);
+            if (response.ok) {
+                const medicines = await response.json();
+                this.data = medicines.map(med => [
+                    med.name,
+                    med.amount,
+                    med.usage_days,
+                    med.position,
+                    med.id  // 隱藏的ID欄位，用於編輯和刪除
+                ]);
+            } else {
+                console.error('Failed to load medicines:', response.statusText);
+                this.data = [];
+            }
+        } catch (error) {
+            console.error('Error loading medicines:', error);
+            this.data = [];
+        }
+    }
+
+    // 初始化Handsontable
+    initTable() {
+        const container = document.getElementById('medicineTable');
+        this.hot = new Handsontable(container, {
+            data: this.data,
+            colHeaders: ['藥品名稱', '藥物數量', '使用天數', '藥物位置', '操作'],
+            columns: [
+                { type: 'text', placeholder: '輸入藥名' },
+                { type: 'numeric', placeholder: '輸入數量' },
+                { type: 'numeric', placeholder: '使用天數' },
+                { type: 'text', placeholder: '儲位位置（如 A1-01）' },
+                { 
+                    type: 'text', 
+                    readOnly: true,
+                    renderer: this.actionButtonRenderer.bind(this)
+                }
+            ],
+            stretchH: 'all',
+            rowHeaders: true,
+            minSpareRows: 1,
+            height: 400,
+            licenseKey: 'non-commercial-and-evaluation',
+            afterChange: this.handleCellChange.bind(this),
+            contextMenu: ['remove_row'],
+            afterRemoveRow: this.handleRowDelete.bind(this)
+        });
+    }
+
+    // 操作按鈕渲染器
+    actionButtonRenderer(instance, td, row, col, prop, value, cellProperties) {
+        td.innerHTML = '';
+        
+        if (row < this.data.length && this.data[row].length >= 5) {
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = '保存';
+            saveBtn.className = 'action-btn save-btn';
+            saveBtn.onclick = () => this.saveMedicine(row);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '刪除';
+            deleteBtn.className = 'action-btn delete-btn';
+            deleteBtn.onclick = () => this.deleteMedicine(row);
+            
+            td.appendChild(saveBtn);
+            td.appendChild(deleteBtn);
+        } else {
+            const addBtn = document.createElement('button');
+            addBtn.textContent = '新增';
+            addBtn.className = 'action-btn add-btn';
+            addBtn.onclick = () => this.addMedicine(row);
+            td.appendChild(addBtn);
+        }
+        
+        return td;
+    }
+
+    // 處理儲存格變更
+    async handleCellChange(changes, source) {
+        if (!changes || source === 'loadData') return;
+        
+        // 自動保存已存在的記錄
+        for (const change of changes) {
+            const [row, col, oldValue, newValue] = change;
+            if (this.data[row] && this.data[row].length >= 5 && this.data[row][4]) {
+                // 延遲保存以避免過於頻繁的API調用
+                clearTimeout(this.saveTimeout);
+                this.saveTimeout = setTimeout(() => {
+                    this.saveMedicine(row);
+                }, 1000);
+            }
+        }
+    }
+
+    // 新增藥物
+    async addMedicine(row) {
+        const rowData = this.hot.getDataAtRow(row);
+        const [name, amount, usage_days, position] = rowData;
+
+        if (!name || !amount || !usage_days || !position) {
+            alert('請填寫完整的藥物資訊');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBase}/medicine/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    amount: parseInt(amount),
+                    usage_days: parseInt(usage_days),
+                    position: position
+                })
+            });
+
+            if (response.ok) {
+                const newMedicine = await response.json();
+                // 更新本地數據
+                this.data[row] = [name, amount, usage_days, position, newMedicine.id];
+                this.hot.render();
+                this.showMessage('藥物新增成功', 'success');
+            } else {
+                const error = await response.json();
+                this.showMessage(`新增失敗: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error adding medicine:', error);
+            this.showMessage('新增失敗，請檢查網路連接', 'error');
+        }
+    }
+
+    // 保存藥物（更新）
+    async saveMedicine(row) {
+        const rowData = this.hot.getDataAtRow(row);
+        const [name, amount, usage_days, position, id] = rowData;
+
+        if (!id) {
+            await this.addMedicine(row);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBase}/medicine/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    amount: parseInt(amount),
+                    usage_days: parseInt(usage_days),
+                    position: position
+                })
+            });
+
+            if (response.ok) {
+                this.showMessage('藥物更新成功', 'success');
+            } else {
+                const error = await response.json();
+                this.showMessage(`更新失敗: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error updating medicine:', error);
+            this.showMessage('更新失敗，請檢查網路連接', 'error');
+        }
+    }
+
+    // 刪除藥物
+    async deleteMedicine(row) {
+        const rowData = this.hot.getDataAtRow(row);
+        const id = rowData[4];
+
+        if (!id) {
+            this.hot.alter('remove_row', row);
+            return;
+        }
+
+        if (!confirm('確定要刪除這個藥物嗎？')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBase}/medicine/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                this.hot.alter('remove_row', row);
+                this.data.splice(row, 1);
+                this.showMessage('藥物刪除成功', 'success');
+            } else {
+                const error = await response.json();
+                this.showMessage(`刪除失敗: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting medicine:', error);
+            this.showMessage('刪除失敗，請檢查網路連接', 'error');
+        }
+    }
+
+    // 處理行刪除事件
+    async handleRowDelete(index, amount) {
+        // 這個事件在用戶使用右鍵選單刪除行時觸發
+        // 我們需要確保也從後端刪除
+        for (let i = 0; i < amount; i++) {
+            const rowIndex = index + i;
+            if (this.data[rowIndex] && this.data[rowIndex][4]) {
+                await this.deleteMedicineById(this.data[rowIndex][4]);
+            }
+        }
+    }
+
+    // 根據ID刪除藥物（內部方法）
+    async deleteMedicineById(id) {
+        try {
+            await fetch(`${this.apiBase}/medicine/${id}`, {
+                method: 'DELETE'
+            });
+        } catch (error) {
+            console.error('Error deleting medicine by ID:', error);
+        }
+    }
+
+    // 顯示訊息
+    showMessage(message, type = 'info') {
+        // 創建或更新訊息元素
+        let messageDiv = document.getElementById('message');
+        if (!messageDiv) {
+            messageDiv = document.createElement('div');
+            messageDiv.id = 'message';
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                border-radius: 5px;
+                color: white;
+                z-index: 1000;
+                transition: opacity 0.3s;
+            `;
+            document.body.appendChild(messageDiv);
+        }
+
+        messageDiv.textContent = message;
+        messageDiv.className = `message-${type}`;
+        
+        // 設置顏色
+        const colors = {
+            success: '#4CAF50',
+            error: '#f44336',
+            info: '#2196F3'
+        };
+        messageDiv.style.backgroundColor = colors[type] || colors.info;
+        
+        // 3秒後自動隱藏
+        setTimeout(() => {
+            if (messageDiv) {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => {
+                    if (messageDiv && messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+
+    // 導出JSON格式的藥物資料
+    exportToJSON() {
+        const jsonData = this.data
+            .filter(row => row.length >= 4 && row[0]) // 過濾空行
+            .map(row => ({
+                name: row[0],
+                amount: row[1],
+                usage_days: row[2],
+                position: row[3],
+                id: row[4] || null
+            }));
+
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { 
+            type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `medicines_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        this.showMessage('JSON檔案已下載', 'success');
+    }
+
+    // 搜尋藥物
+    async searchMedicine(name) {
+        if (!name.trim()) {
+            await this.loadMedicines();
+            this.hot.loadData(this.data);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBase}/medicine/${encodeURIComponent(name)}`);
+            if (response.ok) {
+                const medicine = await response.json();
+                this.data = [[
+                    medicine.name,
+                    medicine.amount,
+                    medicine.usage_days,
+                    medicine.position,
+                    medicine.id
+                ]];
+                this.hot.loadData(this.data);
+                this.showMessage('找到藥物', 'success');
+            } else {
+                this.showMessage('找不到該藥物', 'error');
+            }
+        } catch (error) {
+            console.error('Error searching medicine:', error);
+            this.showMessage('搜尋失敗', 'error');
+        }
+    }
+
+    // 設置事件監聽器
+    setupEventListeners() {
+        // 添加控制按鈕
+        this.addControlButtons();
+    }
+
+    // 添加控制按鈕
+    addControlButtons() {
+        const header = document.querySelector('.header');
+        if (!header) return;
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'control-buttons';
+        buttonContainer.style.cssText = `
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        `;
+
+        // 重新載入按鈕
+        const reloadBtn = this.createButton('重新載入', async () => {
+            await this.loadMedicines();
+            this.hot.loadData(this.data);
+            this.showMessage('資料已重新載入', 'success');
+        });
+
+        // 導出JSON按鈕
+        const exportBtn = this.createButton('導出JSON', () => {
+            this.exportToJSON();
+        });
+
+        // 搜尋框和按鈕
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = '輸入藥名搜尋...';
+        searchInput.style.cssText = `
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        `;
+
+        const searchBtn = this.createButton('搜尋', () => {
+            this.searchMedicine(searchInput.value);
+        });
+
+        const clearSearchBtn = this.createButton('清除搜尋', async () => {
+            searchInput.value = '';
+            await this.loadMedicines();
+            this.hot.loadData(this.data);
+        });
+
+        // 添加Enter鍵搜尋功能
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchMedicine(searchInput.value);
+            }
+        });
+
+        buttonContainer.appendChild(reloadBtn);
+        buttonContainer.appendChild(exportBtn);
+        buttonContainer.appendChild(searchInput);
+        buttonContainer.appendChild(searchBtn);
+        buttonContainer.appendChild(clearSearchBtn);
+
+        header.appendChild(buttonContainer);
+    }
+
+    // 創建按鈕的輔助方法
+    createButton(text, onClick) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.style.cssText = `
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        `;
+        button.addEventListener('click', onClick);
+        button.addEventListener('mouseover', () => {
+            button.style.backgroundColor = '#0056b3';
+        });
+        button.addEventListener('mouseout', () => {
+            button.style.backgroundColor = '#007bff';
+        });
+        return button;
+    }
+}
+
+// 添加CSS樣式
+const style = document.createElement('style');
+style.textContent = `
+    .action-btn {
+        padding: 4px 8px;
+        margin: 2px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .save-btn {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .add-btn {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .action-btn:hover {
+        opacity: 0.8;
+    }
+    
+    .control-buttons {
+        align-items: center;
+    }
+`;
+document.head.appendChild(style);
+
+// 當DOM載入完成時初始化
+document.addEventListener("DOMContentLoaded", () => {
+    new MedicineManager();
 });

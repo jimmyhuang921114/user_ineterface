@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -20,6 +21,15 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="Hospital System API", lifespan=lifespan)
+
+# 添加CORS中間件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 在生產環境中應該設置具體的域名
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 設定資料夾路徑
 base_dir = Path(__file__).resolve().parent
