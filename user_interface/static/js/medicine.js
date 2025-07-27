@@ -287,29 +287,27 @@ class MedicineManager {
 
     // 導出JSON格式的藥物資料
     exportToJSON() {
-        const jsonData = this.data
-            .filter(row => row.length >= 4 && row[0]) // 過濾空行
-            .map(row => ({
-                name: row[0],
-                amount: row[1],
-                usage_days: row[2],
-                position: row[3],
-                id: row[4] || null
-            }));
-
-        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { 
-            type: 'application/json' 
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `medicines_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        this.showMessage('JSON檔案已下載', 'success');
+        fetch(`${this.apiBase}/medicine/export/json`)
+            .then(response => response.json())
+            .then(data => {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { 
+                    type: 'application/json' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `medicines_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showMessage('JSON檔案已下載', 'success');
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                this.showMessage('導出失敗', 'error');
+            });
     }
 
     // 搜尋藥物
@@ -321,18 +319,18 @@ class MedicineManager {
         }
 
         try {
-            const response = await fetch(`${this.apiBase}/medicine/${encodeURIComponent(name)}`);
+            const response = await fetch(`${this.apiBase}/medicine/search/${encodeURIComponent(name)}`);
             if (response.ok) {
-                const medicine = await response.json();
-                this.data = [[
-                    medicine.name,
-                    medicine.amount,
-                    medicine.usage_days,
-                    medicine.position,
-                    medicine.id
-                ]];
+                const medicines = await response.json();
+                this.data = medicines.map(med => [
+                    med.name,
+                    med.amount,
+                    med.usage_days,
+                    med.position,
+                    med.id
+                ]);
                 this.hot.loadData(this.data);
-                this.showMessage('找到藥物', 'success');
+                this.showMessage(`找到 ${medicines.length} 個匹配的藥物`, 'success');
             } else {
                 this.showMessage('找不到該藥物', 'error');
             }
