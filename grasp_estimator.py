@@ -155,12 +155,19 @@ class GraspEstimatorNode(Node):
         self.get_logger().info(f"  與相機Z軸點積: {dot_with_camera:.3f}")
         self.get_logger().info(f"  角度 (與水平面夾角): {angle_to_camera:.2f}°")
 
-        # IMPROVED: Check if surface is reasonably horizontal for top-down grasping
-        if angle_to_camera > 30.0:  # More than 30 degrees from horizontal
-            self.get_logger().warn(f"⚠️ 表面不夠水平 (傾斜 {angle_to_camera:.1f}°)，可能影響抓取精度")
-            self.get_logger().warn(f"   建議: 檢查目標物體是否為水平平面")
-        else:
-            self.get_logger().info(f"✓ 表面夠水平 (傾斜 {angle_to_camera:.1f}°)，適合俯視抓取")
+        # IMPROVED: 判斷表面類型並決定是否適合俯視抓取
+        if angle_to_camera < 30.0:  # 接近水平
+            self.get_logger().info(f"✓ 檢測到水平表面 (傾斜 {angle_to_camera:.1f}°)，適合俯視抓取")
+            surface_type = "horizontal"
+        elif angle_to_camera > 60.0:  # 接近垂直
+            self.get_logger().warn(f"❌ 檢測到垂直表面/側面 (角度 {angle_to_camera:.1f}°)")
+            self.get_logger().warn(f"   這是物體側面，不適合俯視抓取，跳過處理")
+            surface_type = "vertical"
+            return  # 直接返回，不處理側面
+        else:  # 中等傾斜
+            self.get_logger().warn(f"⚠️ 檢測到傾斜表面 (角度 {angle_to_camera:.1f}°)")
+            self.get_logger().warn(f"   表面傾斜度較大，抓取精度可能受影響")
+            surface_type = "inclined"
 
         if time.time() - self.last_sent_time < 1.0:  # Reduced timeout
             self.get_logger().warn("已在處理或剛發送完成")
