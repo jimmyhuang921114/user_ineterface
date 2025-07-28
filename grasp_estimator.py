@@ -93,10 +93,22 @@ class GraspEstimatorNode(Node):
 
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
-        plane_model, inliers = pcd.segment_plane(0.005, 3, 1000)
+        
+        # 嘗試不同的平面擬合參數，專門尋找水平平面
+        plane_model, inliers = pcd.segment_plane(distance_threshold=0.01, 
+                                                ransac_n=3, 
+                                                num_iterations=1000)
+        
         if len(inliers) < 100:
             self.get_logger().warn("Too few inliers for plane fitting.")
             return
+            
+        # 計算inliers比例
+        inlier_ratio = len(inliers) / len(points)
+        self.get_logger().info(f"平面擬合結果: {len(inliers)}/{len(points)} 點 ({inlier_ratio:.2%})")
+        
+        if inlier_ratio < 0.5:  # 如果少於50%的點符合平面
+            self.get_logger().warn(f"平面擬合品質較差 ({inlier_ratio:.1%})，可能不是平坦表面")
 
         center = np.mean(np.asarray(pcd.select_by_index(inliers).points), axis=0)
         normal = np.array(plane_model[:3])
@@ -104,11 +116,24 @@ class GraspEstimatorNode(Node):
 
         # IMPROVED: For top-down view, ensure normal points toward camera (negative Z direction)
         camera_direction = np.array([0.0, 0.0, -1.0])  # Camera looks down negative Z
-        if np.dot(normal, camera_direction) < 0:
+        
+        # 檢查法向量方向，確保指向相機
+        dot_product = np.dot(normal, camera_direction)
+        self.get_logger().info(f"法向量與相機方向點積: {dot_product:.3f}")
+        
+        if dot_product > 0:
             self.get_logger().info("法向量指向攝影機，方向正確")
         else:
             self.get_logger().warn("法向量遠離攝影機，自動反轉")
             normal = -normal
+            
+        # 額外檢查：法向量應該主要指向Z軸負方向（俯視配置）
+        z_component = abs(normal[2])
+        self.get_logger().info(f"法向量Z分量: {normal[2]:.3f}, 絕對值: {z_component:.3f}")
+        
+        if z_component < 0.5:  # Z分量太小，可能不是水平平面
+            self.get_logger().warn(f"檢測到的可能不是水平平面，Z分量過小: {z_component:.3f}")
+            self.get_logger().warn(f"完整法向量: [{normal[0]:.3f}, {normal[1]:.3f}, {normal[2]:.3f}]")
 
         self.z_normal_list.append(normal)
         if len(self.z_normal_list) > 10:
@@ -122,12 +147,20 @@ class GraspEstimatorNode(Node):
         normal_avg /= np.linalg.norm(normal_avg)
 
         # IMPROVED: Calculate angle relative to camera's Z-axis (top-down view)
-        angle_to_camera = np.arccos(np.clip(np.dot(normal_avg, camera_direction), -1, 1)) * 180.0 / np.pi
-        self.get_logger().info(f"[法向量角度] 相對於攝影機 Z 軸: {angle_to_camera:.2f}°")
+        dot_with_camera = np.dot(normal_avg, camera_direction)
+        angle_to_camera = np.arccos(np.clip(abs(dot_with_camera), 0, 1)) * 180.0 / np.pi
+        
+        self.get_logger().info(f"[法向量分析]")
+        self.get_logger().info(f"  平均法向量: [{normal_avg[0]:.3f}, {normal_avg[1]:.3f}, {normal_avg[2]:.3f}]")
+        self.get_logger().info(f"  與相機Z軸點積: {dot_with_camera:.3f}")
+        self.get_logger().info(f"  角度 (與水平面夾角): {angle_to_camera:.2f}°")
 
-        # IMPROVED: Warn if surface is not reasonably flat for top-down grasping
+        # IMPROVED: Check if surface is reasonably horizontal for top-down grasping
         if angle_to_camera > 30.0:  # More than 30 degrees from horizontal
-            self.get_logger().warn(f"表面傾斜角度較大 ({angle_to_camera:.1f}°)，可能影響抓取精度")
+            self.get_logger().warn(f"⚠️ 表面不夠水平 (傾斜 {angle_to_camera:.1f}°)，可能影響抓取精度")
+            self.get_logger().warn(f"   建議: 檢查目標物體是否為水平平面")
+        else:
+            self.get_logger().info(f"✓ 表面夠水平 (傾斜 {angle_to_camera:.1f}°)，適合俯視抓取")
 
         if time.time() - self.last_sent_time < 1.0:  # Reduced timeout
             self.get_logger().warn("已在處理或剛發送完成")
