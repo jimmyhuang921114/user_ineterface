@@ -175,22 +175,23 @@ class GraspEstimatorNode(Node):
 
         self.last_sent_time = time.time()
 
-        # IMPROVED: 根據抓取策略生成適合的姿態
+        # IMPROVED: 針對吸盤抓取生成適合的姿態
+        # 吸盤需要垂直於表面接近，Z軸指向表面法向量方向
         if grasp_strategy == "top_down":
-            # 俯視抓取：z軸沿法向量方向
+            # 俯視吸取：z軸沿法向量方向（向下）
             z_axis = normal_avg
-            self.get_logger().info("🔧 生成俯視抓取姿態")
+            self.get_logger().info("🔧 生成俯視吸盤姿態 - Z軸向下垂直於水平面")
             
         elif grasp_strategy == "side_grasp":
-            # 側面抓取：調整夾爪方向以適應側面抓取
-            # z軸應該垂直於側面，指向抓取方向
-            z_axis = normal_avg
-            self.get_logger().info("🔧 生成側面抓取姿態")
+            # 側面吸取：z軸沿法向量方向（垂直於側面，指向相機）
+            # 對於吸盤，我們希望吸盤面垂直貼合側面
+            z_axis = normal_avg  # 法向量指向相機方向
+            self.get_logger().info("🔧 生成側面吸盤姿態 - Z軸垂直於側面指向相機")
             
         else:  # angled_grasp
-            # 傾斜抓取：保持法向量方向但可能需要調整
+            # 傾斜吸取：z軸沿法向量方向
             z_axis = normal_avg
-            self.get_logger().info("🔧 生成傾斜抓取姿態")
+            self.get_logger().info("🔧 生成傾斜吸盤姿態 - Z軸垂直於傾斜面")
         
         # 生成對應的坐標軸
         # 根據抓取策略選擇合適的參考軸
@@ -237,13 +238,14 @@ class GraspEstimatorNode(Node):
         final_euler = R.from_matrix(rot_matrix).as_euler('xyz', degrees=True)
         self.get_logger().info(f"  姿態 (歐拉角): roll={final_euler[0]:.2f}°, pitch={final_euler[1]:.2f}°, yaw={final_euler[2]:.2f}°")
         
-        # 根據策略給出提示
+        # 根據策略給出吸盤操作提示
         if grasp_strategy == "top_down":
-            self.get_logger().info("💡 建議: 夾爪垂直向下接近")
+            self.get_logger().info("💡 建議: 吸盤垂直向下接近水平表面")
         elif grasp_strategy == "side_grasp":
-            self.get_logger().info("💡 建議: 夾爪水平方向接近側面")
+            self.get_logger().info("💡 建議: 吸盤垂直接近側面（面向相機的表面）")
+            self.get_logger().info("💡 注意: Z軸指向相機，吸盤面將貼合物體側面")
         else:
-            self.get_logger().info("💡 建議: 夾爪按傾斜角度接近")
+            self.get_logger().info("💡 建議: 吸盤垂直於傾斜面接近")
         
         self.pose_pub.publish(pose_msg)
 

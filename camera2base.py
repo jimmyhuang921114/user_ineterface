@@ -30,14 +30,18 @@ class Camera2Base(Node):
 
         self.T_camera_to_ee = self.create_hand_eye_transform()
         
-        # IMPROVED: Add configurable offsets for fine-tuning
-        self.offset_x = 0.0  # Adjustable X offset
+        # IMPROVED: Add configurable offsets for suction cup grasping
+        self.offset_x = 0.0    # Adjustable X offset
         self.offset_y = -0.02  # Adjustable Y offset 
-        self.offset_z = 0.05  # Adjustable Z offset (approach distance)
+        self.offset_z = 0.03   # Reduced for suction cup (closer approach)
+        
+        # Suction cup specific parameters
+        self.suction_approach_distance = 0.02  # How close to get before suction
 
         self.get_logger().info("Camera2Base node initialized")
         self.get_logger().info(f"Hand-eye transform:\n{self.T_camera_to_ee}")
         self.get_logger().info(f"Applied offsets: x={self.offset_x}, y={self.offset_y}, z={self.offset_z}")
+        self.get_logger().info(f"Suction cup approach distance: {self.suction_approach_distance}m")
 
     def create_hand_eye_transform(self):
         trans = np.array([0.03182497415436079, 0.033778346369806436, 0.06894045731602626])
@@ -167,12 +171,36 @@ class Camera2Base(Node):
         tf_msg = TransformStamped()
         tf_msg.header.stamp = self.get_clock().now().to_msg()
         tf_msg.header.frame_id = 'base'
-        tf_msg.child_frame_id = 'target_object'
+        tf_msg.child_frame_id = 'suction_target'
         tf_msg.transform.translation.x = pos_final[0]
         tf_msg.transform.translation.y = pos_final[1]
         tf_msg.transform.translation.z = pos_final[2]
         tf_msg.transform.rotation = base_pose.orientation
         self.br.sendTransform(tf_msg)
+        
+        # Also publish a pre-approach position for planning
+        tf_pre_approach = TransformStamped()
+        tf_pre_approach.header.stamp = self.get_clock().now().to_msg()
+        tf_pre_approach.header.frame_id = 'base'
+        tf_pre_approach.child_frame_id = 'suction_approach'
+        
+        # Calculate pre-approach position (further back along Z-axis)
+        approach_offset = self.suction_approach_distance
+        euler_angles = R.from_quat(quat).as_euler('xyz')
+        
+        # Move back along the Z-axis of the target frame
+        z_direction = R.from_quat(quat).as_matrix()[:, 2]  # Z-axis direction
+        pre_approach_pos = pos_final - approach_offset * z_direction
+        
+        tf_pre_approach.transform.translation.x = pre_approach_pos[0]
+        tf_pre_approach.transform.translation.y = pre_approach_pos[1]
+        tf_pre_approach.transform.translation.z = pre_approach_pos[2]
+        tf_pre_approach.transform.rotation = base_pose.orientation
+        self.br.sendTransform(tf_pre_approach)
+        
+        self.get_logger().info(f"📍 吸盤路徑規劃:")
+        self.get_logger().info(f"  預接近位置: [{pre_approach_pos[0]:.3f}, {pre_approach_pos[1]:.3f}, {pre_approach_pos[2]:.3f}]")
+        self.get_logger().info(f"  最終吸取位置: [{pos_final[0]:.3f}, {pos_final[1]:.3f}, {pos_final[2]:.3f}]")
 
         response.success = True
         return response
