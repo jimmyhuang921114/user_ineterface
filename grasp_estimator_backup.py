@@ -102,43 +102,33 @@ class GraspEstimatorNode(Node):
         normal = np.array(plane_model[:3])
         normal /= np.linalg.norm(normal)
 
-        # IMPROVED: For top-down view, ensure normal points toward camera (negative Z direction)
-        camera_direction = np.array([0.0, 0.0, -1.0])  # Camera looks down negative Z
-        if np.dot(normal, camera_direction) < 0:
-            self.get_logger().info("法向量指向攝影機，方向正確")
-        else:
-            self.get_logger().warn("法向量遠離攝影機，自動反轉")
-            normal = -normal
-
         self.z_normal_list.append(normal)
         if len(self.z_normal_list) > 10:
             self.z_normal_list.pop(0)
 
-        if len(self.z_normal_list) < 5:  # Reduced from 10 for faster response
+        if len(self.z_normal_list) < 10:
             self.get_logger().info(f"目前收集 {len(self.z_normal_list)} 筆法向量，等待穩定...")
             return
 
         normal_avg = np.mean(self.z_normal_list, axis=0)
         normal_avg /= np.linalg.norm(normal_avg)
+        base_z = np.array([0.0, 0.0, -1.0])
 
-        # IMPROVED: Calculate angle relative to camera's Z-axis (top-down view)
-        angle_to_camera = np.arccos(np.clip(np.dot(normal_avg, camera_direction), -1, 1)) * 180.0 / np.pi
-        self.get_logger().info(f"[法向量角度] 相對於攝影機 Z 軸: {angle_to_camera:.2f}°")
+        if np.dot(normal_avg, base_z) < 0:
+            self.get_logger().warn("法向量方向相反，自動反轉")
+            normal_avg = -normal_avg
 
-        # IMPROVED: Warn if surface is not reasonably flat for top-down grasping
-        if angle_to_camera > 30.0:  # More than 30 degrees from horizontal
-            self.get_logger().warn(f"表面傾斜角度較大 ({angle_to_camera:.1f}°)，可能影響抓取精度")
+        angle_to_base = np.arccos(np.clip(np.dot(normal_avg, base_z), -1, 1)) * 180.0 / np.pi
+        self.get_logger().info(f"[法向量角度] mean: {angle_to_base:.2f}°")
 
-        if time.time() - self.last_sent_time < 1.0:  # Reduced timeout
-            self.get_logger().warn("已在處理或剛發送完成")
+        if time.time() - self.last_sent_time < 1.5:
+            self.get_logger().warn("Already sending or sent.")
             return
 
         self.last_sent_time = time.time()
 
-        # IMPROVED: Create more stable orientation for top-down grasping
+        # 使用 normal_avg 作為 z 軸
         z_axis = normal_avg
-        
-        # For top-down grasping, prefer X-axis alignment with camera frame
         x_temp = np.array([1.0, 0.0, 0.0])
         if np.abs(np.dot(z_axis, x_temp)) > 0.95:
             x_temp = np.array([0.0, 1.0, 0.0])
@@ -149,11 +139,9 @@ class GraspEstimatorNode(Node):
         y_axis /= np.linalg.norm(y_axis)
 
         rot_matrix = np.stack([x_axis, y_axis, z_axis], axis=1)
-        
-        # Ensure right-handed coordinate system
         if np.linalg.det(rot_matrix) < 0:
-            self.get_logger().warn("檢測到左手系統，自動調整")
-            y_axis = -y_axis
+            self.get_logger().warn("檢測到左手系統，自動反轉 z 軸")
+            z_axis = -z_axis
             rot_matrix = np.stack([x_axis, y_axis, z_axis], axis=1)
 
         quat = R.from_matrix(rot_matrix).as_quat()
@@ -163,11 +151,9 @@ class GraspEstimatorNode(Node):
         pose_msg.header.stamp = self.get_clock().now().to_msg()
         pose_msg.pose.position = Point(x=center[0], y=center[1], z=center[2])
         pose_msg.pose.orientation = Quaternion(x=quat[0], y=quat[1], z=quat[2], w=quat[3])
-        
-        self.get_logger().info(f"目標位置 (相機座標): x={center[0]:.4f}, y={center[1]:.4f}, z={center[2]:.4f}")
+        self.get_logger().info(f"Pose : {center[0], center[1], center[2]}")
         final_euler = R.from_matrix(rot_matrix).as_euler('xyz', degrees=True)
-        self.get_logger().info(f"目標姿態 (歐拉角): roll={final_euler[0]:.2f}°, pitch={final_euler[1]:.2f}°, yaw={final_euler[2]:.2f}°")
-        
+        self.get_logger().info(f"Euler : {final_euler}")
         self.pose_pub.publish(pose_msg)
 
         tf_msg = TransformStamped()
