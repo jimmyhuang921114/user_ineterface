@@ -25,7 +25,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取藥物 {medicine_name} 失敗: {e}")
+            print(f"錯誤: 獲取藥物 {medicine_name} 失敗: {e}")
             return {}
     
     def search_medicine_by_code(self, code: str) -> Dict:
@@ -35,7 +35,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 搜尋編號 {code} 失敗: {e}")
+            print(f"錯誤: 搜尋編號 {code} 失敗: {e}")
             return {}
     
     def get_integrated_medicine(self, medicine_name: str) -> Dict:
@@ -45,7 +45,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取整合藥物資訊失敗: {e}")
+            print(f"錯誤: 獲取整合藥物資訊失敗: {e}")
             return {}
     
     def get_all_medicines_detailed(self) -> Dict:
@@ -55,7 +55,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取所有詳細藥物失敗: {e}")
+            print(f"錯誤: 獲取所有詳細藥物失敗: {e}")
             return {}
     
     def search_medicines(self, query: str) -> Dict:
@@ -65,7 +65,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 搜尋藥物失敗: {e}")
+            print(f"錯誤: 搜尋藥物失敗: {e}")
             return {}
     
     # === 病人相關API ===
@@ -77,7 +77,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取病人列表失敗: {e}")
+            print(f"錯誤: 獲取病人列表失敗: {e}")
             return []
     
     def get_patient_by_id(self, patient_id: int) -> Dict:
@@ -87,7 +87,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取病人 {patient_id} 失敗: {e}")
+            print(f"錯誤: 獲取病人 {patient_id} 失敗: {e}")
             return {}
     
     def create_patient(self, patient_data: Dict) -> Dict:
@@ -97,7 +97,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 新增病人失敗: {e}")
+            print(f"錯誤: 新增病人失敗: {e}")
             return {}
     
     # === 病例記錄相關API ===
@@ -109,7 +109,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取病例記錄失敗: {e}")
+            print(f"錯誤: 獲取病例記錄失敗: {e}")
             return []
     
     def get_patient_records(self, patient_id: int) -> List[Dict]:
@@ -119,7 +119,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 獲取病人 {patient_id} 記錄失敗: {e}")
+            print(f"錯誤: 獲取病人 {patient_id} 記錄失敗: {e}")
             return []
     
     def create_record(self, record_data: Dict) -> Dict:
@@ -129,7 +129,7 @@ class HospitalSystemAPI:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"❌ 新增病例記錄失敗: {e}")
+            print(f"錯誤: 新增病例記錄失敗: {e}")
             return {}
     
     # === 導出功能 ===
@@ -144,11 +144,11 @@ class HospitalSystemAPI:
             if save_file:
                 with open(save_file, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
-                print(f"✅ 已保存到 {save_file}")
+                print(f"成功: 已保存到 {save_file}")
             
             return data
         except requests.exceptions.RequestException as e:
-            print(f"❌ 導出整合藥物資訊失敗: {e}")
+            print(f"錯誤: 導出整合藥物資訊失敗: {e}")
             return {}
     
     def export_patients(self, save_file: str = None) -> Dict:
@@ -161,11 +161,11 @@ class HospitalSystemAPI:
             if save_file:
                 with open(save_file, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
-                print(f"✅ 已保存到 {save_file}")
+                print(f"成功: 已保存到 {save_file}")
             
             return data
         except requests.exceptions.RequestException as e:
-            print(f"❌ 導出病人資料失敗: {e}")
+            print(f"錯誤: 導出病人資料失敗: {e}")
             return {}
     
     def export_records(self, save_file: str = None) -> Dict:
@@ -178,18 +178,18 @@ class HospitalSystemAPI:
             if save_file:
                 with open(save_file, 'w', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=2)
-                print(f"✅ 已保存到 {save_file}")
+                print(f"成功: 已保存到 {save_file}")
             
             return data
         except requests.exceptions.RequestException as e:
-            print(f"❌ 導出病例記錄失敗: {e}")
+            print(f"錯誤: 導出病例記錄失敗: {e}")
             return {}
 
 # === 使用範例 ===
 
 def example_medicine_operations():
     """藥物操作範例"""
-    print("🔬 藥物操作範例")
+    print("藥物操作範例")
     print("=" * 40)
     
     api = HospitalSystemAPI()
@@ -218,7 +218,7 @@ def example_medicine_operations():
         if integrated.get('basic_info'):
             print(f"   庫存數量: {integrated['basic_info']['amount']}")
         if integrated.get('detailed_info'):
-            print(f"   有詳細資訊: ✅")
+            print(f"   有詳細資訊: 是")
     
     # 4. 搜尋藥物
     print("\n4. 搜尋包含'心律'的藥物:")
@@ -228,7 +228,7 @@ def example_medicine_operations():
 
 def example_patient_operations():
     """病人操作範例"""
-    print("\n👥 病人操作範例")
+    print("\n病人操作範例")
     print("=" * 40)
     
     api = HospitalSystemAPI()
@@ -253,7 +253,7 @@ def example_patient_operations():
     
     created_patient = api.create_patient(new_patient)
     if created_patient:
-        print(f"   ✅ 成功新增病人 ID: {created_patient['id']}")
+        print(f"   成功: 成功新增病人 ID: {created_patient['id']}")
         
         # 3. 為新病人新增病例記錄
         print("\n3. 為新病人新增病例記錄:")
@@ -268,11 +268,11 @@ def example_patient_operations():
         
         created_record = api.create_record(new_record)
         if created_record:
-            print(f"   ✅ 成功新增病例記錄 ID: {created_record['id']}")
+            print(f"   成功: 成功新增病例記錄 ID: {created_record['id']}")
 
 def example_records_operations():
     """病例記錄操作範例"""
-    print("\n📋 病例記錄操作範例")
+    print("\n病例記錄操作範例")
     print("=" * 40)
     
     api = HospitalSystemAPI()
@@ -295,7 +295,7 @@ def example_records_operations():
 
 def example_export_operations():
     """導出操作範例"""
-    print("\n📦 導出操作範例")
+    print("\n導出操作範例")
     print("=" * 40)
     
     api = HospitalSystemAPI()
@@ -317,7 +317,7 @@ def example_export_operations():
 
 def practical_example():
     """實際應用範例：查詢病人及其用藥資訊"""
-    print("\n🎯 實際應用範例：查詢病人及其用藥資訊")
+    print("\n實際應用範例：查詢病人及其用藥資訊")
     print("=" * 50)
     
     api = HospitalSystemAPI()
@@ -326,7 +326,7 @@ def practical_example():
     patients = api.get_all_patients()
     
     for patient in patients:
-        print(f"\n👤 病人: {patient['name']} (ID: {patient['id']})")
+        print(f"\n病人: {patient['name']} (ID: {patient['id']})")
         print(f"   年齡: {patient['age']}, 性別: {patient['gender']}")
         print(f"   過敏史: {patient.get('allergies', '無')}")
         
@@ -334,7 +334,7 @@ def practical_example():
         records = api.get_patient_records(patient['id'])
         
         for record in records:
-            print(f"\n   📋 病例記錄 (ID: {record['id']}):")
+            print(f"\n   病例記錄 (ID: {record['id']}):")
             print(f"      就診日期: {record['visit_date']}")
             print(f"      診斷: {record['diagnosis']}")
             print(f"      處方藥物: {', '.join(record['prescribed_medicines'])}")
@@ -346,7 +346,7 @@ def practical_example():
                 medicine_detail = api.get_medicine_by_name(clean_name)
                 
                 if medicine_detail:
-                    print(f"\n      💊 {clean_name} 詳細資訊:")
+                    print(f"\n      藥物 {clean_name} 詳細資訊:")
                     basic_info = medicine_detail.get('基本資訊', {})
                     print(f"         廠商: {basic_info.get('廠商', '未知')}")
                     print(f"         劑量: {basic_info.get('劑量', '未知')}")
@@ -359,7 +359,7 @@ def practical_example():
                         print(f"         位置: {stock['position']}")
 
 if __name__ == "__main__":
-    print("🏥 醫院系統API調用範例")
+    print("醫院系統API調用範例")
     print("=" * 50)
     
     try:
@@ -370,12 +370,12 @@ if __name__ == "__main__":
         example_export_operations()
         practical_example()
         
-        print("\n🎉 所有範例執行完成！")
-        print("\n📝 生成的文件:")
+        print("\n所有範例執行完成！")
+        print("\n生成的文件:")
         print("   - exported_medicines.json")
         print("   - exported_patients.json") 
         print("   - exported_records.json")
         
     except Exception as e:
-        print(f"❌ 執行過程中發生錯誤: {e}")
-        print("💡 請確保伺服器正在運行: python3 enhanced_server.py")
+        print(f"錯誤: 執行過程中發生錯誤: {e}")
+        print("提示: 請確保伺服器正在運行: python3 enhanced_server.py")

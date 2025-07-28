@@ -58,7 +58,7 @@ def export_data(data_type="complete"):
 
 # === 使用範例 ===
 if __name__ == "__main__":
-    print("🏥 醫院系統API - 快速使用範例")
+    print("醫院系統API - 快速使用範例")
     print("=" * 40)
     
     # 1. 查詢心律錠資訊
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             json.dump(medicines_data, f, ensure_ascii=False, indent=2)
         print("   已保存到 my_medicines.json")
     
-    print("\n✅ 範例執行完成！")
+    print("\n範例執行完成！")
 
 # === 常用功能函數 ===
 def quick_medicine_lookup(name_or_code):

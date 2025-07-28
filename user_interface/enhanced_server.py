@@ -97,8 +97,8 @@ next_record_id = 1
 @app.get("/")
 async def root():
     return {
-        "message": "🏥 醫院藥物管理系統 - 增強版",
-        "status": "✅ 運行中",
+        "message": "醫院藥物管理系統 - 增強版",
+        "status": "運行中",
         "version": "2.0.0",
         "statistics": {
             "medicines": len(medicines_db),
@@ -119,7 +119,7 @@ async def root():
 async def test_api():
     return {
         "status": "success",
-        "message": "✅ API連接正常",
+        "message": "API連接正常",
         "time": datetime.now().isoformat(),
         "system_stats": {
             "medicines": len(medicines_db),
@@ -686,31 +686,31 @@ def init_test_data():
     next_record_id = 2
 
 if __name__ == "__main__":
-    print("🏥 醫院藥物管理系統 - 增強版")
+    print("醫院藥物管理系統 - 增強版")
     print("=" * 70)
-    print("🚀 正在啟動伺服器...")
-    print("🆕 新功能: 病人管理 + 詳細藥物資訊 + 病例記錄")
-    print("🌐 伺服器地址: http://localhost:8000")
-    print("📱 API文檔: http://localhost:8000/docs")
-    print("💊 藥物管理: http://localhost:8000/Medicine.html")
-    print("👥 病人管理: http://localhost:8000/Patients.html")
-    print("📋 病例記錄: http://localhost:8000/Records.html")
-    print("🧪 API測試: http://localhost:8000/api/test")
-    print("📦 完整導出: http://localhost:8000/api/export/complete")
+    print("正在啟動伺服器...")
+    print("新功能: 病人管理 + 詳細藥物資訊 + 病例記錄")
+    print("伺服器地址: http://localhost:8000")
+    print("API文檔: http://localhost:8000/docs")
+    print("藥物管理: http://localhost:8000/Medicine.html")
+    print("病人管理: http://localhost:8000/Patients.html")
+    print("病例記錄: http://localhost:8000/Records.html")
+    print("API測試: http://localhost:8000/api/test")
+    print("完整導出: http://localhost:8000/api/export/complete")
     print("=" * 70)
     
     # 初始化測試資料
     init_test_data()
-    print(f"✅ 已載入測試資料:")
-    print(f"   💊 基本藥物: {len(medicines_db)} 個")
-    print(f"   🔬 詳細藥物: {len(detailed_medicines_db)} 個")
-    print(f"   👥 病人: {len(patients_db)} 個")
-    print(f"   📋 病例: {len(patient_records_db)} 個")
+    print(f"已載入測試資料:")
+    print(f"   基本藥物: {len(medicines_db)} 個")
+    print(f"   詳細藥物: {len(detailed_medicines_db)} 個")
+    print(f"   病人: {len(patients_db)} 個")
+    print(f"   病例: {len(patient_records_db)} 個")
     
     try:
         uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
     except KeyboardInterrupt:
-        print("\n👋 伺服器已停止")
+        print("\n伺服器已停止")
     except Exception as e:
-        print(f"❌ 伺服器啟動失敗: {e}")
+        print(f"錯誤: 伺服器啟動失敗: {e}")
         exit(1)
