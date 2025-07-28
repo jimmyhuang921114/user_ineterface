@@ -155,19 +155,19 @@ class GraspEstimatorNode(Node):
         self.get_logger().info(f"  與相機Z軸點積: {dot_with_camera:.3f}")
         self.get_logger().info(f"  角度 (與水平面夾角): {angle_to_camera:.2f}°")
 
-        # IMPROVED: 判斷表面類型並決定是否適合俯視抓取
+        # IMPROVED: 判斷表面類型並選擇適合的抓取策略
         if angle_to_camera < 30.0:  # 接近水平
-            self.get_logger().info(f"✓ 檢測到水平表面 (傾斜 {angle_to_camera:.1f}°)，適合俯視抓取")
+            self.get_logger().info(f"✓ 檢測到水平表面 (傾斜 {angle_to_camera:.1f}°)，使用俯視抓取")
             surface_type = "horizontal"
+            grasp_strategy = "top_down"
         elif angle_to_camera > 60.0:  # 接近垂直
-            self.get_logger().warn(f"❌ 檢測到垂直表面/側面 (角度 {angle_to_camera:.1f}°)")
-            self.get_logger().warn(f"   這是物體側面，不適合俯視抓取，跳過處理")
+            self.get_logger().info(f"✓ 檢測到垂直表面/側面 (角度 {angle_to_camera:.1f}°)，使用側面抓取")
             surface_type = "vertical"
-            return  # 直接返回，不處理側面
+            grasp_strategy = "side_grasp"
         else:  # 中等傾斜
-            self.get_logger().warn(f"⚠️ 檢測到傾斜表面 (角度 {angle_to_camera:.1f}°)")
-            self.get_logger().warn(f"   表面傾斜度較大，抓取精度可能受影響")
+            self.get_logger().info(f"✓ 檢測到傾斜表面 (角度 {angle_to_camera:.1f}°)，使用傾斜抓取")
             surface_type = "inclined"
+            grasp_strategy = "angled_grasp"
 
         if time.time() - self.last_sent_time < 1.0:  # Reduced timeout
             self.get_logger().warn("已在處理或剛發送完成")
@@ -175,13 +175,35 @@ class GraspEstimatorNode(Node):
 
         self.last_sent_time = time.time()
 
-        # IMPROVED: Create more stable orientation for top-down grasping
-        z_axis = normal_avg
+        # IMPROVED: 根據抓取策略生成適合的姿態
+        if grasp_strategy == "top_down":
+            # 俯視抓取：z軸沿法向量方向
+            z_axis = normal_avg
+            self.get_logger().info("🔧 生成俯視抓取姿態")
+            
+        elif grasp_strategy == "side_grasp":
+            # 側面抓取：調整夾爪方向以適應側面抓取
+            # z軸應該垂直於側面，指向抓取方向
+            z_axis = normal_avg
+            self.get_logger().info("🔧 生成側面抓取姿態")
+            
+        else:  # angled_grasp
+            # 傾斜抓取：保持法向量方向但可能需要調整
+            z_axis = normal_avg
+            self.get_logger().info("🔧 生成傾斜抓取姿態")
         
-        # For top-down grasping, prefer X-axis alignment with camera frame
-        x_temp = np.array([1.0, 0.0, 0.0])
-        if np.abs(np.dot(z_axis, x_temp)) > 0.95:
-            x_temp = np.array([0.0, 1.0, 0.0])
+        # 生成對應的坐標軸
+        # 根據抓取策略選擇合適的參考軸
+        if grasp_strategy == "side_grasp":
+            # 側面抓取時，優先選擇水平方向作為參考
+            x_temp = np.array([1.0, 0.0, 0.0])  # 水平方向
+            if np.abs(np.dot(z_axis, x_temp)) > 0.95:
+                x_temp = np.array([0.0, 1.0, 0.0])
+        else:
+            # 俯視和傾斜抓取時的標準處理
+            x_temp = np.array([1.0, 0.0, 0.0])
+            if np.abs(np.dot(z_axis, x_temp)) > 0.95:
+                x_temp = np.array([0.0, 1.0, 0.0])
 
         x_axis = np.cross(x_temp, z_axis)
         x_axis /= np.linalg.norm(x_axis)
@@ -195,6 +217,11 @@ class GraspEstimatorNode(Node):
             self.get_logger().warn("檢測到左手系統，自動調整")
             y_axis = -y_axis
             rot_matrix = np.stack([x_axis, y_axis, z_axis], axis=1)
+            
+        self.get_logger().info(f"📐 最終抓取軸向:")
+        self.get_logger().info(f"  X軸: [{x_axis[0]:.3f}, {x_axis[1]:.3f}, {x_axis[2]:.3f}]")
+        self.get_logger().info(f"  Y軸: [{y_axis[0]:.3f}, {y_axis[1]:.3f}, {y_axis[2]:.3f}]")
+        self.get_logger().info(f"  Z軸: [{z_axis[0]:.3f}, {z_axis[1]:.3f}, {z_axis[2]:.3f}]")
 
         quat = R.from_matrix(rot_matrix).as_quat()
 
@@ -204,15 +231,25 @@ class GraspEstimatorNode(Node):
         pose_msg.pose.position = Point(x=center[0], y=center[1], z=center[2])
         pose_msg.pose.orientation = Quaternion(x=quat[0], y=quat[1], z=quat[2], w=quat[3])
         
-        self.get_logger().info(f"目標位置 (相機座標): x={center[0]:.4f}, y={center[1]:.4f}, z={center[2]:.4f}")
+        self.get_logger().info(f"🎯 抓取目標資訊:")
+        self.get_logger().info(f"  策略: {grasp_strategy} ({surface_type})")
+        self.get_logger().info(f"  位置 (相機座標): x={center[0]:.4f}, y={center[1]:.4f}, z={center[2]:.4f}")
         final_euler = R.from_matrix(rot_matrix).as_euler('xyz', degrees=True)
-        self.get_logger().info(f"目標姿態 (歐拉角): roll={final_euler[0]:.2f}°, pitch={final_euler[1]:.2f}°, yaw={final_euler[2]:.2f}°")
+        self.get_logger().info(f"  姿態 (歐拉角): roll={final_euler[0]:.2f}°, pitch={final_euler[1]:.2f}°, yaw={final_euler[2]:.2f}°")
+        
+        # 根據策略給出提示
+        if grasp_strategy == "top_down":
+            self.get_logger().info("💡 建議: 夾爪垂直向下接近")
+        elif grasp_strategy == "side_grasp":
+            self.get_logger().info("💡 建議: 夾爪水平方向接近側面")
+        else:
+            self.get_logger().info("💡 建議: 夾爪按傾斜角度接近")
         
         self.pose_pub.publish(pose_msg)
 
         tf_msg = TransformStamped()
         tf_msg.header = pose_msg.header
-        tf_msg.child_frame_id = 'grasp_pose'
+        tf_msg.child_frame_id = f'grasp_pose_{grasp_strategy}'
         tf_msg.transform.translation = Vector3(x=center[0], y=center[1], z=center[2])
         tf_msg.transform.rotation = pose_msg.pose.orientation
         self.br.sendTransform(tf_msg)
