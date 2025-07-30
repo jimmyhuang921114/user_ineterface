@@ -29,15 +29,15 @@
         <!-- 統計卡片 -->
         <div class="card fade-in">
             <div style="padding: 20px;">
-                <h3>📊 庫存統計</h3>
+                <h3>📊 藥物統計</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
                     <div style="padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #3498db;" id="totalMedicines">0</div>
-                        <div style="color: #7f8c8d;">基本藥物</div>
+                        <div style="color: #7f8c8d;">藥物種類</div>
                     </div>
                     <div style="padding: 15px; background: rgba(39, 174, 96, 0.1); border-radius: 8px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #27ae60;" id="detailedMedicines">0</div>
-                        <div style="color: #7f8c8d;">詳細資訊</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #27ae60;" id="completeMedicines">0</div>
+                        <div style="color: #7f8c8d;">完整資料</div>
                     </div>
                     <div style="padding: 15px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #f39c12;" id="lowStock">0</div>
@@ -194,11 +194,17 @@
         function updateStatistics() {
             const totalBasic = basicMedicinesData.length;
             const totalDetailed = Object.keys(detailedMedicinesData).length;
+            
+            // 計算有完整資料的藥物（既有基本資料又有詳細資料）
+            const completeMedicines = basicMedicinesData.filter(med => 
+                detailedMedicinesData.hasOwnProperty(med.name)
+            ).length;
+            
             const lowStock = basicMedicinesData.filter(med => med.amount < 20).length;
             const totalStock = basicMedicinesData.reduce((sum, med) => sum + med.amount, 0);
 
             document.getElementById('totalMedicines').textContent = totalBasic;
-            document.getElementById('detailedMedicines').textContent = totalDetailed;
+            document.getElementById('completeMedicines').textContent = completeMedicines;
             document.getElementById('lowStock').textContent = lowStock;
             document.getElementById('totalStock').textContent = totalStock;
         }

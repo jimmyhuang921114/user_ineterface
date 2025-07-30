@@ -65,12 +65,7 @@
                             <option value="cancelled">已取消</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin: 0;">
-                        <label for="doctorFilter">👨‍⚕️ 醫師篩選</label>
-                        <select id="doctorFilter" onchange="filterPrescriptions()" style="width: 150px;">
-                            <option value="">所有醫師</option>
-                        </select>
-                    </div>
+
                     <button class="btn btn-info" onclick="loadPrescriptions()">🔄 重新載入</button>
                     <button class="btn btn-success" onclick="exportPrescriptions()">📊 匯出資料</button>
                 </div>
@@ -144,7 +139,6 @@
                     allPrescriptions = await response.json();
                     filteredPrescriptions = [...allPrescriptions];
                     updateStatistics();
-                    updateDoctorFilter();
                     renderPrescriptions();
                     console.log(`✅ 載入了 ${allPrescriptions.length} 個處方`);
                 } else {
@@ -169,31 +163,13 @@
             document.getElementById('completedCount').textContent = completed;
         }
 
-        // 更新醫師篩選選項
-        function updateDoctorFilter() {
-            const doctors = [...new Set(allPrescriptions.map(p => p.doctor_name))];
-            const select = document.getElementById('doctorFilter');
-            
-            // 清空現有選項（保留"所有醫師"）
-            select.innerHTML = '<option value="">所有醫師</option>';
-            
-            doctors.forEach(doctor => {
-                const option = document.createElement('option');
-                option.value = doctor;
-                option.textContent = doctor;
-                select.appendChild(option);
-            });
-        }
-
         // 篩選處方
         function filterPrescriptions() {
             const statusFilter = document.getElementById('statusFilter').value;
-            const doctorFilter = document.getElementById('doctorFilter').value;
 
             filteredPrescriptions = allPrescriptions.filter(prescription => {
                 const statusMatch = !statusFilter || prescription.status === statusFilter;
-                const doctorMatch = !doctorFilter || prescription.doctor_name === doctorFilter;
-                return statusMatch && doctorMatch;
+                return statusMatch;
             });
 
             renderPrescriptions();
