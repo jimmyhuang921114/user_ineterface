@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <title>藥物庫存管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.js"></script>
+    <link rel="stylesheet" href="/css/medicine.css" />
+</head>
+<body>
+    <div class="sidebar">
+        <h2>系統選單</h2>
+        <button onclick="location.href='/doctor.html'">開立處方籤</button>
+        <button onclick="location.href='/Prescription.html'">病患處方籤</button>
+        <button onclick="location.href='/Medicine.html'">藥物庫存</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>藥物庫存管理</h1>
+        </div>
+
+        <!-- 基本藥物庫存表格 -->
+        <div class="section">
+            <h2>基本庫存管理</h2>
+            <div class="table-container">
+                <div id="medicineTable"></div>
+            </div>
+        </div>
+
+        <!-- 詳細藥物資訊輸入區塊 -->
+        <div class="section">
+            <h2>詳細藥物資訊管理</h2>
+            <div class="detailed-medicine-container">
+                <!-- 藥物選擇 -->
+                <div class="medicine-selector">
+                    <label for="medicineSelect">選擇藥物：</label>
+                    <select id="medicineSelect">
+                        <option value="">-- 選擇藥物 --</option>
+                    </select>
+                    <button id="loadDetailedInfo" class="btn-primary">載入詳細資訊</button>
+                    <button id="clearForm" class="btn-secondary">清空表單</button>
+                </div>
+
+                <!-- 詳細資訊表單 -->
+                <div class="detailed-form">
+                    <div class="form-grid">
+                        <!-- 基本資訊 -->
+                        <div class="form-section">
+                            <h3>基本資訊</h3>
+                            <div class="form-group">
+                                <label for="medicineName">藥物名稱：</label>
+                                <input type="text" id="medicineName" placeholder="例：精神好製藥 (Antipsychotics)">
+                            </div>
+                            <div class="form-group">
+                                <label for="dosage">劑量：</label>
+                                <input type="text" id="dosage" placeholder="例：5 毫克">
+                            </div>
+                            <div class="form-group">
+                                <label for="manufacturer">廠商：</label>
+                                <input type="text" id="manufacturer" placeholder="例：某某製藥公司">
+                            </div>
+                            <div class="form-group">
+                                <label for="usageMethod">服用方式：</label>
+                                <input type="text" id="usageMethod" placeholder="例：口服 (Oral use)">
+                            </div>
+                            <div class="form-group">
+                                <label for="unitDose">單位劑量：</label>
+                                <input type="text" id="unitDose" placeholder="例：1 special pill">
+                            </div>
+                        </div>
+
+                        <!-- 外觀 -->
+                        <div class="form-section">
+                            <h3>外觀</h3>
+                            <div class="form-group">
+                                <label for="color">顏色：</label>
+                                <input type="text" id="color" placeholder="例：紅色條紋 白色外觀">
+                            </div>
+                            <div class="form-group">
+                                <label for="shape">形狀：</label>
+                                <input type="text" id="shape" placeholder="例：圓扁形">
+                            </div>
+                        </div>
+
+                        <!-- 其他資訊 -->
+                        <div class="form-section">
+                            <h3>其他資訊</h3>
+                            <div class="form-group">
+                                <label for="expiryDate">有效日期：</label>
+                                <input type="date" id="expiryDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="barcode">條碼：</label>
+                                <input type="text" id="barcode" placeholder="條碼編號或備註">
+                            </div>
+                            <div class="form-group">
+                                <label for="companyFullName">公司全名：</label>
+                                <input type="text" id="companyFullName" placeholder="完整公司名稱">
+                            </div>
+                            <div class="form-group">
+                                <label for="drugFullName">藥物全名：</label>
+                                <input type="text" id="drugFullName" placeholder="藥物的完整化學名稱">
+                            </div>
+                        </div>
+
+                        <!-- 包裝編號 -->
+                        <div class="form-section">
+                            <h3>包裝編號</h3>
+                            <div class="form-group">
+                                <label for="code1">編號1：</label>
+                                <input type="text" id="code1" placeholder="主要包裝編號">
+                            </div>
+                            <div class="form-group">
+                                <label for="code2">編號2：</label>
+                                <input type="text" id="code2" placeholder="次要包裝編號">
+                            </div>
+                            <div class="form-group">
+                                <label for="code3">編號3：</label>
+                                <input type="text" id="code3" placeholder="額外包裝編號">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 大文字區域 -->
+                    <div class="text-areas">
+                        <div class="form-group">
+                            <label for="indications">適應症：</label>
+                            <textarea id="indications" rows="3" placeholder="請描述此藥物的適應症..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="sideEffects">可能副作用：</label>
+                            <textarea id="sideEffects" rows="3" placeholder="請列出可能的副作用..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="usage">使用說明：</label>
+                            <textarea id="usage" rows="2" placeholder="用法用量說明..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="precautions">注意事項：</label>
+                            <textarea id="precautions" rows="3" placeholder="使用注意事項..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="pregnancyClass">懷孕分級：</label>
+                            <input type="text" id="pregnancyClass" placeholder="例：C級">
+                        </div>
+                        <div class="form-group">
+                            <label for="storageConditions">儲存條件：</label>
+                            <textarea id="storageConditions" rows="2" placeholder="儲存條件說明..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 操作按鈕 -->
+                    <div class="form-actions">
+                        <button id="saveDetailedInfo" class="btn-primary">保存詳細資訊</button>
+                        <button id="updateDetailedInfo" class="btn-success" style="display: none;">更新詳細資訊</button>
+                        <button id="viewDetailedJSON" class="btn-info">查看JSON格式</button>
+                        <button id="exportDetailedJSON" class="btn-secondary">匯出JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 詳細資訊顯示區域 -->
+        <div class="section">
+            <h2>藥物詳細資訊查看</h2>
+            <div class="info-display-container">
+                <div class="search-controls">
+                    <input type="text" id="searchMedicineInput" placeholder="輸入藥物名稱搜尋...">
+                    <button id="searchDetailedBtn" class="btn-primary">搜尋詳細資訊</button>
+                    <button id="searchByCodeBtn" class="btn-info">按編號搜尋</button>
+                </div>
+                <div id="medicineInfoDisplay" class="info-display">
+                    <p class="placeholder-text">請搜尋藥物以顯示詳細資訊</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON 預覽模態框 -->
+        <div id="jsonModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>JSON 預覽</h3>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <pre id="jsonPreview"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button id="copyJSON" class="btn-info">複製JSON</button>
+                    <button id="downloadJSON" class="btn-primary">下載JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/medicine.js"></script>
+</body>
+</html> 
