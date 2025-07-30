@@ -1,1 +1,695 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="google" content="notranslate" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Doctor's Page</title> <!-- Handsontable --> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.css" /> <script src="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.js"></script> <!-- Unified CSS --> <link rel="stylesheet" href="../css/doctor_style.css" /> </head> <body> <div class="sidebar"> <h2>系統選單</h2> <button onclick="location.href='doctor.html'">開立處方籤</button> <button onclick="location.href='Prescription.html'">病患處方籤</button> <button onclick="location.href='Medicine.html'">藥物庫存</button> </div> <div class="main-content"> <div class="header"> <h1>開立處方</h1> </div> <div class="table-container"> <form id="prescriptionForm"> <label for="PatientName">病患姓名</label><br /> <input type="text" id="PatientName" name="patientName" required /><br /><br /> <label for="id_number">身分證字號</label><br /> <input type="text" id="id_number" name="id_number" required /><br /><br /> <label>性別</label><br /> <input type="radio" id="Male" name="sex" value="Male" required /> <label for="Male">男性</label><br /> <input type="radio" id="Female" name="sex" value="Female" /> <label for="Female">女性</label><br /><br /> <label>處方藥物清單：</label> <div id="excelTable" class="hot-container"></div><br /> <button type="submit">送出處方</button> </form> </div> </div> <script src="../js/doctor.js"></script> </body> </html> 
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醫生工作台 - 藥物管理</title>
+    
+    <!-- Handsontable -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.js"></script>
+    
+    <!-- 樣式 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            line-height: 1.6;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            z-index: 1000;
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+        
+        .tab-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-button:hover {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hot-container {
+            margin: 20px 0;
+            min-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>醫生工作台</h2>
+        <button onclick="location.href='doctor.html'">藥物管理</button>
+        <button onclick="location.href='Prescription.html'">處方管理</button>
+        <button onclick="location.href='Medicine.html'">庫存查看</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>醫生工作台 - 藥物資訊管理</h1>
+            <p>在此頁面可以填寫藥物基本資訊和詳細資訊，資料將直接儲存到Medicine系統中</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('basic')">基本藥物資訊</button>
+                <button class="tab-button" onclick="switchTab('detailed')">詳細藥物資訊</button>
+                <button class="tab-button" onclick="switchTab('prescription')">開立處方</button>
+            </div>
+
+            <!-- 基本藥物資訊標籤 -->
+            <div id="basic" class="tab-content active">
+                <div class="form-section">
+                    <h3>新增基本藥物資訊</h3>
+                    <form id="basicMedicineForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="basicMedicineName">藥物名稱 *</label>
+                                <input type="text" id="basicMedicineName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="basicAmount">庫存數量 *</label>
+                                <input type="number" id="basicAmount" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="basicUsageDays">使用天數 *</label>
+                                <input type="number" id="basicUsageDays" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="basicPosition">存放位置 *</label>
+                                <input type="text" id="basicPosition" placeholder="例：A1-01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">儲存基本資訊</button>
+                        <button type="button" class="btn btn-warning" onclick="clearBasicForm()">清空表單</button>
+                    </form>
+                </div>
+                
+                <div id="basicMessage" class="message"></div>
+            </div>
+
+            <!-- 詳細藥物資訊標籤 -->
+            <div id="detailed" class="tab-content">
+                <div class="form-section">
+                    <h3>新增詳細藥物資訊</h3>
+                    <form id="detailedMedicineForm">
+                        <!-- 選擇藥物 -->
+                        <div class="form-group">
+                            <label for="detailedMedicineName">選擇藥物 *</label>
+                            <select id="detailedMedicineName" required>
+                                <option value="">-- 請選擇藥物 --</option>
+                            </select>
+                            <button type="button" class="btn btn-warning" onclick="loadMedicineOptions()">重新載入藥物列表</button>
+                        </div>
+
+                        <!-- 基本資訊 -->
+                        <div class="form-section">
+                            <h4>基本資訊</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="detailedFullName">完整名稱</label>
+                                    <input type="text" id="detailedFullName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedManufacturer">廠商</label>
+                                    <input type="text" id="detailedManufacturer">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedDosage">劑量</label>
+                                    <input type="text" id="detailedDosage" placeholder="例：10毫克">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedUsageMethod">服用方式</label>
+                                    <input type="text" id="detailedUsageMethod" placeholder="例：口服">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 外觀 -->
+                        <div class="form-section">
+                            <h4>外觀</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="detailedColor">顏色</label>
+                                    <input type="text" id="detailedColor" placeholder="例：白色">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedShape">形狀</label>
+                                    <input type="text" id="detailedShape" placeholder="例：圓形">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 包裝編號 -->
+                        <div class="form-section">
+                            <h4>包裝編號</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="detailedCode1">編號1</label>
+                                    <input type="text" id="detailedCode1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedCode2">編號2</label>
+                                    <input type="text" id="detailedCode2">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedCode3">編號3</label>
+                                    <input type="text" id="detailedCode3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 其他資訊 -->
+                        <div class="form-section">
+                            <h4>其他資訊</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="detailedCompany">公司全名</label>
+                                    <input type="text" id="detailedCompany">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedFullDrugName">藥物全名</label>
+                                    <input type="text" id="detailedFullDrugName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="detailedExpiryDate">有效日期</label>
+                                    <input type="date" id="detailedExpiryDate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 詳細描述 -->
+                        <div class="form-section">
+                            <h4>詳細描述</h4>
+                            <div class="form-group">
+                                <label for="detailedIndications">適應症</label>
+                                <textarea id="detailedIndications" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="detailedSideEffects">可能的副作用</label>
+                                <textarea id="detailedSideEffects" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="detailedUsageInstructions">使用說明</label>
+                                <textarea id="detailedUsageInstructions" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="detailedPrecautions">注意事項</label>
+                                <textarea id="detailedPrecautions" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="detailedPregnancyCategory">懷孕分級</label>
+                                <input type="text" id="detailedPregnancyCategory" placeholder="例：C級">
+                            </div>
+                            <div class="form-group">
+                                <label for="detailedStorageConditions">儲存條件</label>
+                                <textarea id="detailedStorageConditions" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">儲存詳細資訊</button>
+                        <button type="button" class="btn btn-warning" onclick="clearDetailedForm()">清空表單</button>
+                    </form>
+                </div>
+                
+                <div id="detailedMessage" class="message"></div>
+            </div>
+
+            <!-- 開立處方標籤 -->
+            <div id="prescription" class="tab-content">
+                <div class="form-section">
+                    <h3>開立處方</h3>
+                    <form id="prescriptionForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="patientName">病患姓名 *</label>
+                                <input type="text" id="patientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="idNumber">身分證字號</label>
+                                <input type="text" id="idNumber">
+                            </div>
+                            <div class="form-group">
+                                <label for="doctorName">醫生姓名 *</label>
+                                <input type="text" id="doctorName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="diagnosis">診斷</label>
+                                <textarea id="diagnosis" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <h4>處方藥物清單</h4>
+                        <div id="prescriptionTable" class="hot-container"></div>
+                        
+                        <button type="submit" class="btn btn-success">送出處方</button>
+                        <button type="button" class="btn btn-warning" onclick="clearPrescriptionForm()">清空表單</button>
+                    </form>
+                </div>
+                
+                <div id="prescriptionMessage" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API基礎URL
+        const API_BASE = 'http://localhost:8000';
+        
+        // 全域變數
+        let prescriptionHot = null;
+
+        // 標籤切換功能
+        function switchTab(tabName) {
+            // 隱藏所有標籤內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有按鈕的active狀態
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 顯示選中的標籤
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // 如果切換到處方標籤，初始化表格
+            if (tabName === 'prescription') {
+                initPrescriptionTable();
+            }
+        }
+
+        // 顯示訊息
+        function showMessage(elementId, message, type = 'success') {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // 基本藥物表單處理
+        document.getElementById('basicMedicineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('basicMedicineName').value,
+                amount: parseInt(document.getElementById('basicAmount').value),
+                usage_days: parseInt(document.getElementById('basicUsageDays').value),
+                position: document.getElementById('basicPosition').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/medicine/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage('basicMessage', `基本藥物資訊已成功儲存！ID: ${result.id}`, 'success');
+                    clearBasicForm();
+                    loadMedicineOptions(); // 重新載入詳細資訊的選項
+                } else {
+                    const error = await response.json();
+                    showMessage('basicMessage', `儲存失敗: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showMessage('basicMessage', `連接錯誤: ${error.message}`, 'error');
+            }
+        });
+
+        // 詳細藥物表單處理
+        document.getElementById('detailedMedicineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const medicineName = document.getElementById('detailedMedicineName').value;
+            if (!medicineName) {
+                showMessage('detailedMessage', '請先選擇藥物', 'error');
+                return;
+            }
+
+            const medicineData = {
+                基本資訊: {
+                    名稱: document.getElementById('detailedFullName').value || medicineName,
+                    廠商: document.getElementById('detailedManufacturer').value,
+                    劑量: document.getElementById('detailedDosage').value,
+                    服用方式: document.getElementById('detailedUsageMethod').value
+                },
+                外觀: {
+                    顏色: document.getElementById('detailedColor').value,
+                    形狀: document.getElementById('detailedShape').value
+                },
+                包裝編號: {
+                    編號1: document.getElementById('detailedCode1').value,
+                    編號2: document.getElementById('detailedCode2').value,
+                    編號3: document.getElementById('detailedCode3').value
+                },
+                其他資訊: {
+                    公司全名: document.getElementById('detailedCompany').value,
+                    藥物全名: document.getElementById('detailedFullDrugName').value,
+                    有效日期: document.getElementById('detailedExpiryDate').value
+                },
+                適應症: document.getElementById('detailedIndications').value,
+                可能的副作用: document.getElementById('detailedSideEffects').value,
+                使用說明: document.getElementById('detailedUsageInstructions').value,
+                注意事項: document.getElementById('detailedPrecautions').value,
+                懷孕分級: document.getElementById('detailedPregnancyCategory').value,
+                儲存條件: document.getElementById('detailedStorageConditions').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/medicine/detailed/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        medicine_name: medicineName,
+                        medicine_data: medicineData
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage('detailedMessage', `詳細藥物資訊已成功儲存！`, 'success');
+                    clearDetailedForm();
+                } else {
+                    const error = await response.json();
+                    showMessage('detailedMessage', `儲存失敗: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showMessage('detailedMessage', `連接錯誤: ${error.message}`, 'error');
+            }
+        });
+
+        // 處方表單處理
+        document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const medicines = prescriptionHot.getData().filter(row => 
+                row[0] && row[1] && row[2] && row[3] // 確保有藥物名稱、劑量、頻率、天數
+            ).map(row => ({
+                medicine_name: row[0],
+                dosage: row[1],
+                frequency: row[2],
+                duration: row[3],
+                instructions: row[4] || ''
+            }));
+
+            if (medicines.length === 0) {
+                showMessage('prescriptionMessage', '請至少添加一個藥物', 'error');
+                return;
+            }
+
+            const prescriptionData = {
+                patient_name: document.getElementById('patientName').value,
+                doctor_name: document.getElementById('doctorName').value,
+                diagnosis: document.getElementById('diagnosis').value,
+                medicines: medicines
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/prescription/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(prescriptionData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage('prescriptionMessage', `處方已成功開立！處方ID: ${result.id}`, 'success');
+                    clearPrescriptionForm();
+                } else {
+                    const error = await response.json();
+                    showMessage('prescriptionMessage', `開立失敗: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showMessage('prescriptionMessage', `連接錯誤: ${error.message}`, 'error');
+            }
+        });
+
+        // 載入藥物選項
+        async function loadMedicineOptions() {
+            try {
+                const response = await fetch(`${API_BASE}/api/medicine/`);
+                if (response.ok) {
+                    const medicines = await response.json();
+                    const select = document.getElementById('detailedMedicineName');
+                    
+                    // 清空現有選項
+                    select.innerHTML = '<option value="">-- 請選擇藥物 --</option>';
+                    
+                    // 添加藥物選項
+                    medicines.forEach(medicine => {
+                        const option = document.createElement('option');
+                        option.value = medicine.name;
+                        option.textContent = `${medicine.name} (位置: ${medicine.position})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('載入藥物選項失敗:', error);
+            }
+        }
+
+        // 初始化處方表格
+        function initPrescriptionTable() {
+            if (prescriptionHot) return; // 避免重複初始化
+            
+            const container = document.getElementById('prescriptionTable');
+            prescriptionHot = new Handsontable(container, {
+                data: [['', '', '', '', '']],
+                rowHeaders: true,
+                colHeaders: ['藥物名稱', '劑量', '頻率', '天數', '特殊指示'],
+                columns: [
+                    { type: 'text' },
+                    { type: 'text' },
+                    { type: 'text' },
+                    { type: 'text' },
+                    { type: 'text' }
+                ],
+                minRows: 5,
+                licenseKey: 'non-commercial-and-evaluation'
+            });
+        }
+
+        // 清空表單函數
+        function clearBasicForm() {
+            document.getElementById('basicMedicineForm').reset();
+        }
+
+        function clearDetailedForm() {
+            document.getElementById('detailedMedicineForm').reset();
+        }
+
+        function clearPrescriptionForm() {
+            document.getElementById('prescriptionForm').reset();
+            if (prescriptionHot) {
+                prescriptionHot.loadData([['', '', '', '', '']]);
+            }
+        }
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedicineOptions();
+        });
+    </script>
+</body>
+</html> 
