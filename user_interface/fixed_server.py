@@ -54,6 +54,21 @@ class PatientRecord(BaseModel):
     dosage_instructions: str
     doctor_notes: str
 
+class PrescriptionMedicine(BaseModel):
+    medicine_name: str
+    dosage: str
+    frequency: str
+    duration: str
+    instructions: Optional[str] = ""
+
+class PrescriptionCreate(BaseModel):
+    patient_name: str
+    doctor_name: str
+    medicines: List[PrescriptionMedicine]
+    diagnosis: Optional[str] = ""
+    instructions: Optional[str] = ""
+    priority: Optional[str] = "normal"
+
 # 建立 FastAPI 應用
 app = FastAPI(
     title="醫院藥物管理系統 - 增強版",
@@ -90,9 +105,11 @@ medicines_db = []
 detailed_medicines_db = {}
 patients_db = []
 patient_records_db = []
+prescriptions_db = []
 next_medicine_id = 1
 next_patient_id = 1
 next_record_id = 1
+next_prescription_id = 1
 
 # 根路由
 @app.get("/")
@@ -124,8 +141,10 @@ async def test_api():
         "time": datetime.now().isoformat(),
         "system_stats": {
             "medicines": len(medicines_db),
+            "detailed_medicines": len(detailed_medicines_db),
             "patients": len(patients_db),
-            "records": len(patient_records_db)
+            "records": len(patient_records_db),
+            "prescriptions": len(prescriptions_db)
         }
     }
 
@@ -338,6 +357,68 @@ async def export_integrated_medicines():
         headers={"Content-Disposition": "attachment; filename=integrated_medicines.json"}
     )
 
+# === 處方管理 API ===
+@app.post("/api/prescription/")
+async def create_prescription(prescription: PrescriptionCreate):
+    """醫生開立新處方"""
+    global next_prescription_id
+    
+    new_prescription = {
+        "id": next_prescription_id,
+        "patient_name": prescription.patient_name,
+        "doctor_name": prescription.doctor_name,
+        "medicines": [med.dict() for med in prescription.medicines],
+        "diagnosis": prescription.diagnosis,
+        "instructions": prescription.instructions,
+        "priority": prescription.priority,
+        "status": "pending",
+        "created_time": datetime.now().isoformat(),
+        "updated_time": datetime.now().isoformat()
+    }
+    
+    prescriptions_db.append(new_prescription)
+    next_prescription_id += 1
+    
+    return new_prescription
+
+@app.get("/api/prescription/")
+async def get_all_prescriptions():
+    """獲取所有處方"""
+    return prescriptions_db
+
+@app.get("/api/prescription/{prescription_id}")
+async def get_prescription(prescription_id: int):
+    """獲取特定處方詳情"""
+    prescription = next((p for p in prescriptions_db if p["id"] == prescription_id), None)
+    if not prescription:
+        raise HTTPException(status_code=404, detail="處方未找到")
+    return prescription
+
+@app.put("/api/prescription/{prescription_id}/status")
+async def update_prescription_status(prescription_id: int, status_data: dict):
+    """更新處方狀態"""
+    prescription = next((p for p in prescriptions_db if p["id"] == prescription_id), None)
+    if not prescription:
+        raise HTTPException(status_code=404, detail="處方未找到")
+    
+    new_status = status_data.get("status", "pending")
+    prescription["status"] = new_status
+    prescription["updated_time"] = datetime.now().isoformat()
+    
+    return {"success": True, "message": "處方狀態已更新", "new_status": new_status}
+
+@app.get("/api/prescription/status/{status}")
+async def get_prescriptions_by_status(status: str):
+    """根據狀態獲取處方"""
+    filtered_prescriptions = [p for p in prescriptions_db if p["status"] == status]
+    return filtered_prescriptions
+
+@app.get("/api/prescription/doctor/{doctor_name}")
+async def get_prescriptions_by_doctor(doctor_name: str):
+    """獲取特定醫生的處方"""
+    doctor_prescriptions = [p for p in prescriptions_db if p["doctor_name"] == doctor_name]
+    return doctor_prescriptions
+
 # === 前端頁面路由 ===
 @app.get("/Medicine.html")
 async def serve_medicine_page():
@@ -346,6 +427,22 @@ async def serve_medicine_page():
         return FileResponse(html_file, media_type='text/html')
     else:
         return JSONResponse(content={"error": "Medicine.html not found"}, status_code=404)
+
+@app.get("/Prescription.html")
+async def serve_prescription_page():
+    html_file = static_dir / "html" / "Prescription.html"
+    if html_file.exists():
+        return FileResponse(html_file, media_type='text/html')
+    else:
+        return JSONResponse(content={"error": "Prescription.html not found"}, status_code=404)
+
+@app.get("/doctor.html")
+async def serve_doctor_page():
+    html_file = static_dir / "html" / "doctor.html"
+    if html_file.exists():
+        return FileResponse(html_file, media_type='text/html')
+    else:
+        return JSONResponse(content={"error": "doctor.html not found"}, status_code=404)
 
 # 初始化測試資料
 def init_test_data():
