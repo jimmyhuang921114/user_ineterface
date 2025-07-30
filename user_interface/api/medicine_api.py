@@ -9,10 +9,10 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-# API
-router = APIRouter(prefix="/api/medicine", tags=[""])
+# 藥物管理API路由器
+router = APIRouter(prefix="/api/medicine", tags=["藥物管理"])
 
-# Pydantic
+# Pydantic數據模型
 class MedicineBasic(BaseModel):
     name: str
     amount: int
@@ -20,27 +20,18 @@ class MedicineBasic(BaseModel):
     position: str
 
 class MedicineDetailed(BaseModel):
-    : Dict[str, str]
-    : Dict[str, str]
-    : Optional[Dict[str, str]] = {}
-    : Dict[str, str]
-    : str
-    : str
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
+    medicine_name: str
+    medicine_data: Dict[str, Any]
 
-#  ()
+# 記憶體內資料庫 (將被持久化儲存取代)
 medicines_db = []
 detailed_medicines_db = {}
 next_medicine_id = 1
 
-# === API ===
+# === 基本藥物API端點 ===
 @router.get("/")
 async def get_all_medicines():
-    """"""
+    """獲取所有基本藥物"""
     return medicines_db
 
 @router.post("/")
