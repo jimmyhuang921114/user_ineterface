@@ -12,9 +12,13 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import os
+import asyncio
+from datetime import datetime
 
 # 導入API模組
 from api import medicine_api, prescription_api
+# 導入資料持久化模組
+from data_persistence import data_persistence
 
 # 創建FastAPI應用
 app = FastAPI(
@@ -241,25 +245,141 @@ async def serve_prescription_page():
         return FileResponse(html_file)
     return HTMLResponse("<h1>處方管理頁面未找到</h1>", status_code=404)
 
-# === 系統狀態API ===
+# === 系統狀態和資料管理API ===
 @app.get("/api/system/status")
 async def system_status():
     """系統狀態檢查"""
+    data_info = data_persistence.get_data_info()
+    
     return {
         "system": "醫院管理系統",
         "version": "2.0.0",
         "status": "運行中",
         "architecture": "模組化API",
+        "persistence": "JSON文件儲存",
         "components": {
             "medicine_api": "藥物管理API",
-            "prescription_api": "處方管理API"
+            "prescription_api": "處方管理API",
+            "data_persistence": "資料持久化模組"
         },
         "statistics": {
             "total_medicines": len(medicine_api.medicines_db),
             "detailed_medicines": len(medicine_api.detailed_medicines_db),
             "total_prescriptions": len(prescription_api.prescriptions_db)
-        }
+        },
+        "data_files": data_info
     }
+
+@app.post("/api/system/save")
+async def manual_save():
+    """手動儲存資料"""
+    success = save_persistent_data()
+    return {
+        "success": success,
+        "message": "資料儲存成功" if success else "資料儲存失敗",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.post("/api/system/backup")
+async def create_backup():
+    """創建資料備份"""
+    backup_path = data_persistence.create_backup()
+    return {
+        "success": backup_path is not None,
+        "backup_path": backup_path,
+        "message": "備份創建成功" if backup_path else "備份創建失敗",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/api/system/backups")
+async def list_backups():
+    """列出所有備份"""
+    backups = data_persistence.list_backups()
+    return {
+        "backups": backups,
+        "count": len(backups)
+    }
+
+@app.post("/api/system/restore/{backup_name}")
+async def restore_backup(backup_name: str):
+    """還原備份"""
+    success = data_persistence.restore_backup(backup_name)
+    
+    if success:
+        # 重新載入資料
+        load_persistent_data()
+    
+    return {
+        "success": success,
+        "message": "備份還原成功" if success else "備份還原失敗",
+        "backup_name": backup_name,
+        "timestamp": datetime.now().isoformat()
+    }
+
+# 載入持久化資料
+def load_persistent_data():
+    """載入持久化資料"""
+    print("📂 載入持久化資料...")
+    
+    try:
+        # 載入所有資料
+        data = data_persistence.load_all_data()
+        
+        # 更新API模組的資料
+        medicine_api.medicines_db[:] = data['medicines_db']
+        medicine_api.next_medicine_id = data['next_medicine_id']
+        medicine_api.detailed_medicines_db.clear()
+        medicine_api.detailed_medicines_db.update(data['detailed_medicines_db'])
+        
+        prescription_api.prescriptions_db[:] = data['prescriptions_db']
+        prescription_api.prescription_status_db[:] = data['prescription_status_db']
+        prescription_api.next_prescription_id = data['next_prescription_id']
+        
+        total_medicines = len(medicine_api.medicines_db)
+        total_detailed = len(medicine_api.detailed_medicines_db)
+        total_prescriptions = len(prescription_api.prescriptions_db)
+        
+        print(f"✅ 資料載入完成:")
+        print(f"   - 基本藥物: {total_medicines} 項")
+        print(f"   - 詳細藥物: {total_detailed} 項")
+        print(f"   - 處方記錄: {total_prescriptions} 項")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ 載入持久化資料失敗: {e}")
+        print("🔄 將使用測試資料初始化")
+        return False
+
+# 儲存持久化資料
+def save_persistent_data():
+    """儲存持久化資料"""
+    try:
+        return data_persistence.save_all_data(
+            medicine_api.medicines_db,
+            medicine_api.next_medicine_id,
+            medicine_api.detailed_medicines_db,
+            prescription_api.prescriptions_db,
+            prescription_api.prescription_status_db,
+            prescription_api.next_prescription_id
+        )
+    except Exception as e:
+        print(f"❌ 儲存持久化資料失敗: {e}")
+        return False
+
+# 定期自動儲存任務
+async def auto_save_task():
+    """定期自動儲存資料（每5分鐘）"""
+    while True:
+        try:
+            await asyncio.sleep(300)  # 5分鐘
+            success = save_persistent_data()
+            if success:
+                print(f"🔄 自動儲存完成 - {datetime.now().strftime('%H:%M:%S')}")
+            else:
+                print(f"❌ 自動儲存失敗 - {datetime.now().strftime('%H:%M:%S')}")
+        except Exception as e:
+            print(f"❌ 自動儲存任務錯誤: {e}")
 
 # 啟動事件
 @app.on_event("startup")
@@ -267,7 +387,16 @@ async def startup_event():
     print("=" * 60)
     print("🏥 醫院管理系統 - 模組化架構啟動中...")
     print("=" * 60)
-    init_test_data()
+    
+    # 嘗試載入持久化資料
+    if not load_persistent_data():
+        # 如果載入失敗，使用測試資料初始化
+        init_test_data()
+    
+    # 啟動自動儲存任務
+    asyncio.create_task(auto_save_task())
+    print("⏰ 自動儲存任務已啟動（每5分鐘）")
+    
     print("\n🚀 系統已成功啟動！")
     print("📍 訪問地址:")
     print("   主頁: http://localhost:8000")
@@ -275,7 +404,19 @@ async def startup_event():
     print("   藥物管理: http://localhost:8000/Medicine.html")
     print("   處方管理: http://localhost:8000/Prescription.html")
     print("   API文檔: http://localhost:8000/docs")
+    print("💾 資料持久化: 啟用（JSON文件儲存 + 自動備份）")
     print("=" * 60)
+
+# 關閉事件
+@app.on_event("shutdown")
+async def shutdown_event():
+    print("\n💾 正在儲存資料...")
+    success = save_persistent_data()
+    if success:
+        print("✅ 資料儲存完成")
+    else:
+        print("❌ 資料儲存失敗")
+    print("🛑 系統已關閉")
 
 if __name__ == "__main__":
     uvicorn.run(
