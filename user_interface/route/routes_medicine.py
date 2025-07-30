@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from database.database import get_db  
+from database.database import get_db
 from model import medicine_models
 from services import crud_medicine
 from schemas.medicine_schema import MedicineCreate, MedicineUpdate, MedicineRead
@@ -26,7 +26,7 @@ def list_all(db: Session = Depends(get_db)):
 def export_medicines_json(db: Session = Depends(get_db)):
     medicines = crud_medicine.get_all_medicines(db)
     json_data = []
-    
+
     for medicine in medicines:
         json_data.append({
             "id": medicine.id,
@@ -36,7 +36,7 @@ def export_medicines_json(db: Session = Depends(get_db)):
             "position": medicine.position,
             "create_time": medicine.create_time.isoformat() if medicine.create_time else None
         })
-    
+
     return JSONResponse(
         content={
             "total_medicines": len(json_data),

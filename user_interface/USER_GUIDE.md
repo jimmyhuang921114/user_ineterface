@@ -1,7 +1,7 @@
 # Hospital Medicine Management System - User Guide
-醫院藥物管理系統 - 使用者指南
+ -
 
-## 📚 Table of Contents
+##  Table of Contents
 1. [Package Overview](#package-overview)
 2. [System Structure](#system-structure)
 3. [Read Operations](#read-operations)
@@ -12,38 +12,38 @@
 
 ---
 
-## 📦 Package Overview
+##  Package Overview
 
 This system is organized into focused packages for different functionalities:
 
 ### Core Packages Structure
 ```
 user_interface/
-├── 🚀 Server Package
-│   └── enhanced_server.py          # Main application server
-├── 📖 API Client Package  
-│   ├── api_client_examples.py      # Complete API examples
-│   └── quick_api_guide.py          # Quick start guide
-├── 🧪 Testing Package
-│   └── test_enhanced_system.py     # System testing
-├── ⚙️ Management Package
-│   ├── run_system.py               # System management
-│   └── start_local.py              # Local startup
-├── 📋 Documentation Package
-│   ├── packages_usage.md           # Package usage guide
-│   ├── system_architecture.md      # System architecture
-│   ├── QUICK_START.md              # Quick start
-│   └── USER_GUIDE.md               # This file
-└── 🔧 Extension Packages
-    ├── route/                      # API routing
-    ├── services/                   # Business logic
-    ├── model/                      # Data models
-    └── schemas/                    # Data schemas
+  Server Package
+    enhanced_server.py          # Main application server
+  API Client Package
+    api_client_examples.py      # Complete API examples
+    quick_api_guide.py          # Quick start guide
+  Testing Package
+    test_enhanced_system.py     # System testing
+  Management Package
+    run_system.py               # System management
+    start_local.py              # Local startup
+  Documentation Package
+    packages_usage.md           # Package usage guide
+    system_architecture.md      # System architecture
+    QUICK_START.md              # Quick start
+    USER_GUIDE.md               # This file
+  Extension Packages
+     route/                      # API routing
+     services/                   # Business logic
+     model/                      # Data models
+     schemas/                    # Data schemas
 ```
 
 ---
 
-## 🏗️ System Structure
+##  System Structure
 
 ### Data Flow Architecture
 ```
@@ -55,22 +55,22 @@ Frontend (web/) ←→ API Layer ←→ Business Logic ←→ Data Storage
 ### Package Dependencies
 ```
 enhanced_server.py (Core)
-    ├── Depends on: fastapi, uvicorn, pydantic
-    ├── Serves: web/ directory (static files)
-    └── Provides: REST API endpoints
+     Depends on: fastapi, uvicorn, pydantic
+     Serves: web/ directory (static files)
+     Provides: REST API endpoints
 
 api_client_examples.py
-    ├── Depends on: requests, json
-    └── Connects to: enhanced_server.py API
+     Depends on: requests, json
+     Connects to: enhanced_server.py API
 
 test_enhanced_system.py
-    ├── Depends on: requests
-    └── Tests: enhanced_server.py endpoints
+     Depends on: requests
+     Tests: enhanced_server.py endpoints
 ```
 
 ---
 
-## 📖 Read Operations
+##  Read Operations
 
 ### 1. Reading Medicine Data
 
@@ -91,13 +91,13 @@ for medicine in medicines:
 #### Detailed Medicine Information
 ```python
 # Get detailed medicine info by name
-medicine_name = "心律錠"
+medicine_name = ""
 response = requests.get(f'http://localhost:8000/api/medicine/detailed/{medicine_name}')
 detailed_info = response.json()
 
-print(f"Basic Info: {detailed_info['基本資訊']}")
-print(f"Indications: {detailed_info['適應症']}")
-print(f"Side Effects: {detailed_info['可能的副作用']}")
+print(f"Basic Info: {detailed_info['']}")
+print(f"Indications: {detailed_info['']}")
+print(f"Side Effects: {detailed_info['']}")
 ```
 
 #### Search Medicine by Code
@@ -151,17 +151,17 @@ with open('system_backup.json', 'w', encoding='utf-8') as f:
 
 ---
 
-## ✏️ Write Operations
+##  Write Operations
 
 ### 1. Creating Medicine Data
 
 #### Add Basic Medicine
 ```python
 new_medicine = {
-    "name": "新藥物",
+    "name": "",
     "amount": 100,
     "position": "A1-05",
-    "unit": "錠",
+    "unit": "",
     "expiry_date": "2024-12-31"
 }
 
@@ -173,25 +173,25 @@ print(f"Created medicine with ID: {created_medicine['id']}")
 #### Add Detailed Medicine Information
 ```python
 detailed_medicine = {
-    "medicine_name": "新藥物",
+    "medicine_name": "",
     "medicine_data": {
-        "基本資訊": {
-            "名稱": "新藥物",
-            "廠商": "某製藥公司",
-            "劑量": "10毫克"
+        "": {
+            "": "",
+            "": "",
+            "": "10"
         },
-        "外觀": {
-            "顏色": "白色",
-            "形狀": "圓形"
+        "": {
+            "": "",
+            "": ""
         },
-        "包裝編號": {
-            "編號1": "NEW001",
-            "編號2": "NEW002"
+        "": {
+            "1": "NEW001",
+            "2": "NEW002"
         },
-        "適應症": "測試用藥物",
-        "可能的副作用": "無已知副作用",
-        "使用說明": "按醫囑服用",
-        "注意事項": "存放於陰涼乾燥處"
+        "": "",
+        "": "",
+        "": "",
+        "": ""
     }
 }
 
@@ -203,13 +203,13 @@ response = requests.post('http://localhost:8000/api/medicine/detailed/', json=de
 #### Add New Patient
 ```python
 new_patient = {
-    "name": "張三",
+    "name": "",
     "age": 30,
-    "gender": "男",
+    "gender": "",
     "phone": "0912345678",
-    "address": "台北市信義區",
-    "medical_history": "無特殊病史",
-    "allergies": "無"
+    "address": "",
+    "medical_history": "",
+    "allergies": ""
 }
 
 response = requests.post('http://localhost:8000/api/patients/', json=new_patient)
@@ -226,10 +226,10 @@ from datetime import datetime
 new_record = {
     "patient_id": 1,
     "visit_date": datetime.now().isoformat(),
-    "diagnosis": "高血壓",
-    "prescribed_medicines": ["心律錠 10mg"],
-    "dosage_instructions": "每日一次，飯後服用",
-    "doctor_notes": "定期回診追蹤"
+    "diagnosis": "",
+    "prescribed_medicines": [" 10mg"],
+    "dosage_instructions": "",
+    "doctor_notes": ""
 }
 
 response = requests.post('http://localhost:8000/api/records/', json=new_record)
@@ -243,7 +243,7 @@ print(f"Created record with ID: {created_record['id']}")
 ```python
 medicine_id = 1
 updated_data = {
-    "name": "更新的藥名",
+    "name": "",
     "amount": 150,
     "position": "A1-06"
 }
@@ -255,7 +255,7 @@ response = requests.put(f'http://localhost:8000/api/medicine/{medicine_id}', jso
 ```python
 patient_id = 1
 updated_patient = {
-    "name": "張三",
+    "name": "",
     "age": 31,  # Updated age
     "phone": "0987654321"  # Updated phone
 }
@@ -283,7 +283,7 @@ if response.status_code == 200:
 
 ---
 
-## 🔧 API Usage Examples
+##  API Usage Examples
 
 ### Using the API Client Package
 
@@ -296,7 +296,7 @@ api = HospitalSystemAPI()
 
 # Medicine operations
 medicines = api.get_all_medicines_detailed()
-heart_medicine = api.get_medicine_by_name("心律錠")
+heart_medicine = api.get_medicine_by_name("")
 
 # Patient operations
 patients = api.get_all_patients()
@@ -314,7 +314,7 @@ medicines_data = api.export_integrated_medicines("backup.json")
 from quick_api_guide import get_medicine_info, export_data
 
 # Quick medicine lookup
-medicine_info = get_medicine_info("心律錠")
+medicine_info = get_medicine_info("")
 print(medicine_info)
 
 # Quick data export
@@ -323,7 +323,7 @@ all_data = export_data('complete')
 
 ---
 
-## 📋 Package Operations
+##  Package Operations
 
 ### 1. Server Package Operations
 
@@ -374,7 +374,7 @@ def test_custom_feature():
     new_medicine = {"name": "Test Medicine", "amount": 10}
     response = requests.post('http://localhost:8000/api/medicine/', json=new_medicine)
     assert response.status_code == 200
-    
+
     # Test medicine retrieval
     response = requests.get('http://localhost:8000/api/medicine/')
     medicines = response.json()
@@ -421,7 +421,7 @@ class CustomModel(BaseModel):
 
 ---
 
-## 🔍 Troubleshooting
+##  Troubleshooting
 
 ### Common Read Operation Issues
 
@@ -495,7 +495,7 @@ pip3 install fastapi uvicorn pydantic requests
 
 ---
 
-## 📖 Reading Package Code
+##  Reading Package Code
 
 ### Understanding the Server Package
 ```python
@@ -525,7 +525,7 @@ pip3 install fastapi uvicorn pydantic requests
 
 ---
 
-## ✏️ Writing Package Extensions
+##  Writing Package Extensions
 
 ### Adding New Features
 
@@ -558,7 +558,7 @@ def create_new_feature(self, feature_data):
 
 ---
 
-## 🎯 Best Practices
+##  Best Practices
 
 ### For Reading Operations
 1. Always check response status codes

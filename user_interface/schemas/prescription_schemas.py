@@ -17,7 +17,7 @@ class PrescriptionRead(PrescriptionCreate):
 
 class PatientCreate(BaseModel):
     name: str
-    id: str  # 身分證字號
+    id: str  #
     sex: str
     age: int
     created_at: str

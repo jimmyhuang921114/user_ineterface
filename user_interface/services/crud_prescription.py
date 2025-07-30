@@ -11,8 +11,8 @@ def create_patient_with_prescriptions(db: Session, data):
         name=data.name,
         sex=data.sex,
         age=data.age,
-        status_grab=(data.picked_state != "尚未開始"),
-        status_picked=(data.collected_state != "尚未開始"),
+        status_grab=(data.picked_state != ""),
+        status_picked=(data.collected_state != ""),
         create_time=datetime.utcnow()
     )
     db.add(new_patient)
@@ -22,7 +22,7 @@ def create_patient_with_prescriptions(db: Session, data):
     # create many prescriptions
     for p in data.prescriptions:
         new_prescription = prescription_models.Prescription(
-            patient_id=new_patient.medicine_id, 
+            patient_id=new_patient.medicine_id,
             medicine_name=p.medicine_name,
             medicine_dosage=p.medicine_dosage,
             medicine_frequency=p.medicine_frequency,
@@ -52,7 +52,7 @@ def get_all_prescriptions(db: Session):
     return db.query(prescription_models.Prescription).all()
 
 
-#delete prescription by 
+#delete prescription by
 # def delete_prescription(db: Session, prescription: prescription_models.Prescription):
 #     db.delete(prescription)
 #     db.commit()

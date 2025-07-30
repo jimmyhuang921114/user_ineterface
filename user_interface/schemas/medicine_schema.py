@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
-# 用於接收前端新增藥物資料（POST body）
+# POST body
 class MedicineCreate(SQLModel):
     name: str
     amount: int
@@ -11,7 +11,7 @@ class MedicineCreate(SQLModel):
     position: str
 
 
-# 用於查詢/顯示藥物資料（GET 回傳）
+# /GET
 class MedicineRead(SQLModel):
     id: int
     name: str
@@ -21,7 +21,7 @@ class MedicineRead(SQLModel):
     create_time: datetime
 
 
-# 可選：若你要支援藥物更新（PATCH / PUT）
+# PATCH / PUT
 class MedicineUpdate(SQLModel):
     name: Optional[str] = None
     amount: Optional[int] = None

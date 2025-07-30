@@ -1,4 +1,4 @@
-// 增強版藥物管理系統 JavaScript
+//  JavaScript
 class EnhancedMedicineManager {
     constructor() {
         this.apiBase = 'http://localhost:8000/api';
@@ -16,7 +16,7 @@ class EnhancedMedicineManager {
         await this.loadMedicineSelect();
     }
 
-    // ==================== 基本庫存管理 ====================
+    // ====================  ====================
 
     async loadBasicMedicines() {
         try {
@@ -44,12 +44,12 @@ class EnhancedMedicineManager {
         const container = document.getElementById('medicineTable');
         this.hot = new Handsontable(container, {
             data: this.basicData,
-            colHeaders: ['藥品名稱', '數量', '使用天數', '儲存位置', '操作'],
+            colHeaders: ['', '', '', '', ''],
             columns: [
-                { type: 'text', placeholder: '輸入藥名' },
-                { type: 'numeric', placeholder: '輸入數量' },
-                { type: 'numeric', placeholder: '使用天數' },
-                { type: 'text', placeholder: '儲位位置（如 A1-01）' },
+                { type: 'text', placeholder: '' },
+                { type: 'numeric', placeholder: '' },
+                { type: 'numeric', placeholder: '' },
+                { type: 'text', placeholder: ' A1-01' },
                 { type: 'text', readOnly: true, renderer: this.actionButtonRenderer.bind(this) }
             ],
             stretchH: 'all',
@@ -67,17 +67,17 @@ class EnhancedMedicineManager {
         td.innerHTML = '';
         if (row < this.basicData.length && this.basicData[row].length >= 5) {
             const saveBtn = document.createElement('button');
-            saveBtn.textContent = '保存';
+            saveBtn.textContent = '';
             saveBtn.className = 'action-btn save-btn';
             saveBtn.onclick = () => this.saveBasicMedicine(row);
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = '刪除';
+            deleteBtn.textContent = '';
             deleteBtn.className = 'action-btn delete-btn';
             deleteBtn.onclick = () => this.deleteBasicMedicine(row);
 
             const viewBtn = document.createElement('button');
-            viewBtn.textContent = '詳情';
+            viewBtn.textContent = '';
             viewBtn.className = 'action-btn btn-info';
             viewBtn.onclick = () => this.viewMedicineDetails(this.basicData[row][0]);
 
@@ -86,7 +86,7 @@ class EnhancedMedicineManager {
             td.appendChild(viewBtn);
         } else {
             const addBtn = document.createElement('button');
-            addBtn.textContent = '新增';
+            addBtn.textContent = '';
             addBtn.className = 'action-btn add-btn';
             addBtn.onclick = () => this.addBasicMedicine(row);
             td.appendChild(addBtn);
@@ -96,7 +96,7 @@ class EnhancedMedicineManager {
 
     async handleCellChange(changes, source) {
         if (!changes || source === 'loadData') return;
-        
+
         for (const change of changes) {
             const [row, col, oldValue, newValue] = change;
             if (this.basicData[row] && this.basicData[row].length >= 5 && this.basicData[row][4]) {
@@ -113,7 +113,7 @@ class EnhancedMedicineManager {
         const [name, amount, usage_days, position] = rowData;
 
         if (!name || !amount || !usage_days || !position) {
-            this.showMessage('請填寫完整的藥物資訊', 'error');
+            this.showMessage('', 'error');
             return;
         }
 
@@ -133,15 +133,15 @@ class EnhancedMedicineManager {
                 const newMedicine = await response.json();
                 this.basicData[row] = [name, amount, usage_days, position, newMedicine.id];
                 this.hot.render();
-                this.showMessage('藥物新增成功', 'success');
-                await this.loadMedicineSelect(); // 更新選擇器
+                this.showMessage('', 'success');
+                await this.loadMedicineSelect(); //
             } else {
                 const error = await response.json();
-                this.showMessage(`新增失敗: ${error.detail}`, 'error');
+                this.showMessage(`: ${error.detail}`, 'error');
             }
         } catch (error) {
             console.error('Error adding medicine:', error);
-            this.showMessage('新增失敗，請檢查網路連接', 'error');
+            this.showMessage('', 'error');
         }
     }
 
@@ -167,14 +167,14 @@ class EnhancedMedicineManager {
             });
 
             if (response.ok) {
-                this.showMessage('藥物更新成功', 'success');
+                this.showMessage('', 'success');
             } else {
                 const error = await response.json();
-                this.showMessage(`更新失敗: ${error.detail}`, 'error');
+                this.showMessage(`: ${error.detail}`, 'error');
             }
         } catch (error) {
             console.error('Error updating medicine:', error);
-            this.showMessage('更新失敗，請檢查網路連接', 'error');
+            this.showMessage('', 'error');
         }
     }
 
@@ -187,7 +187,7 @@ class EnhancedMedicineManager {
             return;
         }
 
-        if (!confirm('確定要刪除這個藥物嗎？')) {
+        if (!confirm('')) {
             return;
         }
 
@@ -199,28 +199,28 @@ class EnhancedMedicineManager {
             if (response.ok) {
                 this.hot.alter('remove_row', row);
                 this.basicData.splice(row, 1);
-                this.showMessage('藥物刪除成功', 'success');
-                await this.loadMedicineSelect(); // 更新選擇器
+                this.showMessage('', 'success');
+                await this.loadMedicineSelect(); //
             } else {
                 const error = await response.json();
-                this.showMessage(`刪除失敗: ${error.detail}`, 'error');
+                this.showMessage(`: ${error.detail}`, 'error');
             }
         } catch (error) {
             console.error('Error deleting medicine:', error);
-            this.showMessage('刪除失敗，請檢查網路連接', 'error');
+            this.showMessage('', 'error');
         }
     }
 
-    // ==================== 詳細藥物資訊管理 ====================
+    // ====================  ====================
 
     initDetailedMedicineForm() {
-        // 初始化表單和事件監聽器
+        //
         this.clearDetailedForm();
     }
 
     async loadMedicineSelect() {
         const select = document.getElementById('medicineSelect');
-        select.innerHTML = '<option value="">-- 選擇藥物 --</option>';
+        select.innerHTML = '<option value="">--  --</option>';
 
         try {
             const response = await fetch(`${this.apiBase}/medicine/`);
@@ -229,7 +229,7 @@ class EnhancedMedicineManager {
                 medicines.forEach(medicine => {
                     const option = document.createElement('option');
                     option.value = medicine.name;
-                    option.textContent = `${medicine.name} (位置: ${medicine.position})`;
+                    option.textContent = `${medicine.name} (: ${medicine.position})`;
                     select.appendChild(option);
                 });
             }
@@ -253,57 +253,57 @@ class EnhancedMedicineManager {
                 document.getElementById('updateDetailedInfo').style.display = 'inline-block';
                 document.getElementById('saveDetailedInfo').style.display = 'none';
             } else {
-                // 沒有詳細資訊，準備新增
+                //
                 this.clearDetailedForm();
                 document.getElementById('medicineName').value = medicineName;
                 this.currentEditingMedicine = null;
                 document.getElementById('updateDetailedInfo').style.display = 'none';
                 document.getElementById('saveDetailedInfo').style.display = 'inline-block';
-                this.showMessage('此藥物尚無詳細資訊，請填寫後保存', 'info');
+                this.showMessage('', 'info');
             }
         } catch (error) {
             console.error('Error loading detailed medicine info:', error);
-            this.showMessage('載入詳細資訊失敗', 'error');
+            this.showMessage('', 'error');
         }
     }
 
     populateDetailedForm(medicineName, data) {
-        // 基本資訊
-        document.getElementById('medicineName').value = data.基本資訊?.名稱 || medicineName;
-        document.getElementById('dosage').value = data.基本資訊?.劑量 || '';
-        document.getElementById('manufacturer').value = data.基本資訊?.廠商 || '';
-        document.getElementById('usageMethod').value = data.基本資訊?.服用方式 || '';
-        document.getElementById('unitDose').value = data.基本資訊?.單位劑量 || '';
+        //
+        document.getElementById('medicineName').value = data.?. || medicineName;
+        document.getElementById('dosage').value = data.?. || '';
+        document.getElementById('manufacturer').value = data.?. || '';
+        document.getElementById('usageMethod').value = data.?. || '';
+        document.getElementById('unitDose').value = data.?. || '';
 
-        // 外觀
-        document.getElementById('color').value = data.外觀?.顏色 || '';
-        document.getElementById('shape').value = data.外觀?.形狀 || '';
+        //
+        document.getElementById('color').value = data.?. || '';
+        document.getElementById('shape').value = data.?. || '';
 
-        // 其他資訊
-        document.getElementById('expiryDate').value = data.其他資訊?.有效日期 || '';
-        document.getElementById('barcode').value = data.其他資訊?.條碼 || data.條碼 || '';
-        document.getElementById('companyFullName').value = data.其他資訊?.公司全名 || '';
-        document.getElementById('drugFullName').value = data.其他資訊?.藥物全名 || '';
+        //
+        document.getElementById('expiryDate').value = data.?. || '';
+        document.getElementById('barcode').value = data.?. || data. || '';
+        document.getElementById('companyFullName').value = data.?. || '';
+        document.getElementById('drugFullName').value = data.?. || '';
 
-        // 包裝編號
-        document.getElementById('code1').value = data.包裝編號?.編號1 || '';
-        document.getElementById('code2').value = data.包裝編號?.編號2 || '';
-        document.getElementById('code3').value = data.包裝編號?.編號3 || '';
+        //
+        document.getElementById('code1').value = data.?.1 || '';
+        document.getElementById('code2').value = data.?.2 || '';
+        document.getElementById('code3').value = data.?.3 || '';
 
-        // 大文字區域
-        document.getElementById('indications').value = data.適應症 || '';
-        document.getElementById('sideEffects').value = data.可能副作用 || data.可能的副作用 || '';
-        document.getElementById('usage').value = data.使用說明 || '';
-        document.getElementById('precautions').value = data.注意事項 || '';
-        document.getElementById('pregnancyClass').value = data.懷孕分級 || '';
-        document.getElementById('storageConditions').value = data.儲存條件 || '';
+        //
+        document.getElementById('indications').value = data. || '';
+        document.getElementById('sideEffects').value = data. || data. || '';
+        document.getElementById('usage').value = data. || '';
+        document.getElementById('precautions').value = data. || '';
+        document.getElementById('pregnancyClass').value = data. || '';
+        document.getElementById('storageConditions').value = data. || '';
     }
 
     clearDetailedForm() {
         const inputs = [
             'medicineName', 'dosage', 'manufacturer', 'usageMethod', 'unitDose',
             'color', 'shape', 'expiryDate', 'barcode', 'companyFullName', 'drugFullName',
-            'code1', 'code2', 'code3', 'indications', 'sideEffects', 'usage', 
+            'code1', 'code2', 'code3', 'indications', 'sideEffects', 'usage',
             'precautions', 'pregnancyClass', 'storageConditions'
         ];
 
@@ -319,41 +319,41 @@ class EnhancedMedicineManager {
 
     getDetailedFormData() {
         return {
-            基本資訊: {
-                名稱: document.getElementById('medicineName').value,
-                劑量: document.getElementById('dosage').value,
-                廠商: document.getElementById('manufacturer').value,
-                服用方式: document.getElementById('usageMethod').value,
-                單位劑量: document.getElementById('unitDose').value
+            : {
+                : document.getElementById('medicineName').value,
+                : document.getElementById('dosage').value,
+                : document.getElementById('manufacturer').value,
+                : document.getElementById('usageMethod').value,
+                : document.getElementById('unitDose').value
             },
-            外觀: {
-                顏色: document.getElementById('color').value,
-                形狀: document.getElementById('shape').value
+            : {
+                : document.getElementById('color').value,
+                : document.getElementById('shape').value
             },
-            其他資訊: {
-                有效日期: document.getElementById('expiryDate').value,
-                條碼: document.getElementById('barcode').value,
-                公司全名: document.getElementById('companyFullName').value,
-                藥物全名: document.getElementById('drugFullName').value
+            : {
+                : document.getElementById('expiryDate').value,
+                : document.getElementById('barcode').value,
+                : document.getElementById('companyFullName').value,
+                : document.getElementById('drugFullName').value
             },
-            包裝編號: {
-                編號1: document.getElementById('code1').value,
-                編號2: document.getElementById('code2').value,
-                編號3: document.getElementById('code3').value
+            : {
+                1: document.getElementById('code1').value,
+                2: document.getElementById('code2').value,
+                3: document.getElementById('code3').value
             },
-            適應症: document.getElementById('indications').value,
-            可能的副作用: document.getElementById('sideEffects').value,
-            使用說明: document.getElementById('usage').value,
-            注意事項: document.getElementById('precautions').value,
-            懷孕分級: document.getElementById('pregnancyClass').value,
-            儲存條件: document.getElementById('storageConditions').value
+            : document.getElementById('indications').value,
+            : document.getElementById('sideEffects').value,
+            : document.getElementById('usage').value,
+            : document.getElementById('precautions').value,
+            : document.getElementById('pregnancyClass').value,
+            : document.getElementById('storageConditions').value
         };
     }
 
     async saveDetailedMedicineInfo() {
         const medicineName = document.getElementById('medicineName').value;
         if (!medicineName) {
-            this.showMessage('請填寫藥物名稱', 'error');
+            this.showMessage('', 'error');
             return;
         }
 
@@ -370,25 +370,25 @@ class EnhancedMedicineManager {
             });
 
             if (response.ok) {
-                this.showMessage('詳細藥物資訊保存成功', 'success');
+                this.showMessage('', 'success');
                 this.currentEditingMedicine = medicineName;
                 document.getElementById('updateDetailedInfo').style.display = 'inline-block';
                 document.getElementById('saveDetailedInfo').style.display = 'none';
             } else {
                 const error = await response.json();
-                this.showMessage(`保存失敗: ${error.detail}`, 'error');
+                this.showMessage(`: ${error.detail}`, 'error');
             }
         } catch (error) {
             console.error('Error saving detailed medicine info:', error);
-            this.showMessage('保存失敗，請檢查網路連接', 'error');
+            this.showMessage('', 'error');
         }
     }
 
-    // ==================== 藥物資訊查看 ====================
+    // ====================  ====================
 
     async searchDetailedMedicine(searchTerm, searchType = 'name') {
         if (!searchTerm.trim()) {
-            this.showMessage('請輸入搜尋關鍵字', 'error');
+            this.showMessage('', 'error');
             return;
         }
 
@@ -409,24 +409,24 @@ class EnhancedMedicineManager {
                 const data = await response.json();
                 this.displayMedicineInfo(data);
             } else {
-                document.getElementById('medicineInfoDisplay').innerHTML = 
-                    '<p class="placeholder-text">找不到相關藥物資訊</p>';
-                this.showMessage('找不到相關藥物', 'error');
+                document.getElementById('medicineInfoDisplay').innerHTML =
+                    '<p class="placeholder-text"></p>';
+                this.showMessage('', 'error');
             }
         } catch (error) {
             console.error('Error searching medicine:', error);
-            this.showMessage('搜尋失敗', 'error');
+            this.showMessage('', 'error');
         }
     }
 
     displayMedicineInfo(data) {
         const display = document.getElementById('medicineInfoDisplay');
-        
+
         if (data.medicine_name) {
-            // 單一藥物的整合資訊
+            //
             display.innerHTML = this.formatIntegratedMedicineInfo(data);
         } else {
-            // 多個搜尋結果
+            //
             display.innerHTML = this.formatSearchResults(data);
         }
     }
@@ -435,37 +435,37 @@ class EnhancedMedicineManager {
         let html = `<div class="medicine-info">
             <h3>${data.medicine_name}</h3>`;
 
-        // 庫存資訊
+        //
         if (data.basic_info) {
             html += `<div class="info-section inventory-info">
-                <h4>庫存資訊</h4>
+                <h4></h4>
                 <div class="info-item">
-                    <span class="info-label">數量：</span>
+                    <span class="info-label"></span>
                     <span class="info-value">${data.basic_info.amount}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">位置：</span>
+                    <span class="info-label"></span>
                     <span class="info-value">${data.basic_info.position}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">使用天數：</span>
+                    <span class="info-label"></span>
                     <span class="info-value">${data.basic_info.usage_days}</span>
                 </div>
             </div>`;
         }
 
-        // 詳細資訊
+        //
         if (data.detailed_info) {
             const detailed = data.detailed_info;
-            
-            // 基本資訊
-            if (detailed.基本資訊) {
+
+            //
+            if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4>基本資訊</h4>`;
-                Object.entries(detailed.基本資訊).forEach(([key, value]) => {
+                    <h4></h4>`;
+                Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
-                            <span class="info-label">${key}：</span>
+                            <span class="info-label">${key}</span>
                             <span class="info-value">${value}</span>
                         </div>`;
                     }
@@ -473,14 +473,14 @@ class EnhancedMedicineManager {
                 html += '</div>';
             }
 
-            // 外觀
-            if (detailed.外觀) {
+            //
+            if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4>外觀</h4>`;
-                Object.entries(detailed.外觀).forEach(([key, value]) => {
+                    <h4></h4>`;
+                Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
-                            <span class="info-label">${key}：</span>
+                            <span class="info-label">${key}</span>
                             <span class="info-value">${value}</span>
                         </div>`;
                     }
@@ -488,14 +488,14 @@ class EnhancedMedicineManager {
                 html += '</div>';
             }
 
-            // 包裝編號
-            if (detailed.包裝編號) {
+            //
+            if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4>包裝編號</h4>`;
-                Object.entries(detailed.包裝編號).forEach(([key, value]) => {
+                    <h4></h4>`;
+                Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
-                            <span class="info-label">${key}：</span>
+                            <span class="info-label">${key}</span>
                             <span class="info-value">${value}</span>
                         </div>`;
                     }
@@ -503,14 +503,14 @@ class EnhancedMedicineManager {
                 html += '</div>';
             }
 
-            // 其他重要資訊
+            //
             const importantFields = [
-                { key: '適應症', label: '適應症' },
-                { key: '可能的副作用', label: '可能的副作用' },
-                { key: '使用說明', label: '使用說明' },
-                { key: '注意事項', label: '注意事項' },
-                { key: '懷孕分級', label: '懷孕分級' },
-                { key: '儲存條件', label: '儲存條件' }
+                { key: '', label: '' },
+                { key: '', label: '' },
+                { key: '', label: '' },
+                { key: '', label: '' },
+                { key: '', label: '' },
+                { key: '', label: '' }
             ];
 
             importantFields.forEach(field => {
@@ -530,24 +530,24 @@ class EnhancedMedicineManager {
     }
 
     formatSearchResults(results) {
-        let html = '<div class="medicine-info"><h3>搜尋結果</h3>';
-        
+        let html = '<div class="medicine-info"><h3></h3>';
+
         Object.entries(results).forEach(([name, data]) => {
             html += `<div class="info-section">
                 <h4>${name}</h4>`;
-            
+
             if (data.matched_code) {
                 html += `<div class="info-item">
-                    <span class="info-label">匹配編號：</span>
+                    <span class="info-label"></span>
                     <span class="info-value">${data.matched_code.type} - ${data.matched_code.value}</span>
                 </div>`;
             }
-            
+
             html += `<button class="btn-info" onclick="medicineManager.viewMedicineDetails('${name}')">
-                查看詳細資訊
+
             </button></div>`;
         });
-        
+
         html += '</div>';
         return html;
     }
@@ -556,19 +556,19 @@ class EnhancedMedicineManager {
         await this.searchDetailedMedicine(medicineName, 'name');
     }
 
-    // ==================== JSON 操作 ====================
+    // ==================== JSON  ====================
 
     showJSONPreview() {
         const medicineData = this.getDetailedFormData();
         const medicineName = document.getElementById('medicineName').value;
-        
+
         if (!medicineName) {
-            this.showMessage('請先填寫藥物名稱', 'error');
+            this.showMessage('', 'error');
             return;
         }
 
         const jsonData = {
-            藥物名稱: medicineName,
+            : medicineName,
             ...medicineData
         };
 
@@ -579,17 +579,17 @@ class EnhancedMedicineManager {
     copyJSON() {
         const jsonText = document.getElementById('jsonPreview').textContent;
         navigator.clipboard.writeText(jsonText).then(() => {
-            this.showMessage('JSON已複製到剪貼板', 'success');
+            this.showMessage('JSON', 'success');
         }).catch(err => {
             console.error('Failed to copy JSON:', err);
-            this.showMessage('複製失敗', 'error');
+            this.showMessage('', 'error');
         });
     }
 
     downloadJSON() {
         const jsonText = document.getElementById('jsonPreview').textContent;
         const medicineName = document.getElementById('medicineName').value || 'medicine';
-        
+
         const blob = new Blob([jsonText], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -599,8 +599,8 @@ class EnhancedMedicineManager {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
-        this.showMessage('JSON檔案已下載', 'success');
+
+        this.showMessage('JSON', 'success');
     }
 
     async exportDetailedJSON() {
@@ -608,7 +608,7 @@ class EnhancedMedicineManager {
             const response = await fetch(`${this.apiBase}/export/medicines/integrated`);
             if (response.ok) {
                 const data = await response.json();
-                
+
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -618,32 +618,32 @@ class EnhancedMedicineManager {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
-                this.showMessage('詳細藥物資訊已導出', 'success');
+
+                this.showMessage('', 'success');
             } else {
-                this.showMessage('導出失敗', 'error');
+                this.showMessage('', 'error');
             }
         } catch (error) {
             console.error('Error exporting detailed JSON:', error);
-            this.showMessage('導出失敗', 'error');
+            this.showMessage('', 'error');
         }
     }
 
-    // ==================== 事件處理 ====================
+    // ====================  ====================
 
     setupEventListeners() {
-        // 藥物選擇器
+        //
         document.getElementById('medicineSelect').addEventListener('change', (e) => {
             this.loadDetailedMedicineInfo(e.target.value);
         });
 
-        // 詳細資訊按鈕
+        //
         document.getElementById('loadDetailedInfo').addEventListener('click', () => {
             const selectedMedicine = document.getElementById('medicineSelect').value;
             if (selectedMedicine) {
                 this.loadDetailedMedicineInfo(selectedMedicine);
             } else {
-                this.showMessage('請先選擇藥物', 'error');
+                this.showMessage('', 'error');
             }
         });
 
@@ -667,7 +667,7 @@ class EnhancedMedicineManager {
             this.exportDetailedJSON();
         });
 
-        // 搜尋功能
+        //
         document.getElementById('searchDetailedBtn').addEventListener('click', () => {
             const searchTerm = document.getElementById('searchMedicineInput').value;
             this.searchDetailedMedicine(searchTerm, 'name');
@@ -684,7 +684,7 @@ class EnhancedMedicineManager {
             }
         });
 
-        // 模態框
+        //
         document.querySelector('.close').addEventListener('click', () => {
             document.getElementById('jsonModal').style.display = 'none';
         });
@@ -697,7 +697,7 @@ class EnhancedMedicineManager {
             this.downloadJSON();
         });
 
-        // 點擊模態框外部關閉
+        //
         window.addEventListener('click', (e) => {
             const modal = document.getElementById('jsonModal');
             if (e.target === modal) {
@@ -705,7 +705,7 @@ class EnhancedMedicineManager {
             }
         });
 
-        // 添加控制按鈕
+        //
         this.addControlButtons();
     }
 
@@ -716,16 +716,16 @@ class EnhancedMedicineManager {
         const buttonContainer = document.createElement('div');
         buttonContainer.className = 'control-buttons';
 
-        // 重新載入按鈕
-        const reloadBtn = this.createButton('重新載入資料', async () => {
+        //
+        const reloadBtn = this.createButton('', async () => {
             await this.loadBasicMedicines();
             this.hot.loadData(this.basicData);
             await this.loadMedicineSelect();
-            this.showMessage('資料已重新載入', 'success');
+            this.showMessage('', 'success');
         });
 
-        // 導出基本資料按鈕
-        const exportBasicBtn = this.createButton('導出基本資料', () => {
+        //
+        const exportBasicBtn = this.createButton('', () => {
             this.exportBasicJSON();
         });
 
@@ -762,11 +762,11 @@ class EnhancedMedicineManager {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
-        this.showMessage('基本藥物資料已導出', 'success');
+
+        this.showMessage('', 'success');
     }
 
-    // ==================== 通用功能 ====================
+    // ====================  ====================
 
     showMessage(message, type = 'info') {
         let messageDiv = document.getElementById('message');
@@ -830,9 +830,9 @@ class EnhancedMedicineManager {
     }
 }
 
-// 全局變量和初始化
+//
 let medicineManager;
 
 document.addEventListener("DOMContentLoaded", () => {
     medicineManager = new EnhancedMedicineManager();
-}); 
+});

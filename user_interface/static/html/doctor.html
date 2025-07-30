@@ -3,254 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>醫生工作台 - 醫院管理系統</title>
-    
+    <title> - </title>
+
     <!-- Handsontable -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.css">
     <script src="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.js"></script>
-    
-    <!-- 統一風格 -->
+
+    <!--  -->
     <link rel="stylesheet" href="../css/unified_style.css">
 </head>
 <body>
     <div class="sidebar">
-        <h2>醫院管理系統</h2>
-        <button onclick="location.href='doctor.html'" class="active">醫生工作台</button>
-        <button onclick="location.href='Medicine.html'">藥物庫存管理</button>
-        <button onclick="location.href='Prescription.html'">處方管理系統</button>
+        <h2></h2>
+        <button onclick="location.href='doctor.html'" class="active"></button>
+        <button onclick="location.href='Medicine.html'"></button>
+        <button onclick="location.href='Prescription.html'"></button>
     </div>
 
     <div class="main-content">
         <div class="header fade-in">
-            <h1>醫生工作台</h1>
-            <p>藥物資訊管理與處方開立系統 - 資料直接儲存至醫院管理系統</p>
+            <h1></h1>
+            <p> - </p>
         </div>
 
         <div class="tab-container fade-in">
             <div class="tab-buttons">
-                <button class="tab-button active" onclick="switchTab('basic')">基本藥物管理</button>
-                <button class="tab-button" onclick="switchTab('detailed')">詳細藥物資訊</button>
-                <button class="tab-button" onclick="switchTab('prescription')">處方開立</button>
+                <button class="tab-button active" onclick="switchTab('basic')"></button>
+                <button class="tab-button" onclick="switchTab('detailed')"></button>
+                <button class="tab-button" onclick="switchTab('prescription')"></button>
             </div>
 
-            <!-- 基本藥物資訊標籤 -->
+            <!--  -->
             <div id="basic" class="tab-content active">
                 <div class="form-section">
-                    <h3>新增基本藥物資訊</h3>
+                    <h3></h3>
                     <form id="basicMedicineForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="basicMedicineName" class="required">藥物名稱</label>
-                                <input type="text" id="basicMedicineName" placeholder="請輸入藥物名稱" required>
+                                <label for="basicMedicineName" class="required"></label>
+                                <input type="text" id="basicMedicineName" placeholder="" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicAmount" class="required">庫存數量</label>
-                                <input type="number" id="basicAmount" placeholder="請輸入數量" min="0" required>
+                                <label for="basicAmount" class="required"></label>
+                                <input type="number" id="basicAmount" placeholder="" min="0" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicUsageDays" class="required">建議使用天數</label>
-                                <input type="number" id="basicUsageDays" placeholder="請輸入天數" min="1" required>
+                                <label for="basicUsageDays" class="required"></label>
+                                <input type="number" id="basicUsageDays" placeholder="" min="1" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicPosition" class="required">存放位置</label>
-                                <input type="text" id="basicPosition" placeholder="例：A1-01, B2-15" required>
+                                <label for="basicPosition" class="required"></label>
+                                <input type="text" id="basicPosition" placeholder="A1-01, B2-15" required>
                             </div>
                         </div>
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success">💾 儲存基本資訊</button>
-                            <button type="button" class="btn btn-warning" onclick="clearBasicForm()">🗑️ 清空表單</button>
+                            <button type="submit" class="btn btn-success"> </button>
+                            <button type="button" class="btn btn-warning" onclick="clearBasicForm()"> </button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="basicMessage" class="message"></div>
             </div>
 
-            <!-- 詳細藥物資訊標籤 -->
+            <!--  -->
             <div id="detailed" class="tab-content">
                 <div class="form-section">
-                    <h3>詳細藥物資訊管理</h3>
-                    <p style="color: #7f8c8d; margin-bottom: 20px;">請先在「基本藥物管理」中新增藥物，再選擇藥物填寫詳細資訊</p>
-                    
+                    <h3></h3>
+                    <p style="color: #7f8c8d; margin-bottom: 20px;"></p>
+
                     <form id="detailedMedicineForm">
-                        <!-- 選擇藥物 -->
+                        <!--  -->
                         <div class="form-group">
-                            <label for="detailedMedicineName" class="required">選擇藥物</label>
+                            <label for="detailedMedicineName" class="required"></label>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <select id="detailedMedicineName" required style="flex: 1;">
-                                    <option value="">-- 請選擇已新增的藥物 --</option>
+                                    <option value="">--  --</option>
                                 </select>
-                                <button type="button" class="btn btn-info" onclick="loadMedicineOptions()">🔄 重新載入</button>
+                                <button type="button" class="btn btn-info" onclick="loadMedicineOptions()"> </button>
                             </div>
                         </div>
 
-                        <!-- 自由格式詳細資訊 -->
+                        <!--  -->
                         <div class="form-section">
-                            <h4>📋 藥物詳細資訊 (自由填寫)</h4>
+                            <h4>  ()</h4>
                             <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">
-                                您可以自由填寫藥物的詳細資訊，系統會將資料以JSON格式儲存
+                                JSON
                             </p>
-                            
+
                             <div class="form-group">
-                                <label for="medicineDescription">📝 藥物描述與適應症</label>
-                                <textarea id="medicineDescription" rows="4" 
-                                    placeholder="請描述藥物的主要功效、適應症、使用方式等..."></textarea>
+                                <label for="medicineDescription"> </label>
+                                <textarea id="medicineDescription" rows="4"
+                                    placeholder="..."></textarea>
                             </div>
-                            
+
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label for="medicineManufacturer">🏭 製造商</label>
-                                    <input type="text" id="medicineManufacturer" placeholder="例：台灣製藥公司">
+                                    <label for="medicineManufacturer"> </label>
+                                    <input type="text" id="medicineManufacturer" placeholder="">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineDosage">💊 劑量規格</label>
-                                    <input type="text" id="medicineDosage" placeholder="例：10mg, 500mg">
+                                    <label for="medicineDosage"> </label>
+                                    <input type="text" id="medicineDosage" placeholder="10mg, 500mg">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineColor">🎨 外觀顏色</label>
-                                    <input type="text" id="medicineColor" placeholder="例：白色、藍色">
+                                    <label for="medicineColor"> </label>
+                                    <input type="text" id="medicineColor" placeholder="">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineShape">⚪ 外觀形狀</label>
-                                    <input type="text" id="medicineShape" placeholder="例：圓形、橢圓形">
+                                    <label for="medicineShape"> </label>
+                                    <input type="text" id="medicineShape" placeholder="">
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="medicineSideEffects">⚠️ 主要副作用</label>
-                                <textarea id="medicineSideEffects" rows="3" 
-                                    placeholder="請列出主要的副作用和注意事項..."></textarea>
+                                <label for="medicineSideEffects"> </label>
+                                <textarea id="medicineSideEffects" rows="3"
+                                    placeholder="..."></textarea>
                             </div>
-                            
+
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label for="medicineStorage">🌡️ 儲存條件</label>
-                                    <input type="text" id="medicineStorage" placeholder="例：室溫保存、冷藏">
+                                    <label for="medicineStorage"> </label>
+                                    <input type="text" id="medicineStorage" placeholder="">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineExpiry">📅 有效期限</label>
+                                    <label for="medicineExpiry"> </label>
                                     <input type="date" id="medicineExpiry">
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
-                                <label for="medicineNotes">📋 其他備註</label>
-                                <textarea id="medicineNotes" rows="3" 
-                                    placeholder="其他重要資訊、特殊注意事項等..."></textarea>
+                                <label for="medicineNotes"> </label>
+                                <textarea id="medicineNotes" rows="3"
+                                    placeholder="..."></textarea>
                             </div>
                         </div>
 
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success">💾 儲存詳細資訊</button>
-                            <button type="button" class="btn btn-warning" onclick="clearDetailedForm()">🗑️ 清空表單</button>
+                            <button type="submit" class="btn btn-success"> </button>
+                            <button type="button" class="btn btn-warning" onclick="clearDetailedForm()"> </button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="detailedMessage" class="message"></div>
             </div>
 
-            <!-- 開立處方標籤 -->
+            <!--  -->
             <div id="prescription" class="tab-content">
                 <div class="form-section">
-                    <h3>處方開立系統</h3>
+                    <h3></h3>
                     <form id="prescriptionForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="patientName" class="required">病患姓名</label>
-                                <input type="text" id="patientName" placeholder="請輸入病患姓名" required>
+                                <label for="patientName" class="required"></label>
+                                <input type="text" id="patientName" placeholder="" required>
                             </div>
                             <div class="form-group">
-                                <label for="patientId">病患身分證字號</label>
-                                <input type="text" id="patientId" placeholder="請輸入身分證字號">
+                                <label for="patientId"></label>
+                                <input type="text" id="patientId" placeholder="">
                             </div>
                             <div class="form-group">
-                                <label for="doctorName" class="required">主治醫師</label>
-                                <input type="text" id="doctorName" placeholder="請輸入醫師姓名" required>
+                                <label for="doctorName" class="required"></label>
+                                <input type="text" id="doctorName" placeholder="" required>
                             </div>
                             <div class="form-group">
-                                <label for="prescriptionDate">處方日期</label>
+                                <label for="prescriptionDate"></label>
                                 <input type="date" id="prescriptionDate">
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="diagnosis">🩺 診斷結果</label>
-                            <textarea id="diagnosis" rows="3" placeholder="請輸入診斷結果或病情描述..."></textarea>
+                            <label for="diagnosis"> </label>
+                            <textarea id="diagnosis" rows="3" placeholder="..."></textarea>
                         </div>
 
                         <div class="form-section">
-                            <h4>💊 處方藥物清單</h4>
+                            <h4> </h4>
                             <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">
-                                請在下方表格中填寫處方藥物，可以新增多列來填寫多種藥物
+
                             </p>
                             <div id="prescriptionTable" class="hot-container"></div>
                         </div>
-                        
+
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success">📋 開立處方</button>
-                            <button type="button" class="btn btn-warning" onclick="clearPrescriptionForm()">🗑️ 清空表單</button>
-                            <button type="button" class="btn btn-info" onclick="addPrescriptionRow()">➕ 新增藥物列</button>
+                            <button type="submit" class="btn btn-success"> </button>
+                            <button type="button" class="btn btn-warning" onclick="clearPrescriptionForm()"> </button>
+                            <button type="button" class="btn btn-info" onclick="addPrescriptionRow()"> </button>
                         </div>
                     </form>
                 </div>
-                
+
                 <div id="prescriptionMessage" class="message"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // API基礎URL
+        // APIURL
         const API_BASE = 'http://localhost:8000';
-        
-        // 全域變數
+
+        //
         let prescriptionHot = null;
 
-        // 初始化頁面
+        //
         document.addEventListener('DOMContentLoaded', () => {
             loadMedicineOptions();
             document.getElementById('prescriptionDate').value = new Date().toISOString().split('T')[0];
         });
 
-        // 標籤切換功能
+        //
         function switchTab(tabName) {
-            // 隱藏所有標籤內容
+            //
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
-            // 移除所有按鈕的active狀態
+
+            // active
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
-            
-            // 顯示選中的標籤
+
+            //
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
-            
-            // 如果切換到處方標籤，初始化表格
+
+            //
             if (tabName === 'prescription') {
                 setTimeout(() => initPrescriptionTable(), 100);
             }
         }
 
-        // 顯示訊息
+        //
         function showMessage(elementId, message, type = 'success') {
             const messageEl = document.getElementById(elementId);
             messageEl.textContent = message;
             messageEl.className = `message ${type}`;
             messageEl.style.display = 'block';
-            
+
             setTimeout(() => {
                 messageEl.style.display = 'none';
             }, 5000);
         }
 
-        // 基本藥物表單處理
+        //
         document.getElementById('basicMedicineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = {
                 name: document.getElementById('basicMedicineName').value.trim(),
                 amount: parseInt(document.getElementById('basicAmount').value),
@@ -269,46 +269,46 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    showMessage('basicMessage', `✅ 基本藥物資訊已成功儲存！藥物ID: ${result.id}`, 'success');
+                    showMessage('basicMessage', ` ID: ${result.id}`, 'success');
                     clearBasicForm();
-                    loadMedicineOptions(); // 重新載入詳細資訊的選項
+                    loadMedicineOptions(); //
                 } else {
                     const error = await response.json();
-                    showMessage('basicMessage', `❌ 儲存失敗: ${error.detail || '未知錯誤'}`, 'error');
+                    showMessage('basicMessage', ` : ${error.detail || ''}`, 'error');
                 }
             } catch (error) {
-                showMessage('basicMessage', `❌ 連接錯誤: ${error.message}`, 'error');
+                showMessage('basicMessage', ` : ${error.message}`, 'error');
             }
         });
 
-        // 詳細藥物表單處理
+        //
         document.getElementById('detailedMedicineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const medicineName = document.getElementById('detailedMedicineName').value;
             if (!medicineName) {
-                showMessage('detailedMessage', '❌ 請先選擇藥物', 'error');
+                showMessage('detailedMessage', ' ', 'error');
                 return;
             }
 
-            // 自由格式的詳細資訊
+            //
             const medicineData = {
-                基本資訊: {
-                    名稱: medicineName,
-                    製造商: document.getElementById('medicineManufacturer').value || '',
-                    劑量: document.getElementById('medicineDosage').value || ''
+                : {
+                    : medicineName,
+                    : document.getElementById('medicineManufacturer').value || '',
+                    : document.getElementById('medicineDosage').value || ''
                 },
-                外觀: {
-                    顏色: document.getElementById('medicineColor').value || '',
-                    形狀: document.getElementById('medicineShape').value || ''
+                : {
+                    : document.getElementById('medicineColor').value || '',
+                    : document.getElementById('medicineShape').value || ''
                 },
-                藥物描述: document.getElementById('medicineDescription').value || '',
-                主要副作用: document.getElementById('medicineSideEffects').value || '',
-                儲存條件: document.getElementById('medicineStorage').value || '',
-                有效期限: document.getElementById('medicineExpiry').value || '',
-                其他備註: document.getElementById('medicineNotes').value || '',
-                建立時間: new Date().toISOString(),
-                建立人員: document.getElementById('doctorName')?.value || '醫生'
+                : document.getElementById('medicineDescription').value || '',
+                : document.getElementById('medicineSideEffects').value || '',
+                : document.getElementById('medicineStorage').value || '',
+                : document.getElementById('medicineExpiry').value || '',
+                : document.getElementById('medicineNotes').value || '',
+                : new Date().toISOString(),
+                : document.getElementById('doctorName')?.value || ''
             };
 
             try {
@@ -324,28 +324,28 @@
                 });
 
                 if (response.ok) {
-                    showMessage('detailedMessage', `✅ 詳細藥物資訊已成功儲存！`, 'success');
+                    showMessage('detailedMessage', ` `, 'success');
                     clearDetailedForm();
                 } else {
                     const error = await response.json();
-                    showMessage('detailedMessage', `❌ 儲存失敗: ${error.detail || '未知錯誤'}`, 'error');
+                    showMessage('detailedMessage', ` : ${error.detail || ''}`, 'error');
                 }
             } catch (error) {
-                showMessage('detailedMessage', `❌ 連接錯誤: ${error.message}`, 'error');
+                showMessage('detailedMessage', ` : ${error.message}`, 'error');
             }
         });
 
-        // 處方表單處理
+        //
         document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             if (!prescriptionHot) {
-                showMessage('prescriptionMessage', '❌ 處方表格尚未初始化', 'error');
+                showMessage('prescriptionMessage', ' ', 'error');
                 return;
             }
 
             const tableData = prescriptionHot.getData();
-            const medicines = tableData.filter(row => 
+            const medicines = tableData.filter(row =>
                 row[0] && row[0].trim() && row[1] && row[1].trim() && row[2] && row[2].trim() && row[3] && row[3].trim()
             ).map(row => ({
                 medicine_name: row[0].trim(),
@@ -356,7 +356,7 @@
             }));
 
             if (medicines.length === 0) {
-                showMessage('prescriptionMessage', '❌ 請至少填寫一個藥物的完整資訊', 'error');
+                showMessage('prescriptionMessage', ' ', 'error');
                 return;
             }
 
@@ -379,54 +379,54 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    showMessage('prescriptionMessage', `✅ 處方已成功開立！處方編號: ${result.id}`, 'success');
+                    showMessage('prescriptionMessage', ` : ${result.id}`, 'success');
                     clearPrescriptionForm();
                 } else {
                     const error = await response.json();
-                    showMessage('prescriptionMessage', `❌ 開立失敗: ${error.detail || '未知錯誤'}`, 'error');
+                    showMessage('prescriptionMessage', ` : ${error.detail || ''}`, 'error');
                 }
             } catch (error) {
-                showMessage('prescriptionMessage', `❌ 連接錯誤: ${error.message}`, 'error');
+                showMessage('prescriptionMessage', ` : ${error.message}`, 'error');
             }
         });
 
-        // 載入藥物選項
+        //
         async function loadMedicineOptions() {
             try {
                 const response = await fetch(`${API_BASE}/api/medicine/`);
                 if (response.ok) {
                     const medicines = await response.json();
                     const select = document.getElementById('detailedMedicineName');
-                    
-                    // 清空現有選項
-                    select.innerHTML = '<option value="">-- 請選擇已新增的藥物 --</option>';
-                    
-                    // 添加藥物選項
+
+                    //
+                    select.innerHTML = '<option value="">--  --</option>';
+
+                    //
                     medicines.forEach(medicine => {
                         const option = document.createElement('option');
                         option.value = medicine.name;
-                        option.textContent = `${medicine.name} (位置: ${medicine.position}, 庫存: ${medicine.amount})`;
+                        option.textContent = `${medicine.name} (: ${medicine.position}, : ${medicine.amount})`;
                         select.appendChild(option);
                     });
-                    
-                    console.log(`已載入 ${medicines.length} 個藥物選項`);
+
+                    console.log(` ${medicines.length} `);
                 } else {
-                    console.error('載入藥物選項失敗:', response.status);
+                    console.error(':', response.status);
                 }
             } catch (error) {
-                console.error('載入藥物選項錯誤:', error);
+                console.error(':', error);
             }
         }
 
-        // 初始化處方表格
+        //
         function initPrescriptionTable() {
             if (prescriptionHot) {
                 prescriptionHot.destroy();
             }
-            
+
             const container = document.getElementById('prescriptionTable');
             if (!container) return;
-            
+
             prescriptionHot = new Handsontable(container, {
                 data: [
                     ['', '', '', '', ''],
@@ -434,27 +434,27 @@
                     ['', '', '', '', '']
                 ],
                 rowHeaders: true,
-                colHeaders: ['藥物名稱 *', '劑量 *', '使用頻率 *', '使用天數 *', '特殊指示'],
+                colHeaders: [' *', ' *', ' *', ' *', ''],
                 columns: [
-                    { 
+                    {
                         type: 'text',
-                        placeholder: '例：阿斯匹靈'
+                        placeholder: ''
                     },
-                    { 
+                    {
                         type: 'text',
-                        placeholder: '例：100mg'
+                        placeholder: '100mg'
                     },
-                    { 
+                    {
                         type: 'text',
-                        placeholder: '例：每日三次'
+                        placeholder: ''
                     },
-                    { 
+                    {
                         type: 'text',
-                        placeholder: '例：7天'
+                        placeholder: '7'
                     },
-                    { 
+                    {
                         type: 'text',
-                        placeholder: '例：飯後服用'
+                        placeholder: ''
                     }
                 ],
                 minRows: 3,
@@ -467,18 +467,18 @@
                 manualRowResize: true,
                 manualColumnResize: true
             });
-            
-            console.log('處方表格已初始化');
+
+            console.log('');
         }
 
-        // 新增處方藥物列
+        //
         function addPrescriptionRow() {
             if (prescriptionHot) {
                 prescriptionHot.alter('insert_row', prescriptionHot.countRows());
             }
         }
 
-        // 清空表單函數
+        //
         function clearBasicForm() {
             document.getElementById('basicMedicineForm').reset();
         }
@@ -500,4 +500,4 @@
         }
     </script>
 </body>
-</html> 
+</html>

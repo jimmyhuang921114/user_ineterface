@@ -3,158 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>藥物庫存管理 - 醫院管理系統</title>
-    
+    <title> - </title>
+
     <!-- Handsontable -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.css">
     <script src="https://cdn.jsdelivr.net/npm/handsontable@14.4.0/dist/handsontable.full.min.js"></script>
-    
-    <!-- 統一風格 -->
+
+    <!--  -->
     <link rel="stylesheet" href="../css/unified_style.css">
 </head>
 <body>
     <div class="sidebar">
-        <h2>醫院管理系統</h2>
-        <button onclick="location.href='doctor.html'">醫生工作台</button>
-        <button onclick="location.href='Medicine.html'" class="active">藥物庫存管理</button>
-        <button onclick="location.href='Prescription.html'">處方管理系統</button>
+        <h2></h2>
+        <button onclick="location.href='doctor.html'"></button>
+        <button onclick="location.href='Medicine.html'" class="active"></button>
+        <button onclick="location.href='Prescription.html'"></button>
     </div>
 
     <div class="main-content">
         <div class="header fade-in">
-            <h1>藥物庫存管理</h1>
-            <p>查看基本庫存與詳細藥物資訊 - 所有醫生填寫的資料都會在這裡顯示</p>
+            <h1></h1>
+            <p> - </p>
         </div>
 
-        <!-- 統計卡片 -->
+        <!--  -->
         <div class="card fade-in">
             <div style="padding: 20px;">
-                <h3>📊 藥物統計</h3>
+                <h3> </h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
                     <div style="padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #3498db;" id="totalMedicines">0</div>
-                        <div style="color: #7f8c8d;">藥物種類</div>
+                        <div style="color: #7f8c8d;"></div>
                     </div>
                     <div style="padding: 15px; background: rgba(39, 174, 96, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #27ae60;" id="completeMedicines">0</div>
-                        <div style="color: #7f8c8d;">完整資料</div>
+                        <div style="color: #7f8c8d;"></div>
                     </div>
                     <div style="padding: 15px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #f39c12;" id="lowStock">0</div>
-                        <div style="color: #7f8c8d;">庫存不足</div>
+                        <div style="color: #7f8c8d;"></div>
                     </div>
                     <div style="padding: 15px; background: rgba(155, 89, 182, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #9b59b6;" id="totalStock">0</div>
-                        <div style="color: #7f8c8d;">總庫存量</div>
+                        <div style="color: #7f8c8d;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 基本庫存管理 -->
+        <!--  -->
         <div class="card fade-in">
             <div style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3>📦 基本庫存清單</h3>
+                    <h3> </h3>
                     <div>
-                        <button class="btn btn-info" onclick="loadBasicMedicines()">🔄 重新載入</button>
-                        <button class="btn btn-success" onclick="exportBasicData()">📊 匯出資料</button>
+                        <button class="btn btn-info" onclick="loadBasicMedicines()"> </button>
+                        <button class="btn btn-success" onclick="exportBasicData()"> </button>
                     </div>
                 </div>
                 <div id="basicMedicineTable" class="hot-container"></div>
             </div>
         </div>
 
-        <!-- 詳細藥物資訊查看 -->
+        <!--  -->
         <div class="card fade-in">
             <div style="padding: 20px;">
-                <h3>🔍 詳細藥物資訊查詢</h3>
+                <h3> </h3>
                 <p style="color: #7f8c8d; margin-bottom: 20px;">
-                    查看醫生在工作台填寫的詳細藥物資訊，包括適應症、副作用、使用說明等
+
                 </p>
-                
-                <!-- 搜尋控制區 -->
+
+                <!--  -->
                 <div style="display: flex; gap: 15px; align-items: end; margin-bottom: 25px; flex-wrap: wrap;">
                     <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-                        <label for="searchInput">🔍 搜尋藥物</label>
-                        <input type="text" id="searchInput" placeholder="輸入藥物名稱..." style="width: 100%;">
+                        <label for="searchInput"> </label>
+                        <input type="text" id="searchInput" placeholder="..." style="width: 100%;">
                     </div>
-                    <button class="btn btn-primary" onclick="searchMedicine()">搜尋</button>
-                    <button class="btn btn-info" onclick="searchByCode()">按編號搜尋</button>
-                    <button class="btn btn-success" onclick="loadAllDetailed()">顯示全部</button>
+                    <button class="btn btn-primary" onclick="searchMedicine()"></button>
+                    <button class="btn btn-info" onclick="searchByCode()"></button>
+                    <button class="btn btn-success" onclick="loadAllDetailed()"></button>
                 </div>
 
-                <!-- 搜尋結果區域 -->
+                <!--  -->
                 <div id="searchResults" style="display: none;">
                     <div style="margin-bottom: 15px; padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px;">
-                        <h4 style="margin: 0; color: #3498db;">🎯 搜尋結果</h4>
-                        <p style="margin: 5px 0 0 0; color: #7f8c8d;" id="searchStatus">找到 0 個結果</p>
+                        <h4 style="margin: 0; color: #3498db;"> </h4>
+                        <p style="margin: 5px 0 0 0; color: #7f8c8d;" id="searchStatus"> 0 </p>
                     </div>
                     <div id="searchResultsContent"></div>
                 </div>
 
-                <!-- 所有詳細藥物列表 -->
+                <!--  -->
                 <div id="allDetailedList">
-                    <h4>💊 所有詳細藥物資訊</h4>
+                    <h4> </h4>
                     <div id="detailedMedicinesList">
                         <div style="padding: 40px; text-align: center; color: #7f8c8d; background: rgba(248, 249, 250, 0.5); border-radius: 8px;">
-                            <div>📋 暫無詳細藥物資訊</div>
-                            <div style="margin-top: 10px; font-size: 14px;">請醫師先在醫生工作台填寫詳細資訊</div>
+                            <div> </div>
+                            <div style="margin-top: 10px; font-size: 14px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 詳細資訊模態框 -->
+        <!--  -->
         <div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 15px; padding: 30px; max-width: 900px; width: 90%; max-height: 90%; overflow-y: auto;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 id="modalTitle">藥物詳細資訊</h3>
+                    <h3 id="modalTitle"></h3>
                     <button onclick="closeDetailModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
                 </div>
                 <div id="modalContent"></div>
                 <div style="margin-top: 25px; text-align: right;">
-                    <button class="btn btn-info" onclick="exportDetailJSON()">📄 匯出JSON</button>
-                    <button class="btn btn-danger" onclick="closeDetailModal()">關閉</button>
+                    <button class="btn btn-info" onclick="exportDetailJSON()"> JSON</button>
+                    <button class="btn btn-danger" onclick="closeDetailModal()"></button>
                 </div>
             </div>
         </div>
 
-        <!-- JSON 預覽模態框 -->
+        <!-- JSON  -->
         <div id="jsonModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 15px; padding: 30px; max-width: 800px; width: 90%; max-height: 90%; overflow-y: auto;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3>📄 JSON 資料預覽</h3>
+                    <h3> JSON </h3>
                     <button onclick="closeJsonModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
                 </div>
                 <div style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
                     <pre id="jsonContent" style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;"></pre>
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-info" onclick="copyJsonToClipboard()">📋 複製</button>
-                    <button class="btn btn-success" onclick="downloadJson()">💾 下載</button>
-                    <button class="btn btn-danger" onclick="closeJsonModal()">關閉</button>
+                    <button class="btn btn-info" onclick="copyJsonToClipboard()"> </button>
+                    <button class="btn btn-success" onclick="downloadJson()"> </button>
+                    <button class="btn btn-danger" onclick="closeJsonModal()"></button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 全域變數
+        //
         const API_BASE = 'http://localhost:8000';
         let basicMedicinesData = [];
         let detailedMedicinesData = {};
         let basicMedicineHot = null;
         let currentJsonData = null;
 
-        // 頁面載入時初始化
+        //
         document.addEventListener('DOMContentLoaded', () => {
             loadBasicMedicines();
             loadDetailedMedicines();
         });
 
-        // 載入基本藥物資料
+        //
         async function loadBasicMedicines() {
             try {
                 const response = await fetch(`${API_BASE}/api/medicine/`);
@@ -162,17 +162,17 @@
                     basicMedicinesData = await response.json();
                     updateStatistics();
                     initBasicMedicineTable();
-                    console.log(`✅ 載入了 ${basicMedicinesData.length} 個基本藥物`);
+                    console.log(`  ${basicMedicinesData.length} `);
                 } else {
-                    showMessage('載入基本藥物失敗', 'error');
+                    showMessage('', 'error');
                 }
             } catch (error) {
-                console.error('載入基本藥物錯誤:', error);
-                showMessage('連接API失敗', 'error');
+                console.error(':', error);
+                showMessage('API', 'error');
             }
         }
 
-        // 載入詳細藥物資料
+        //
         async function loadDetailedMedicines() {
             try {
                 const response = await fetch(`${API_BASE}/api/medicine/detailed/`);
@@ -180,26 +180,26 @@
                     detailedMedicinesData = await response.json();
                     updateStatistics();
                     renderDetailedMedicinesList();
-                    console.log(`✅ 載入了 ${Object.keys(detailedMedicinesData).length} 個詳細藥物資訊`);
+                    console.log(`  ${Object.keys(detailedMedicinesData).length} `);
                 } else {
-                    showMessage('載入詳細藥物資訊失敗', 'error');
+                    showMessage('', 'error');
                 }
             } catch (error) {
-                console.error('載入詳細藥物錯誤:', error);
-                showMessage('連接API失敗', 'error');
+                console.error(':', error);
+                showMessage('API', 'error');
             }
         }
 
-        // 更新統計資訊
+        //
         function updateStatistics() {
             const totalBasic = basicMedicinesData.length;
             const totalDetailed = Object.keys(detailedMedicinesData).length;
-            
-            // 計算有完整資料的藥物（既有基本資料又有詳細資料）
-            const completeMedicines = basicMedicinesData.filter(med => 
+
+            //
+            const completeMedicines = basicMedicinesData.filter(med =>
                 detailedMedicinesData.hasOwnProperty(med.name)
             ).length;
-            
+
             const lowStock = basicMedicinesData.filter(med => med.amount < 20).length;
             const totalStock = basicMedicinesData.reduce((sum, med) => sum + med.amount, 0);
 
@@ -209,10 +209,10 @@
             document.getElementById('totalStock').textContent = totalStock;
         }
 
-        // 初始化基本藥物表格
+        //
         function initBasicMedicineTable() {
             const container = document.getElementById('basicMedicineTable');
-            
+
             if (basicMedicineHot) {
                 basicMedicineHot.destroy();
             }
@@ -228,7 +228,7 @@
 
             basicMedicineHot = new Handsontable(container, {
                 data: tableData,
-                colHeaders: ['編號', '藥物名稱', '庫存數量', '建議使用天數', '存放位置', '建立時間'],
+                colHeaders: ['', '', '', '', '', ''],
                 columns: [
                     { type: 'numeric', readOnly: true },
                     { type: 'text', readOnly: true },
@@ -247,7 +247,7 @@
             });
         }
 
-        // 渲染詳細藥物清單
+        //
         function renderDetailedMedicinesList() {
             const container = document.getElementById('detailedMedicinesList');
             const medicines = Object.keys(detailedMedicinesData);
@@ -255,8 +255,8 @@
             if (medicines.length === 0) {
                 container.innerHTML = `
                     <div style="padding: 40px; text-align: center; color: #7f8c8d; background: rgba(248, 249, 250, 0.5); border-radius: 8px;">
-                        <div>📋 暫無詳細藥物資訊</div>
-                        <div style="margin-top: 10px; font-size: 14px;">請醫師先在醫生工作台填寫詳細資訊</div>
+                        <div> </div>
+                        <div style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
                 `;
                 return;
@@ -264,34 +264,34 @@
 
             container.innerHTML = medicines.map(medicineName => {
                 const data = detailedMedicinesData[medicineName];
-                const basicInfo = data.基本資訊 || {};
-                const appearance = data.外觀 || {};
-                
+                const basicInfo = data. || {};
+                const appearance = data. || {};
+
                 return `
-                    <div style="border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 15px; background: white; cursor: pointer; transition: all 0.3s ease;" 
-                         onmouseover="this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'" 
+                    <div style="border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 15px; background: white; cursor: pointer; transition: all 0.3s ease;"
+                         onmouseover="this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'"
                          onmouseout="this.style.boxShadow='none'"
                          onclick="showDetailModal('${medicineName}')">
                         <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start;">
                             <div>
                                 <h4 style="margin: 0 0 10px 0; color: #2c3e50; display: flex; align-items: center; gap: 8px;">
-                                    💊 ${medicineName}
-                                    ${basicInfo.製造商 ? `<span style="font-size: 12px; background: rgba(52, 152, 219, 0.1); color: #3498db; padding: 2px 8px; border-radius: 4px;">${basicInfo.製造商}</span>` : ''}
+                                     ${medicineName}
+                                    ${basicInfo. ? `<span style="font-size: 12px; background: rgba(52, 152, 219, 0.1); color: #3498db; padding: 2px 8px; border-radius: 4px;">${basicInfo.}</span>` : ''}
                                 </h4>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
-                                    ${basicInfo.劑量 ? `<div><strong>劑量:</strong> ${basicInfo.劑量}</div>` : ''}
-                                    ${appearance.顏色 ? `<div><strong>顏色:</strong> ${appearance.顏色}</div>` : ''}
-                                    ${appearance.形狀 ? `<div><strong>形狀:</strong> ${appearance.形狀}</div>` : ''}
-                                    ${data.儲存條件 ? `<div><strong>儲存:</strong> ${data.儲存條件}</div>` : ''}
+                                    ${basicInfo. ? `<div><strong>:</strong> ${basicInfo.}</div>` : ''}
+                                    ${appearance. ? `<div><strong>:</strong> ${appearance.}</div>` : ''}
+                                    ${appearance. ? `<div><strong>:</strong> ${appearance.}</div>` : ''}
+                                    ${data. ? `<div><strong>:</strong> ${data.}</div>` : ''}
                                 </div>
-                                ${data.藥物描述 ? `<p style="color: #7f8c8d; margin: 0; line-height: 1.4;">${data.藥物描述}</p>` : ''}
+                                ${data. ? `<p style="color: #7f8c8d; margin: 0; line-height: 1.4;">${data.}</p>` : ''}
                             </div>
                             <div style="text-align: right;">
                                 <button class="btn btn-info" style="padding: 8px 15px; font-size: 12px;" onclick="event.stopPropagation(); showDetailModal('${medicineName}')">
-                                    📋 查看詳情
+
                                 </button>
                                 <div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">
-                                    ${data.建立時間 ? formatDate(data.建立時間) : ''}
+                                    ${data. ? formatDate(data.) : ''}
                                 </div>
                             </div>
                         </div>
@@ -300,11 +300,11 @@
             }).join('');
         }
 
-        // 搜尋藥物
+        //
         async function searchMedicine() {
             const searchTerm = document.getElementById('searchInput').value.trim();
             if (!searchTerm) {
-                showMessage('請輸入搜尋關鍵字', 'warning');
+                showMessage('', 'warning');
                 return;
             }
 
@@ -317,16 +317,16 @@
                     showSearchResults([]);
                 }
             } catch (error) {
-                console.error('搜尋錯誤:', error);
-                showMessage('搜尋失敗', 'error');
+                console.error(':', error);
+                showMessage('', 'error');
             }
         }
 
-        // 按編號搜尋
+        //
         async function searchByCode() {
             const searchTerm = document.getElementById('searchInput').value.trim();
             if (!searchTerm) {
-                showMessage('請輸入包裝編號', 'warning');
+                showMessage('', 'warning');
                 return;
             }
 
@@ -343,45 +343,45 @@
                     showSearchResults([]);
                 }
             } catch (error) {
-                console.error('搜尋錯誤:', error);
-                showMessage('搜尋失敗', 'error');
+                console.error(':', error);
+                showMessage('', 'error');
             }
         }
 
-        // 顯示搜尋結果
+        //
         function showSearchResults(results) {
             const searchResults = document.getElementById('searchResults');
             const searchStatus = document.getElementById('searchStatus');
             const searchResultsContent = document.getElementById('searchResultsContent');
             const allDetailedList = document.getElementById('allDetailedList');
 
-            searchStatus.textContent = `找到 ${results.length} 個結果`;
-            
+            searchStatus.textContent = ` ${results.length} `;
+
             if (results.length === 0) {
                 searchResultsContent.innerHTML = `
                     <div style="padding: 30px; text-align: center; color: #7f8c8d; background: rgba(248, 249, 250, 0.5); border-radius: 8px;">
-                        <div>🔍 沒有找到符合條件的藥物</div>
-                        <div style="margin-top: 10px; font-size: 14px;">請檢查搜尋關鍵字或嘗試其他搜尋方式</div>
+                        <div> </div>
+                        <div style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
                 `;
             } else {
                 searchResultsContent.innerHTML = results.map(result => {
                     const data = result.data;
-                    const basicInfo = data.基本資訊 || {};
-                    const appearance = data.外觀 || {};
-                    
+                    const basicInfo = data. || {};
+                    const appearance = data. || {};
+
                     return `
                         <div style="border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 15px; background: white;">
-                            <h4 style="margin: 0 0 15px 0; color: #2c3e50;">🎯 ${result.name}</h4>
+                            <h4 style="margin: 0 0 15px 0; color: #2c3e50;"> ${result.name}</h4>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                ${basicInfo.劑量 ? `<div><strong>劑量:</strong> ${basicInfo.劑量}</div>` : ''}
-                                ${basicInfo.製造商 ? `<div><strong>製造商:</strong> ${basicInfo.製造商}</div>` : ''}
-                                ${appearance.顏色 ? `<div><strong>顏色:</strong> ${appearance.顏色}</div>` : ''}
-                                ${appearance.形狀 ? `<div><strong>形狀:</strong> ${appearance.形狀}</div>` : ''}
+                                ${basicInfo. ? `<div><strong>:</strong> ${basicInfo.}</div>` : ''}
+                                ${basicInfo. ? `<div><strong>:</strong> ${basicInfo.}</div>` : ''}
+                                ${appearance. ? `<div><strong>:</strong> ${appearance.}</div>` : ''}
+                                ${appearance. ? `<div><strong>:</strong> ${appearance.}</div>` : ''}
                             </div>
-                            ${data.藥物描述 ? `<p style="margin: 15px 0 0 0; color: #7f8c8d;">${data.藥物描述}</p>` : ''}
+                            ${data. ? `<p style="margin: 15px 0 0 0; color: #7f8c8d;">${data.}</p>` : ''}
                             <div style="margin-top: 15px;">
-                                <button class="btn btn-primary" onclick="showDetailModal('${result.name}')">📋 查看完整詳情</button>
+                                <button class="btn btn-primary" onclick="showDetailModal('${result.name}')"> </button>
                             </div>
                         </div>
                     `;
@@ -392,38 +392,38 @@
             allDetailedList.style.display = 'none';
         }
 
-        // 顯示全部詳細資訊
+        //
         function loadAllDetailed() {
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('allDetailedList').style.display = 'block';
             document.getElementById('searchInput').value = '';
         }
 
-        // 顯示詳細資訊模態框
+        //
         function showDetailModal(medicineName) {
             const data = detailedMedicinesData[medicineName];
             if (!data) {
-                showMessage('找不到該藥物的詳細資訊', 'error');
+                showMessage('', 'error');
                 return;
             }
 
-            document.getElementById('modalTitle').textContent = `💊 ${medicineName} - 詳細資訊`;
+            document.getElementById('modalTitle').textContent = ` ${medicineName} - `;
             document.getElementById('modalContent').innerHTML = generateDetailContent(medicineName, data);
             document.getElementById('detailModal').style.display = 'block';
             currentJsonData = {medicineName: medicineName, data: data};
         }
 
-        // 生成詳細內容HTML
+        // HTML
         function generateDetailContent(medicineName, data) {
             let html = '';
 
-            // 基本資訊
-            if (data.基本資訊) {
+            //
+            if (data.) {
                 html += `
                     <div class="form-section">
-                        <h4>📋 基本資訊</h4>
+                        <h4> </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            ${Object.entries(data.基本資訊).map(([key, value]) => 
+                            ${Object.entries(data.).map(([key, value]) =>
                                 `<div><strong>${key}:</strong> ${value}</div>`
                             ).join('')}
                         </div>
@@ -431,13 +431,13 @@
                 `;
             }
 
-            // 外觀
-            if (data.外觀) {
+            //
+            if (data.) {
                 html += `
                     <div class="form-section">
-                        <h4>👁️ 外觀特徵</h4>
+                        <h4> </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            ${Object.entries(data.外觀).map(([key, value]) => 
+                            ${Object.entries(data.).map(([key, value]) =>
                                 `<div><strong>${key}:</strong> ${value}</div>`
                             ).join('')}
                         </div>
@@ -445,36 +445,36 @@
                 `;
             }
 
-            // 藥物描述
-            if (data.藥物描述) {
+            //
+            if (data.) {
                 html += `
                     <div class="form-section">
-                        <h4>📝 藥物描述</h4>
-                        <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6;">${data.藥物描述}</p>
+                        <h4> </h4>
+                        <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6;">${data.}</p>
                     </div>
                 `;
             }
 
-            // 副作用
-            if (data.主要副作用) {
+            //
+            if (data.) {
                 html += `
                     <div class="form-section">
-                        <h4>⚠️ 主要副作用</h4>
-                        <p style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6; color: #c0392b;">${data.主要副作用}</p>
+                        <h4> </h4>
+                        <p style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; margin: 0; line-height: 1.6; color: #c0392b;">${data.}</p>
                     </div>
                 `;
             }
 
-            // 其他資訊
-            const otherFields = ['儲存條件', '有效期限', '其他備註'];
-            const otherInfo = otherFields.filter(field => data[field]).map(field => 
+            //
+            const otherFields = ['', '', ''];
+            const otherInfo = otherFields.filter(field => data[field]).map(field =>
                 `<div><strong>${field}:</strong> ${data[field]}</div>`
             ).join('');
 
             if (otherInfo) {
                 html += `
                     <div class="form-section">
-                        <h4>ℹ️ 其他資訊</h4>
+                        <h4>ℹ </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                             ${otherInfo}
                         </div>
@@ -482,13 +482,13 @@
                 `;
             }
 
-            // 系統資訊
+            //
             html += `
                 <div class="form-section">
-                    <h4>🔧 系統資訊</h4>
+                    <h4> </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        ${data.建立時間 ? `<div><strong>建立時間:</strong> ${formatDate(data.建立時間)}</div>` : ''}
-                        ${data.建立人員 ? `<div><strong>建立人員:</strong> ${data.建立人員}</div>` : ''}
+                        ${data. ? `<div><strong>:</strong> ${formatDate(data.)}</div>` : ''}
+                        ${data. ? `<div><strong>:</strong> ${data.}</div>` : ''}
                     </div>
                 </div>
             `;
@@ -496,16 +496,16 @@
             return html;
         }
 
-        // 關閉詳細資訊模態框
+        //
         function closeDetailModal() {
             document.getElementById('detailModal').style.display = 'none';
             currentJsonData = null;
         }
 
-        // 匯出詳細資訊JSON
+        // JSON
         function exportDetailJSON() {
             if (!currentJsonData) {
-                showMessage('沒有可匯出的資料', 'warning');
+                showMessage('', 'warning');
                 return;
             }
 
@@ -513,52 +513,52 @@
             document.getElementById('jsonModal').style.display = 'block';
         }
 
-        // 關閉JSON模態框
+        // JSON
         function closeJsonModal() {
             document.getElementById('jsonModal').style.display = 'none';
         }
 
-        // 複製JSON到剪貼板
+        // JSON
         function copyJsonToClipboard() {
             const jsonContent = document.getElementById('jsonContent').textContent;
             navigator.clipboard.writeText(jsonContent).then(() => {
-                showMessage('JSON已複製到剪貼板', 'success');
+                showMessage('JSON', 'success');
             }).catch(() => {
-                showMessage('複製失敗', 'error');
+                showMessage('', 'error');
             });
         }
 
-        // 下載JSON文件
+        // JSON
         function downloadJson() {
             if (!currentJsonData) return;
-            
+
             const jsonContent = JSON.stringify(currentJsonData.data, null, 2);
             const blob = new Blob([jsonContent], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${currentJsonData.medicineName}_詳細資訊.json`;
+            a.download = `${currentJsonData.medicineName}_.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showMessage('JSON文件下載成功', 'success');
+            showMessage('JSON', 'success');
         }
 
-        // 匯出基本資料
+        //
         function exportBasicData() {
             if (basicMedicinesData.length === 0) {
-                showMessage('沒有可匯出的基本資料', 'warning');
+                showMessage('', 'warning');
                 return;
             }
 
             const csvContent = generateBasicCSV(basicMedicinesData);
-            downloadCSV(csvContent, `基本藥物資料_${new Date().toISOString().split('T')[0]}.csv`);
+            downloadCSV(csvContent, `_${new Date().toISOString().split('T')[0]}.csv`);
         }
 
-        // 生成基本資料CSV
+        // CSV
         function generateBasicCSV(medicines) {
-            const headers = ['編號', '藥物名稱', '庫存數量', '建議使用天數', '存放位置', '建立時間'];
+            const headers = ['', '', '', '', '', ''];
             const csvRows = [headers.join(',')];
 
             medicines.forEach(medicine => {
@@ -576,7 +576,7 @@
             return csvRows.join('\n');
         }
 
-        // 下載CSV文件
+        // CSV
         function downloadCSV(content, filename) {
             const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -587,17 +587,17 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showMessage('CSV文件下載成功', 'success');
+            showMessage('CSV', 'success');
         }
 
-        // 格式化日期
+        //
         function formatDate(dateString) {
-            if (!dateString) return '無日期';
+            if (!dateString) return '';
             const date = new Date(dateString);
             return date.toLocaleDateString('zh-TW') + ' ' + date.toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'});
         }
 
-        // 顯示訊息
+        //
         function showMessage(message, type = 'info') {
             const alertColor = type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db';
             const alertDiv = document.createElement('div');
@@ -609,7 +609,7 @@
             `;
             alertDiv.textContent = message;
             document.body.appendChild(alertDiv);
-            
+
             setTimeout(() => {
                 if (document.body.contains(alertDiv)) {
                     document.body.removeChild(alertDiv);
@@ -618,4 +618,4 @@
         }
     </script>
 </body>
-</html> 
+</html>

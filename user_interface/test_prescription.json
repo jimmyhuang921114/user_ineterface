@@ -1,21 +1,21 @@
 {
-        "patient_name": "測試病人",
-        "doctor_name": "測試醫生",
+        "patient_name": "",
+        "doctor_name": "",
         "prescription_date": "2025-07-30",
         "medicines": [
             {
-                "medicine_name": "測試藥物A",
+                "medicine_name": "A",
                 "dosage": "10mg",
-                "frequency": "每日三次",
-                "duration": "7天"
+                "frequency": "",
+                "duration": "7"
             },
             {
-                "medicine_name": "測試藥物B", 
+                "medicine_name": "B",
                 "dosage": "5mg",
-                "frequency": "每日兩次",
-                "duration": "14天"
+                "frequency": "",
+                "duration": "14"
             }
         ],
-        "instructions": "飯後服用，多喝水",
+        "instructions": "",
         "status": "pending"
     }
