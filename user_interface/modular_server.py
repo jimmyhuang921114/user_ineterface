@@ -15,8 +15,8 @@ import os
 import asyncio
 from datetime import datetime
 
-# API
-from api import medicine_api, prescription_api
+# 導入API模組
+from api import medicine_api, prescription_api, medical_record_api
 #
 from data_persistence import data_persistence
 
@@ -47,6 +47,7 @@ if static_path.exists():
 # API
 app.include_router(medicine_api.router)
 app.include_router(prescription_api.router)
+app.include_router(medical_record_api.router)
 
 #
 def init_test_data():
@@ -325,15 +326,20 @@ def load_persistent_data():
         #
         data = data_persistence.load_all_data()
 
-        # API
+        # 更新API模組的資料
         medicine_api.medicines_db[:] = data['medicines_db']
         medicine_api.next_medicine_id = data['next_medicine_id']
         medicine_api.detailed_medicines_db.clear()
         medicine_api.detailed_medicines_db.update(data['detailed_medicines_db'])
-
+        
         prescription_api.prescriptions_db[:] = data['prescriptions_db']
         prescription_api.prescription_status_db[:] = data['prescription_status_db']
         prescription_api.next_prescription_id = data['next_prescription_id']
+        
+        # 載入病例資料
+        if 'medical_records_db' in data:
+            medical_record_api.medical_records_db[:] = data['medical_records_db']
+            medical_record_api.next_record_id = data.get('next_record_id', 1)
 
         total_medicines = len(medicine_api.medicines_db)
         total_detailed = len(medicine_api.detailed_medicines_db)

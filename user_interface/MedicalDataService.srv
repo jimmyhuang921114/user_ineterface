@@ -1,0 +1,16 @@
+# 醫療數據查詢服務
+# Medical Data Query Service
+
+# 請求 (Request)
+string query_type        # 查詢類型: "medical_record", "medicine", "prescription"
+string query_id          # 查詢ID (病例ID、藥物名稱、處方ID等)
+string patient_id        # 病患ID (可選)
+string additional_params # 額外參數 (JSON格式)
+
+---
+
+# 響應 (Response)
+bool success             # 操作是否成功
+string message           # 響應訊息
+string data              # 查詢結果數據 (JSON格式)
+string error_code        # 錯誤代碼 (如果有錯誤)
