@@ -1,0 +1,29 @@
+nohup: ignoring input
+INFO:     Started server process [3867]
+INFO:     Waiting for application startup.
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("medicine")
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("inventorylog")
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("patient")
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("prescription")
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,995 INFO sqlalchemy.engine.Engine COMMIT
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("medicine")
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("inventorylog")
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("patient")
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("prescription")
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-08-01 11:09:38,996 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:34788 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34790 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     127.0.0.1:46844 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46846 - "GET /docs HTTP/1.1" 200 OK
