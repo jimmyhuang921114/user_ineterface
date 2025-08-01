@@ -24,17 +24,17 @@ class MedicineBasic(BaseModel):
     position: str
 
 class MedicineDetailed(BaseModel):
-    : Dict[str, str]
-    : Dict[str, str]
-    : Optional[Dict[str, str]] = {}
-    : Dict[str, str]
-    : str
-    : str
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
-    : Optional[str] = ""
+    basic_info: Dict[str, str]
+    indications: Dict[str, str]
+    contraindications: Optional[Dict[str, str]] = {}
+    side_effects: Dict[str, str]
+    precautions: str
+    dosage_instructions: str
+    storage_conditions: Optional[str] = ""
+    manufacturer: Optional[str] = ""
+    batch_number: Optional[str] = ""
+    expiry_date: Optional[str] = ""
+    notes: Optional[str] = ""
 
 class Patient(BaseModel):
     name: str
