@@ -8,3 +8,7 @@ INFO:     127.0.0.1:50602 - "GET /Medicine.html HTTP/1.1" 200 OK
 INFO:     127.0.0.1:50614 - "HEAD /css/unified_style.css HTTP/1.1" 200 OK
 INFO:     127.0.0.1:51582 - "GET /api/medicine/ HTTP/1.1" 200 OK
 INFO:     127.0.0.1:51584 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59406 - "GET /Medicine.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52200 - "GET /Medicine.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52214 - "GET /Prescription.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52228 - "GET /doctor.html HTTP/1.1" 200 OK
