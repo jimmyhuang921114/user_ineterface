@@ -80,69 +80,69 @@
                                 <select id="detailedMedicineName" required style="flex: 1;">
                                     <option value="">--  --</option>
                                 </select>
-                                <button type="button" class="btn btn-info" onclick="loadMedicineOptions()"> </button>
+                                <button type="button" class="btn btn-info" onclick="loadMedicineOptions()">重新載入</button>
                             </div>
                         </div>
 
                         <!--  -->
                         <div class="form-section">
-                            <h4>  ()</h4>
+                            <h4>藥物詳細資訊 (可選)</h4>
                             <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">
-                                JSON
+                                以下資訊將以JSON格式儲存到詳細藥物資料庫中
                             </p>
 
                             <div class="form-group">
-                                <label for="medicineDescription"> </label>
+                                <label for="medicineDescription">藥物描述</label>
                                 <textarea id="medicineDescription" rows="4"
-                                    placeholder="..."></textarea>
+                                    placeholder="請輸入藥物的詳細描述..."></textarea>
                             </div>
 
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label for="medicineManufacturer"> </label>
-                                    <input type="text" id="medicineManufacturer" placeholder="">
+                                    <label for="medicineManufacturer">製造商</label>
+                                    <input type="text" id="medicineManufacturer" placeholder="請輸入製造商名稱">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineDosage"> </label>
-                                    <input type="text" id="medicineDosage" placeholder="10mg, 500mg">
+                                    <label for="medicineDosage">劑量</label>
+                                    <input type="text" id="medicineDosage" placeholder="例如: 10mg, 500mg">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineColor"> </label>
-                                    <input type="text" id="medicineColor" placeholder="">
+                                    <label for="medicineColor">顏色</label>
+                                    <input type="text" id="medicineColor" placeholder="請輸入藥物顏色">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineShape"> </label>
-                                    <input type="text" id="medicineShape" placeholder="">
+                                    <label for="medicineShape">形狀</label>
+                                    <input type="text" id="medicineShape" placeholder="請輸入藥物形狀">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="medicineSideEffects"> </label>
+                                <label for="medicineSideEffects">副作用</label>
                                 <textarea id="medicineSideEffects" rows="3"
-                                    placeholder="..."></textarea>
+                                    placeholder="請輸入可能的副作用..."></textarea>
                             </div>
 
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label for="medicineStorage"> </label>
-                                    <input type="text" id="medicineStorage" placeholder="">
+                                    <label for="medicineStorage">儲存條件</label>
+                                    <input type="text" id="medicineStorage" placeholder="請輸入儲存條件">
                                 </div>
                                 <div class="form-group">
-                                    <label for="medicineExpiry"> </label>
+                                    <label for="medicineExpiry">有效期限</label>
                                     <input type="date" id="medicineExpiry">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="medicineNotes"> </label>
+                                <label for="medicineNotes">備註</label>
                                 <textarea id="medicineNotes" rows="3"
-                                    placeholder="..."></textarea>
+                                    placeholder="請輸入其他備註資訊..."></textarea>
                             </div>
                         </div>
 
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success"> </button>
-                            <button type="button" class="btn btn-warning" onclick="clearDetailedForm()"> </button>
+                            <button type="submit" class="btn btn-success">儲存詳細資訊</button>
+                            <button type="button" class="btn btn-warning" onclick="clearDetailedForm()">清空表單</button>
                         </div>
                     </form>
                 </div>
@@ -153,44 +153,44 @@
             <!--  -->
             <div id="prescription" class="tab-content">
                 <div class="form-section">
-                    <h3></h3>
+                    <h3>開立處方籤</h3>
                     <form id="prescriptionForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="patientName" class="required"></label>
-                                <input type="text" id="patientName" placeholder="" required>
+                                <label for="patientName" class="required">患者姓名</label>
+                                <input type="text" id="patientName" placeholder="請輸入患者姓名" required>
                             </div>
                             <div class="form-group">
-                                <label for="patientId"></label>
-                                <input type="text" id="patientId" placeholder="">
+                                <label for="patientId">患者編號</label>
+                                <input type="text" id="patientId" placeholder="請輸入患者編號">
                             </div>
                             <div class="form-group">
-                                <label for="doctorName" class="required"></label>
-                                <input type="text" id="doctorName" placeholder="" required>
+                                <label for="doctorName" class="required">醫生姓名</label>
+                                <input type="text" id="doctorName" placeholder="請輸入醫生姓名" required>
                             </div>
                             <div class="form-group">
-                                <label for="prescriptionDate"></label>
+                                <label for="prescriptionDate">處方日期</label>
                                 <input type="date" id="prescriptionDate">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="diagnosis"> </label>
-                            <textarea id="diagnosis" rows="3" placeholder="..."></textarea>
+                            <label for="diagnosis">診斷結果</label>
+                            <textarea id="diagnosis" rows="3" placeholder="請輸入診斷結果..."></textarea>
                         </div>
 
                         <div class="form-section">
-                            <h4> </h4>
+                            <h4>處方用藥</h4>
                             <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">
-
+                                請在下方表格中填入處方用藥資訊，標記 * 的欄位為必填
                             </p>
                             <div id="prescriptionTable" class="hot-container"></div>
                         </div>
 
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success"> </button>
-                            <button type="button" class="btn btn-warning" onclick="clearPrescriptionForm()"> </button>
-                            <button type="button" class="btn btn-info" onclick="addPrescriptionRow()"> </button>
+                            <button type="submit" class="btn btn-success">開立處方籤</button>
+                            <button type="button" class="btn btn-warning" onclick="clearPrescriptionForm()">清空表單</button>
+                            <button type="button" class="btn btn-info" onclick="addPrescriptionRow()">新增藥物行</button>
                         </div>
                     </form>
                 </div>
@@ -434,27 +434,27 @@
                     ['', '', '', '', '']
                 ],
                 rowHeaders: true,
-                colHeaders: [' *', ' *', ' *', ' *', ''],
+                colHeaders: ['藥物名稱 *', '劑量 *', '頻率 *', '療程 *', '特殊說明'],
                 columns: [
                     {
                         type: 'text',
-                        placeholder: ''
+                        placeholder: '請輸入藥物名稱'
                     },
                     {
                         type: 'text',
-                        placeholder: '100mg'
+                        placeholder: '例如: 100mg'
                     },
                     {
                         type: 'text',
-                        placeholder: ''
+                        placeholder: '例如: 每日三次'
                     },
                     {
                         type: 'text',
-                        placeholder: '7'
+                        placeholder: '例如: 7天'
                     },
                     {
                         type: 'text',
-                        placeholder: ''
+                        placeholder: '特殊用藥說明'
                     }
                 ],
                 minRows: 3,
