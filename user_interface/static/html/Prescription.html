@@ -22,30 +22,30 @@
 
     <div class="main-content">
         <div class="header fade-in">
-            <h1></h1>
-            <p> - </p>
+            <h1>處方籤管理系統</h1>
+            <p>醫院處方籤管理 - 查看和處理患者處方籤</p>
         </div>
 
         <!--  -->
         <div class="card fade-in">
             <div style="padding: 20px;">
-                <h3> </h3>
+                <h3>處方籤統計</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
                     <div style="padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #3498db;" id="totalCount">0</div>
-                        <div style="color: #7f8c8d;"></div>
+                        <div style="color: #7f8c8d;">總處方籤數</div>
                     </div>
                     <div style="padding: 15px; background: rgba(243, 156, 18, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #f39c12;" id="pendingCount">0</div>
-                        <div style="color: #7f8c8d;"></div>
+                        <div style="color: #7f8c8d;">待處理</div>
                     </div>
                     <div style="padding: 15px; background: rgba(155, 89, 182, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #9b59b6;" id="processingCount">0</div>
-                        <div style="color: #7f8c8d;"></div>
+                        <div style="color: #7f8c8d;">處理中</div>
                     </div>
                     <div style="padding: 15px; background: rgba(39, 174, 96, 0.1); border-radius: 8px; text-align: center;">
                         <div style="font-size: 24px; font-weight: bold; color: #27ae60;" id="completedCount">0</div>
-                        <div style="color: #7f8c8d;"></div>
+                        <div style="color: #7f8c8d;">已完成</div>
                     </div>
                 </div>
             </div>
@@ -56,18 +56,18 @@
             <div style="padding: 20px;">
                 <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                     <div class="form-group" style="margin: 0;">
-                        <label for="statusFilter"> </label>
+                        <label for="statusFilter">篩選狀態</label>
                         <select id="statusFilter" onchange="filterPrescriptions()" style="width: 150px;">
-                            <option value=""></option>
-                            <option value="pending"></option>
-                            <option value="processing"></option>
-                            <option value="completed"></option>
-                            <option value="cancelled"></option>
+                            <option value="">全部狀態</option>
+                            <option value="pending">待處理</option>
+                            <option value="processing">處理中</option>
+                            <option value="completed">已完成</option>
+                            <option value="cancelled">已取消</option>
                         </select>
                     </div>
 
-                    <button class="btn btn-info" onclick="loadPrescriptions()"> </button>
-                    <button class="btn btn-success" onclick="exportPrescriptions()"> </button>
+                    <button class="btn btn-info" onclick="loadPrescriptions()">刷新資料</button>
+                    <button class="btn btn-success" onclick="exportPrescriptions()">導出報表</button>
                 </div>
             </div>
         </div>
@@ -75,27 +75,27 @@
         <!--  -->
         <div class="card fade-in">
             <div style="padding: 20px;">
-                <h3> </h3>
+                <h3>處方籤列表</h3>
                 <div class="table-container">
                     <div id="prescriptionTable" style="width: 100%; overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
                             <thead>
                                 <tr style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;"></th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">處方籤編號</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">患者姓名</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">醫生姓名</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">藥物名稱</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">數量</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">狀態</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">建立時間</th>
+                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">操作</th>
                                 </tr>
                             </thead>
                             <tbody id="prescriptionTableBody">
                                 <tr>
                                     <td colspan="8" style="padding: 40px; text-align: center; color: #7f8c8d;">
-                                        <div> </div>
-                                        <div style="margin-top: 10px; font-size: 14px;"></div>
+                                        <div>暫無處方籤資料</div>
+                                        <div style="margin-top: 10px; font-size: 14px;">請先由醫生開立處方籤</div>
                                     </td>
                                 </tr>
                             </tbody>

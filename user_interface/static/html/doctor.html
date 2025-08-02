@@ -22,43 +22,43 @@
 
     <div class="main-content">
         <div class="header fade-in">
-            <h1></h1>
-            <p> - </p>
+            <h1>醫生開立處方籤系統</h1>
+            <p>醫生專用介面 - 開立處方籤和管理藥物資訊</p>
         </div>
 
         <div class="tab-container fade-in">
             <div class="tab-buttons">
-                <button class="tab-button active" onclick="switchTab('basic')"></button>
-                <button class="tab-button" onclick="switchTab('detailed')"></button>
-                <button class="tab-button" onclick="switchTab('prescription')"></button>
+                <button class="tab-button active" onclick="switchTab('basic')">基本藥物管理</button>
+                <button class="tab-button" onclick="switchTab('detailed')">詳細藥物資訊</button>
+                <button class="tab-button" onclick="switchTab('prescription')">開立處方籤</button>
             </div>
 
             <!--  -->
             <div id="basic" class="tab-content active">
                 <div class="form-section">
-                    <h3></h3>
+                    <h3>新增基本藥物</h3>
                     <form id="basicMedicineForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="basicMedicineName" class="required"></label>
-                                <input type="text" id="basicMedicineName" placeholder="" required>
+                                <label for="basicMedicineName" class="required">藥物名稱</label>
+                                <input type="text" id="basicMedicineName" placeholder="請輸入藥物名稱" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicAmount" class="required"></label>
-                                <input type="number" id="basicAmount" placeholder="" min="0" required>
+                                <label for="basicAmount" class="required">數量</label>
+                                <input type="number" id="basicAmount" placeholder="請輸入數量" min="0" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicUsageDays" class="required"></label>
-                                <input type="number" id="basicUsageDays" placeholder="" min="1" required>
+                                <label for="basicUsageDays" class="required">使用天數</label>
+                                <input type="number" id="basicUsageDays" placeholder="請輸入使用天數" min="1" required>
                             </div>
                             <div class="form-group">
-                                <label for="basicPosition" class="required"></label>
-                                <input type="text" id="basicPosition" placeholder="A1-01, B2-15" required>
+                                <label for="basicPosition" class="required">儲存位置</label>
+                                <input type="text" id="basicPosition" placeholder="例如: A1-01, B2-15" required>
                             </div>
                         </div>
                         <div style="margin-top: 25px;">
-                            <button type="submit" class="btn btn-success"> </button>
-                            <button type="button" class="btn btn-warning" onclick="clearBasicForm()"> </button>
+                            <button type="submit" class="btn btn-success">新增藥物</button>
+                            <button type="button" class="btn btn-warning" onclick="clearBasicForm()">清空表單</button>
                         </div>
                     </form>
                 </div>
@@ -69,13 +69,13 @@
             <!--  -->
             <div id="detailed" class="tab-content">
                 <div class="form-section">
-                    <h3></h3>
-                    <p style="color: #7f8c8d; margin-bottom: 20px;"></p>
+                    <h3>詳細藥物資訊管理</h3>
+                    <p style="color: #7f8c8d; margin-bottom: 20px;">為基本藥物添加詳細資訊，包括適應症、禁忌症、副作用等</p>
 
                     <form id="detailedMedicineForm">
                         <!--  -->
                         <div class="form-group">
-                            <label for="detailedMedicineName" class="required"></label>
+                            <label for="detailedMedicineName" class="required">選擇藥物</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <select id="detailedMedicineName" required style="flex: 1;">
                                     <option value="">--  --</option>
