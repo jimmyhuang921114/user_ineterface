@@ -213,26 +213,45 @@
             document.getElementById('prescriptionDate').value = new Date().toISOString().split('T')[0];
         });
 
-        //
+        // 標籤頁切換功能
         function switchTab(tabName) {
-            //
+            // 隱藏所有標籤頁內容
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
 
-            // active
+            // 移除所有按鈕的 active 狀態
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
 
-            //
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            // 顯示選中的標籤頁
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            // 設置按鈕為 active 狀態
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // 如果沒有事件對象，找到對應的按鈕
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach((button, index) => {
+                    if ((tabName === 'basic' && index === 0) ||
+                        (tabName === 'detailed' && index === 1) ||
+                        (tabName === 'prescription' && index === 2)) {
+                        button.classList.add('active');
+                    }
+                });
+            }
 
-            //
+            // 處方籤標籤頁需要初始化表格
             if (tabName === 'prescription') {
                 setTimeout(() => initPrescriptionTable(), 100);
             }
+            
+            console.log('切換到標籤頁:', tabName);
         }
 
         //

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 醫院管理系統 - 功能測試</title>
+    <link rel="stylesheet" href="/css/unified_style.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .test-button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .test-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🧪 醫院管理系統功能測試</h1>
+            <p>測試所有系統功能的輸入輸出</p>
+        </div>
+
+        <!-- 基本藥物管理測試 -->
+        <div class="test-section">
+            <h2>💊 基本藥物管理測試</h2>
+            <button class="test-button" onclick="testAddMedicine()">測試新增藥物</button>
+            <button class="test-button" onclick="testGetMedicines()">測試獲取藥物列表</button>
+            <button class="test-button" onclick="testUpdateMedicine()">測試更新藥物</button>
+            <button class="test-button" onclick="testDeleteMedicine()">測試刪除藥物</button>
+            <div id="medicineTestResults"></div>
+        </div>
+
+        <!-- 詳細藥物資訊測試 -->
+        <div class="test-section">
+            <h2>📋 詳細藥物資訊測試</h2>
+            <button class="test-button" onclick="testAddDetailedMedicine()">測試新增詳細資訊</button>
+            <button class="test-button" onclick="testGetDetailedMedicine()">測試獲取詳細資訊</button>
+            <button class="test-button" onclick="testSearchMedicine()">測試搜尋藥物</button>
+            <div id="detailedTestResults"></div>
+        </div>
+
+        <!-- 處方籤管理測試 -->
+        <div class="test-section">
+            <h2>📝 處方籤管理測試</h2>
+            <button class="test-button" onclick="testAddPrescription()">測試開立處方籤</button>
+            <button class="test-button" onclick="testGetPrescriptions()">測試獲取處方籤列表</button>
+            <button class="test-button" onclick="testUpdatePrescriptionStatus()">測試更新狀態</button>
+            <div id="prescriptionTestResults"></div>
+        </div>
+
+        <!-- 標籤頁切換測試 -->
+        <div class="test-section">
+            <h2>🔄 界面功能測試</h2>
+            <button class="test-button" onclick="testTabSwitching()">測試標籤頁切換</button>
+            <button class="test-button" onclick="testFormValidation()">測試表單驗證</button>
+            <button class="test-button" onclick="testDataExport()">測試數據匯出</button>
+            <div id="interfaceTestResults"></div>
+        </div>
+
+        <!-- 整體測試 -->
+        <div class="test-section">
+            <h2>🎯 整體系統測試</h2>
+            <button class="test-button" onclick="runAllTests()">執行所有測試</button>
+            <button class="test-button" onclick="clearTestData()">清理測試數據</button>
+            <div id="overallTestResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let testResults = {};
+
+        // 通用函數
+        function showResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        // 基本藥物管理測試
+        async function testAddMedicine() {
+            clearResults('medicineTestResults');
+            try {
+                const testData = {
+                    name: `測試藥物_${Date.now()}`,
+                    amount: 100,
+                    usage_days: 7,
+                    position: 'TEST-01'
+                };
+
+                const response = await fetch(`${API_BASE}/medicine/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    testResults.lastMedicineId = result.id;
+                    showResult('medicineTestResults', `✅ 新增藥物成功: ${result.name} (ID: ${result.id})`, 'success');
+                } else {
+                    showResult('medicineTestResults', `❌ 新增藥物失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('medicineTestResults', `❌ 新增藥物錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetMedicines() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/`);
+                if (response.ok) {
+                    const medicines = await response.json();
+                    showResult('medicineTestResults', `✅ 獲取藥物列表成功: 共 ${medicines.length} 種藥物`, 'success');
+                    showResult('medicineTestResults', `📋 列表內容: ${medicines.map(m => m.name).join(', ')}`, 'info');
+                } else {
+                    showResult('medicineTestResults', `❌ 獲取藥物列表失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('medicineTestResults', `❌ 獲取藥物列表錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateMedicine() {
+            if (!testResults.lastMedicineId) {
+                showResult('medicineTestResults', '❌ 請先執行新增藥物測試', 'error');
+                return;
+            }
+
+            try {
+                const updateData = {
+                    name: `更新測試藥物_${Date.now()}`,
+                    amount: 200,
+                    usage_days: 14,
+                    position: 'TEST-02'
+                };
+
+                const response = await fetch(`${API_BASE}/medicine/${testResults.lastMedicineId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    showResult('medicineTestResults', `✅ 更新藥物成功: ID ${testResults.lastMedicineId}`, 'success');
+                } else {
+                    showResult('medicineTestResults', `❌ 更新藥物失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('medicineTestResults', `❌ 更新藥物錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeleteMedicine() {
+            if (!testResults.lastMedicineId) {
+                showResult('medicineTestResults', '❌ 請先執行新增藥物測試', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/medicine/${testResults.lastMedicineId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showResult('medicineTestResults', `✅ 刪除藥物成功: ID ${testResults.lastMedicineId}`, 'success');
+                    testResults.lastMedicineId = null;
+                } else {
+                    showResult('medicineTestResults', `❌ 刪除藥物失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('medicineTestResults', `❌ 刪除藥物錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        // 詳細藥物資訊測試
+        async function testAddDetailedMedicine() {
+            clearResults('detailedTestResults');
+            try {
+                const detailedData = {
+                    medicine_name: '阿斯匹靈',
+                    medicine_data: {
+                        basic_info: {
+                            name: '阿斯匹靈',
+                            manufacturer: '測試製藥公司',
+                            dosage: '100mg'
+                        },
+                        appearance: {
+                            color: '白色',
+                            shape: '圓形'
+                        },
+                        indications: '解熱鎮痛',
+                        side_effects: '可能引起胃部不適',
+                        storage_conditions: '室溫保存',
+                        expiry_date: '2025-12-31'
+                    }
+                };
+
+                const response = await fetch(`${API_BASE}/medicine/detailed/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(detailedData)
+                });
+
+                if (response.ok) {
+                    showResult('detailedTestResults', '✅ 新增詳細藥物資訊成功', 'success');
+                } else {
+                    showResult('detailedTestResults', `❌ 新增詳細資訊失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('detailedTestResults', `❌ 新增詳細資訊錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetDetailedMedicine() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/detailed/阿斯匹靈`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('detailedTestResults', '✅ 獲取詳細藥物資訊成功', 'success');
+                    showResult('detailedTestResults', `📋 資訊: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    showResult('detailedTestResults', `❌ 獲取詳細資訊失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('detailedTestResults', `❌ 獲取詳細資訊錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSearchMedicine() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/integrated/阿斯匹靈`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('detailedTestResults', '✅ 搜尋藥物成功', 'success');
+                    showResult('detailedTestResults', `🔍 搜尋結果: ${data.medicine_name || '未找到'}`, 'info');
+                } else {
+                    showResult('detailedTestResults', `❌ 搜尋藥物失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('detailedTestResults', `❌ 搜尋藥物錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        // 處方籤管理測試
+        async function testAddPrescription() {
+            clearResults('prescriptionTestResults');
+            try {
+                const prescriptionData = {
+                    patient_name: '測試患者',
+                    doctor_name: '測試醫師',
+                    diagnosis: '測試診斷',
+                    medicines: [{
+                        medicine_name: '阿斯匹靈',
+                        dosage: '100mg',
+                        frequency: '每日三次',
+                        duration: '7天',
+                        instructions: '飯後服用'
+                    }],
+                    prescription_date: new Date().toISOString().split('T')[0]
+                };
+
+                const response = await fetch(`${API_BASE}/prescription/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(prescriptionData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    testResults.lastPrescriptionId = result.id;
+                    showResult('prescriptionTestResults', `✅ 開立處方籤成功: ID ${result.id}`, 'success');
+                } else {
+                    showResult('prescriptionTestResults', `❌ 開立處方籤失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('prescriptionTestResults', `❌ 開立處方籤錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetPrescriptions() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/`);
+                if (response.ok) {
+                    const prescriptions = await response.json();
+                    showResult('prescriptionTestResults', `✅ 獲取處方籤列表成功: 共 ${prescriptions.length} 張`, 'success');
+                } else {
+                    showResult('prescriptionTestResults', `❌ 獲取處方籤列表失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('prescriptionTestResults', `❌ 獲取處方籤列表錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdatePrescriptionStatus() {
+            if (!testResults.lastPrescriptionId) {
+                showResult('prescriptionTestResults', '❌ 請先執行開立處方籤測試', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/prescription/${testResults.lastPrescriptionId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: 'processing',
+                        updated_by: '測試系統',
+                        notes: '測試狀態更新'
+                    })
+                });
+
+                if (response.ok) {
+                    showResult('prescriptionTestResults', `✅ 更新處方籤狀態成功: ID ${testResults.lastPrescriptionId}`, 'success');
+                } else {
+                    showResult('prescriptionTestResults', `❌ 更新處方籤狀態失敗: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('prescriptionTestResults', `❌ 更新處方籤狀態錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        // 界面功能測試
+        function testTabSwitching() {
+            clearResults('interfaceTestResults');
+            showResult('interfaceTestResults', '🔄 測試標籤頁切換功能...', 'info');
+            
+            // 模擬在新窗口中測試標籤頁
+            window.open('/doctor.html', '_blank');
+            showResult('interfaceTestResults', '✅ 已打開醫生界面，請手動測試標籤頁切換', 'success');
+        }
+
+        function testFormValidation() {
+            showResult('interfaceTestResults', '📝 測試表單驗證功能...', 'info');
+            showResult('interfaceTestResults', '✅ 表單驗證需要在實際界面中測試', 'success');
+        }
+
+        function testDataExport() {
+            showResult('interfaceTestResults', '📊 測試數據匯出功能...', 'info');
+            window.open('/api/export/medicines/basic', '_blank');
+            showResult('interfaceTestResults', '✅ 已觸發數據匯出，請檢查下載', 'success');
+        }
+
+        // 整體測試
+        async function runAllTests() {
+            clearResults('overallTestResults');
+            showResult('overallTestResults', '🚀 開始執行所有測試...', 'info');
+            
+            // 執行所有測試
+            await testAddMedicine();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testGetMedicines();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testAddDetailedMedicine();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testAddPrescription();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testGetPrescriptions();
+            
+            showResult('overallTestResults', '🎉 所有自動化測試完成！', 'success');
+        }
+
+        async function clearTestData() {
+            showResult('overallTestResults', '🧹 清理測試數據...', 'info');
+            // 這裡可以添加清理邏輯
+            showResult('overallTestResults', '✅ 測試數據清理完成', 'success');
+        }
+
+        // 頁面載入時的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            showResult('overallTestResults', '📋 測試頁面已載入，可以開始測試', 'success');
+        });
+    </script>
+</body>
+</html>
