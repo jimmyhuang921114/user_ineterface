@@ -1,9 +1,0 @@
-# 請求 (Request)
-string request_type  # "get_all", "get_by_name", "get_detailed"
-string medicine_name # 藥物名稱 (可選)
----
-# 響應 (Response)
-bool success
-string message
-string data_json     # JSON格式的藥物資訊
-int32 total_count    # 總數量

@@ -1,7 +1,0 @@
-{
-        "timestamp": "2025-07-30T18:29:41+00:00",
-        "total_medicines": 0,
-        "basic_medicines": [{"id":1,"name":"","amount":100,"usage_days":30,"position":"A1-01","create_time":"2025-07-30T18:25:16.756819"},{"id":2,"name":"","amount":50,"usage_days":60,"position":"A1-02","create_time":"2025-07-30T18:25:16.756859"},{"id":3,"name":"","amount":25,"usage_days":90,"position":"B2-03","create_time":"2025-07-30T18:25:16.756861"},{"id":4,"name":"A","amount":100,"usage_days":30,"position":"A1-TEST","create_time":"2025-07-30T18:29:41.414867"},{"id":5,"name":"B","amount":50,"usage_days":14,"position":"B2-TEST","create_time":"2025-07-30T18:29:41.445675"},{"id":6,"name":"C","amount":200,"usage_days":60,"position":"C1-VIT","create_time":"2025-07-30T18:29:41.472224"}],
-        "detailed_medicines": {"":{"":{"":"(Propranolol)","":"","":"10"},"":{"":"","":""},"":{"1":"202801","2":"TP071014","3":"009102"},"":{"":"","":"Propranolol HCl"},"":"","":"--AV","":"","":"1. 2. 3.  COPD 4. 5.  Clonidine","":"C D ","":"","created_time":"2025-07-30T18:25:16.756863"},"":{"":{"":" (Antipsychotics)","":"5 ","":" (Oral use)","":"1 special pill"},"":{"":" ","":""},"":{"":"2027/08/02"},"":"","":"","":"","created_time":"2025-07-30T18:25:16.756871"}},
-        "integration_status": "ready_for_ros2"
-    }

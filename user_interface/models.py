@@ -1,1 +1,0 @@
-from sqlalchemy.orm import declarative_base #  Base  models  Base = declarative_base()
