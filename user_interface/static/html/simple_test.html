@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🩺 簡化功能測試</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { margin: 5px; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; }
+        input, select { margin: 5px; padding: 8px; border: 1px solid #ddd; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🩺 醫院管理系統 - 簡化功能測試</h1>
+
+    <!-- API 連接測試 -->
+    <div class="section">
+        <h2>📡 API 連接測試</h2>
+        <button onclick="testAPIConnection()">測試 API 連接</button>
+        <div id="apiResult" class="result"></div>
+    </div>
+
+    <!-- 藥物管理測試 -->
+    <div class="section">
+        <h2>💊 藥物管理測試</h2>
+        <div>
+            <input type="text" id="medicineName" placeholder="藥物名稱" value="測試藥物">
+            <input type="number" id="medicineAmount" placeholder="數量" value="100">
+            <input type="number" id="medicineUsageDays" placeholder="使用天數" value="7">
+            <input type="text" id="medicinePosition" placeholder="儲存位置" value="A1-01">
+        </div>
+        <button onclick="addMedicine()">新增藥物</button>
+        <button onclick="getMedicines()">獲取藥物列表</button>
+        <div id="medicineResult" class="result"></div>
+    </div>
+
+    <!-- 處方籤管理測試 -->
+    <div class="section">
+        <h2>📋 處方籤管理測試</h2>
+        <div>
+            <input type="text" id="patientName" placeholder="患者姓名" value="王小明">
+            <input type="text" id="doctorName" placeholder="醫生姓名" value="李醫師">
+            <input type="text" id="diagnosis" placeholder="診斷結果" value="感冒">
+        </div>
+        <button onclick="addPrescription()">開立處方籤</button>
+        <button onclick="getPrescriptions()">獲取處方籤列表</button>
+        <div id="prescriptionResult" class="result"></div>
+    </div>
+
+    <!-- 標籤頁切換測試 -->
+    <div class="section">
+        <h2>🔄 標籤頁切換測試</h2>
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTestTab('test1')">測試頁面1</button>
+            <button class="tab-button" onclick="switchTestTab('test2')">測試頁面2</button>
+            <button class="tab-button" onclick="switchTestTab('test3')">測試頁面3</button>
+        </div>
+        <div id="test1" class="tab-content active" style="display: block; padding: 10px; border: 1px solid #ddd; margin-top: 10px;">
+            這是測試頁面1的內容
+        </div>
+        <div id="test2" class="tab-content" style="display: none; padding: 10px; border: 1px solid #ddd; margin-top: 10px;">
+            這是測試頁面2的內容
+        </div>
+        <div id="test3" class="tab-content" style="display: none; padding: 10px; border: 1px solid #ddd; margin-top: 10px;">
+            這是測試頁面3的內容
+        </div>
+        <div id="tabResult" class="result"></div>
+    </div>
+
+    <!-- 綜合測試 -->
+    <div class="section">
+        <h2>🎯 綜合測試</h2>
+        <button onclick="runAllTests()">執行所有測試</button>
+        <button onclick="clearAllResults()">清空結果</button>
+        <div id="allTestResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+
+        // API 連接測試
+        async function testAPIConnection() {
+            const result = document.getElementById('apiResult');
+            try {
+                const response = await fetch(`${API_BASE}/medicine/`);
+                if (response.ok) {
+                    result.innerHTML = '✅ API 連接成功 - 狀態: ' + response.status;
+                    result.style.background = '#d4edda';
+                } else {
+                    result.innerHTML = '❌ API 連接失敗 - 狀態: ' + response.status;
+                    result.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                result.innerHTML = '❌ API 連接錯誤: ' + error.message;
+                result.style.background = '#f8d7da';
+            }
+        }
+
+        // 新增藥物
+        async function addMedicine() {
+            const result = document.getElementById('medicineResult');
+            try {
+                const data = {
+                    name: document.getElementById('medicineName').value,
+                    amount: parseInt(document.getElementById('medicineAmount').value),
+                    usage_days: parseInt(document.getElementById('medicineUsageDays').value),
+                    position: document.getElementById('medicinePosition').value
+                };
+
+                const response = await fetch(`${API_BASE}/medicine/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const medicine = await response.json();
+                    result.innerHTML = '✅ 藥物新增成功: ' + JSON.stringify(medicine, null, 2);
+                    result.style.background = '#d4edda';
+                } else {
+                    result.innerHTML = '❌ 藥物新增失敗 - 狀態: ' + response.status;
+                    result.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                result.innerHTML = '❌ 藥物新增錯誤: ' + error.message;
+                result.style.background = '#f8d7da';
+            }
+        }
+
+        // 獲取藥物列表
+        async function getMedicines() {
+            const result = document.getElementById('medicineResult');
+            try {
+                const response = await fetch(`${API_BASE}/medicine/`);
+                if (response.ok) {
+                    const medicines = await response.json();
+                    result.innerHTML = '✅ 藥物列表獲取成功:\n' + JSON.stringify(medicines, null, 2);
+                    result.style.background = '#d4edda';
+                } else {
+                    result.innerHTML = '❌ 藥物列表獲取失敗 - 狀態: ' + response.status;
+                    result.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                result.innerHTML = '❌ 藥物列表獲取錯誤: ' + error.message;
+                result.style.background = '#f8d7da';
+            }
+        }
+
+        // 開立處方籤
+        async function addPrescription() {
+            const result = document.getElementById('prescriptionResult');
+            try {
+                const data = {
+                    patient_name: document.getElementById('patientName').value,
+                    doctor_name: document.getElementById('doctorName').value,
+                    diagnosis: document.getElementById('diagnosis').value,
+                    medicines: [{
+                        medicine_name: '測試藥物',
+                        dosage: '100mg',
+                        frequency: '每日三次',
+                        duration: '7天',
+                        instructions: '飯後服用'
+                    }],
+                    prescription_date: new Date().toISOString().split('T')[0]
+                };
+
+                const response = await fetch(`${API_BASE}/prescription/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const prescription = await response.json();
+                    result.innerHTML = '✅ 處方籤開立成功: ' + JSON.stringify(prescription, null, 2);
+                    result.style.background = '#d4edda';
+                } else {
+                    result.innerHTML = '❌ 處方籤開立失敗 - 狀態: ' + response.status;
+                    result.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                result.innerHTML = '❌ 處方籤開立錯誤: ' + error.message;
+                result.style.background = '#f8d7da';
+            }
+        }
+
+        // 獲取處方籤列表
+        async function getPrescriptions() {
+            const result = document.getElementById('prescriptionResult');
+            try {
+                const response = await fetch(`${API_BASE}/prescription/`);
+                if (response.ok) {
+                    const prescriptions = await response.json();
+                    result.innerHTML = '✅ 處方籤列表獲取成功:\n' + JSON.stringify(prescriptions, null, 2);
+                    result.style.background = '#d4edda';
+                } else {
+                    result.innerHTML = '❌ 處方籤列表獲取失敗 - 狀態: ' + response.status;
+                    result.style.background = '#f8d7da';
+                }
+            } catch (error) {
+                result.innerHTML = '❌ 處方籤列表獲取錯誤: ' + error.message;
+                result.style.background = '#f8d7da';
+            }
+        }
+
+        // 標籤頁切換測試
+        function switchTestTab(tabName) {
+            const result = document.getElementById('tabResult');
+            
+            // 隱藏所有標籤頁內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+
+            // 移除所有按鈕的 active 狀態
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // 顯示選中的標籤頁
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                targetTab.classList.add('active');
+                result.innerHTML = '✅ 成功切換到: ' + tabName;
+                result.style.background = '#d4edda';
+            } else {
+                result.innerHTML = '❌ 找不到標籤頁: ' + tabName;
+                result.style.background = '#f8d7da';
+            }
+            
+            // 設置按鈕為 active 狀態
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        // 執行所有測試
+        async function runAllTests() {
+            const result = document.getElementById('allTestResult');
+            result.innerHTML = '🚀 開始執行所有測試...\n';
+            result.style.background = '#d1ecf1';
+
+            await testAPIConnection();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await addMedicine();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await getMedicines();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await addPrescription();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await getPrescriptions();
+            
+            result.innerHTML += '\n🎉 所有測試執行完成！';
+        }
+
+        // 清空所有結果
+        function clearAllResults() {
+            document.querySelectorAll('.result').forEach(result => {
+                result.innerHTML = '';
+                result.style.background = '#f8f9fa';
+            });
+        }
+
+        // 頁面載入時測試 API 連接
+        document.addEventListener('DOMContentLoaded', () => {
+            testAPIConnection();
+        });
+    </script>
+</body>
+</html>

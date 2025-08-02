@@ -11,6 +11,7 @@
 
     <!--  -->
     <link rel="stylesheet" href="/css/unified_style.css">
+    <script src="/js/doctor.js"></script>
 </head>
 <body>
     <div class="sidebar">
@@ -310,24 +311,24 @@
                 return;
             }
 
-            //
+            // 組織詳細藥物資訊數據
             const medicineData = {
-                : {
-                    : medicineName,
-                    : document.getElementById('medicineManufacturer').value || '',
-                    : document.getElementById('medicineDosage').value || ''
+                basic_info: {
+                    name: medicineName,
+                    manufacturer: document.getElementById('medicineManufacturer').value || '',
+                    dosage: document.getElementById('medicineDosage').value || ''
                 },
-                : {
-                    : document.getElementById('medicineColor').value || '',
-                    : document.getElementById('medicineShape').value || ''
+                appearance: {
+                    color: document.getElementById('medicineColor').value || '',
+                    shape: document.getElementById('medicineShape').value || ''
                 },
-                : document.getElementById('medicineDescription').value || '',
-                : document.getElementById('medicineSideEffects').value || '',
-                : document.getElementById('medicineStorage').value || '',
-                : document.getElementById('medicineExpiry').value || '',
-                : document.getElementById('medicineNotes').value || '',
-                : new Date().toISOString(),
-                : document.getElementById('doctorName')?.value || ''
+                description: document.getElementById('medicineDescription').value || '',
+                side_effects: document.getElementById('medicineSideEffects').value || '',
+                storage_conditions: document.getElementById('medicineStorage').value || '',
+                expiry_date: document.getElementById('medicineExpiry').value || '',
+                notes: document.getElementById('medicineNotes').value || '',
+                created_time: new Date().toISOString(),
+                created_by: document.getElementById('doctorName')?.value || ''
             };
 
             try {
