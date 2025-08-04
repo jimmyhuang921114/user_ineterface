@@ -189,97 +189,107 @@
         </header>
 
         <form id="integratedMedicineForm" class="integrated-form">
-            <!-- 基本資料區塊 -->
-            <div class="form-section">
-                <h3>📋 基本藥物資料</h3>
+            <!-- 整合藥物資料表格 -->
+            <div class="form-section" style="grid-column: span 2;">
+                <h3>💊 整合藥物資料填寫</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    ✨ 在此表格中同時填寫基本和詳細資料，系統將自動分別儲存到兩個JSON文件中
+                </p>
                 
-                <div class="form-group">
-                    <label for="basicMedicineName">藥物名稱 <span class="required">*</span></label>
-                    <input type="text" id="basicMedicineName" name="basicMedicineName" required 
-                           placeholder="請輸入藥物名稱">
+                <!-- 基本資料部分 -->
+                <div style="border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #f8f9ff;">
+                    <h4 style="color: #007bff; margin-bottom: 15px;">📋 基本藥物資料</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="medicineName">藥物名稱 <span class="required">*</span></label>
+                            <input type="text" id="medicineName" name="medicineName" required 
+                                   placeholder="請輸入藥物名稱">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amount">庫存數量 <span class="required">*</span></label>
+                            <input type="number" id="amount" name="amount" required 
+                                   placeholder="請輸入數量" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="position">儲存位置 <span class="required">*</span></label>
+                            <input type="text" id="position" name="position" required 
+                                   placeholder="例如: A1-01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="usageDays">使用天數</label>
+                            <input type="number" id="usageDays" name="usageDays" 
+                                   placeholder="建議使用天數" min="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="manufacturer">製造商</label>
+                            <input type="text" id="manufacturer" name="manufacturer" 
+                                   placeholder="製造商名稱">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dosage">基本劑量</label>
+                            <input type="text" id="dosage" name="dosage" 
+                                   placeholder="例如: 100mg">
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="basicAmount">庫存數量 <span class="required">*</span></label>
-                    <input type="number" id="basicAmount" name="basicAmount" required 
-                           placeholder="請輸入數量" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="basicUsageDays">使用天數</label>
-                    <input type="number" id="basicUsageDays" name="basicUsageDays" 
-                           placeholder="建議使用天數" min="1">
-                </div>
-                
-                <div class="form-group">
-                    <label for="basicPosition">儲存位置 <span class="required">*</span></label>
-                    <input type="text" id="basicPosition" name="basicPosition" required 
-                           placeholder="例如: A1-01">
-                </div>
-                
-                <div class="form-group">
-                    <label for="basicManufacturer">製造商</label>
-                    <input type="text" id="basicManufacturer" name="basicManufacturer" 
-                           placeholder="製造商名稱">
-                </div>
-                
-                <div class="form-group">
-                    <label for="basicDosage">基本劑量</label>
-                    <input type="text" id="basicDosage" name="basicDosage" 
-                           placeholder="例如: 100mg">
-                </div>
-            </div>
-
-            <!-- 詳細資料區塊 -->
-            <div class="form-section">
-                <h3>📊 詳細藥物資訊</h3>
-                
-                <div class="form-group">
-                    <label for="detailedDescription">藥物描述</label>
-                    <textarea id="detailedDescription" name="detailedDescription" rows="3" 
-                              placeholder="詳細的藥物描述與用途"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedSideEffects">副作用</label>
-                    <textarea id="detailedSideEffects" name="detailedSideEffects" rows="3" 
-                              placeholder="可能的副作用與注意事項"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedColor">外觀顏色</label>
-                    <input type="text" id="detailedColor" name="detailedColor" 
-                           placeholder="藥物的顏色">
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedShape">藥物形狀</label>
-                    <select id="detailedShape" name="detailedShape">
-                        <option value="">-- 請選擇形狀 --</option>
-                        <option value="圓形">圓形</option>
-                        <option value="橢圓形">橢圓形</option>
-                        <option value="方形">方形</option>
-                        <option value="長方形">長方形</option>
-                        <option value="膠囊">膠囊</option>
-                        <option value="其他">其他</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedStorage">儲存條件</label>
-                    <textarea id="detailedStorage" name="detailedStorage" rows="2" 
-                              placeholder="溫度、濕度等儲存要求"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedExpiry">有效期限</label>
-                    <input type="date" id="detailedExpiry" name="detailedExpiry">
-                </div>
-                
-                <div class="form-group">
-                    <label for="detailedNotes">特殊說明</label>
-                    <textarea id="detailedNotes" name="detailedNotes" rows="2" 
-                              placeholder="其他重要說明"></textarea>
+                <!-- 詳細資料部分 -->
+                <div style="border: 2px solid #28a745; border-radius: 8px; padding: 20px; background: #f8fff8;">
+                    <h4 style="color: #28a745; margin-bottom: 15px;">📊 詳細藥物資訊</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="description">藥物描述</label>
+                            <textarea id="description" name="description" rows="3" 
+                                      placeholder="詳細的藥物描述與用途"></textarea>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="sideEffects">副作用</label>
+                            <textarea id="sideEffects" name="sideEffects" rows="3" 
+                                      placeholder="可能的副作用與注意事項"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="color">外觀顏色</label>
+                            <input type="text" id="color" name="color" 
+                                   placeholder="藥物的顏色">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shape">藥物形狀</label>
+                            <select id="shape" name="shape">
+                                <option value="">-- 請選擇形狀 --</option>
+                                <option value="圓形">圓形</option>
+                                <option value="橢圓形">橢圓形</option>
+                                <option value="方形">方形</option>
+                                <option value="長方形">長方形</option>
+                                <option value="膠囊">膠囊</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="storageConditions">儲存條件</label>
+                            <textarea id="storageConditions" name="storageConditions" rows="2" 
+                                      placeholder="溫度、濕度等儲存要求"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="expiryDate">有效期限</label>
+                            <input type="date" id="expiryDate" name="expiryDate">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">特殊說明</label>
+                            <textarea id="notes" name="notes" rows="2" 
+                                      placeholder="其他重要說明"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -320,12 +330,12 @@
             
             // 收集基本資料
             const basicData = {
-                name: document.getElementById('basicMedicineName').value.trim(),
-                amount: parseInt(document.getElementById('basicAmount').value) || 0,
-                usage_days: parseInt(document.getElementById('basicUsageDays').value) || null,
-                position: document.getElementById('basicPosition').value.trim(),
-                manufacturer: document.getElementById('basicManufacturer').value.trim(),
-                dosage: document.getElementById('basicDosage').value.trim(),
+                name: document.getElementById('medicineName').value.trim(),
+                amount: parseInt(document.getElementById('amount').value) || 0,
+                usage_days: parseInt(document.getElementById('usageDays').value) || null,
+                position: document.getElementById('position').value.trim(),
+                manufacturer: document.getElementById('manufacturer').value.trim(),
+                dosage: document.getElementById('dosage').value.trim(),
                 created_time: new Date().toISOString(),
                 updated_time: new Date().toISOString()
             };
@@ -333,15 +343,15 @@
             // 收集詳細資料
             const detailedData = {
                 medicine_name: basicData.name,
-                description: document.getElementById('detailedDescription').value.trim(),
-                side_effects: document.getElementById('detailedSideEffects').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                side_effects: document.getElementById('sideEffects').value.trim(),
                 appearance: {
-                    color: document.getElementById('detailedColor').value.trim(),
-                    shape: document.getElementById('detailedShape').value
+                    color: document.getElementById('color').value.trim(),
+                    shape: document.getElementById('shape').value
                 },
-                storage_conditions: document.getElementById('detailedStorage').value.trim(),
-                expiry_date: document.getElementById('detailedExpiry').value,
-                notes: document.getElementById('detailedNotes').value.trim(),
+                storage_conditions: document.getElementById('storageConditions').value.trim(),
+                expiry_date: document.getElementById('expiryDate').value,
+                notes: document.getElementById('notes').value.trim(),
                 created_time: new Date().toISOString(),
                 updated_time: new Date().toISOString()
             };
@@ -453,10 +463,13 @@
         // 頁面載入時設置預設值
         document.addEventListener('DOMContentLoaded', function() {
             // 設置預設的有效期限為一年後
-            const expiryInput = document.getElementById('detailedExpiry');
+            const expiryInput = document.getElementById('expiryDate');
             const oneYearLater = new Date();
             oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
             expiryInput.value = oneYearLater.toISOString().split('T')[0];
+            
+            console.log('💊 整合藥物管理頁面已載入');
+            console.log('📋 預設有效期限設置為:', expiryInput.value);
         });
     </script>
 </body>
