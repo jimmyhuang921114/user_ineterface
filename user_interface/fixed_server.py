@@ -25,6 +25,7 @@ class MedicineBasic(BaseModel):
     position: str
     manufacturer: Optional[str] = ""
     dosage: Optional[str] = ""
+    prompt: Optional[str] = ""  # 新增prompt提示詞欄位
     created_time: Optional[str] = None
     updated_time: Optional[str] = None
 

@@ -130,7 +130,8 @@ async function handleMedicineSubmit(event) {
             position: formData.get('medicinePosition'),
             usage_days: parseInt(formData.get('medicineUsageDays')) || null,
             manufacturer: formData.get('medicineManufacturer') || '',
-            dosage: formData.get('medicineDosage') || ''
+            dosage: formData.get('medicineDosage') || '',
+            prompt: formData.get('medicinePrompt') || ''  // 添加prompt欄位
         };
         
         // 收集詳細資料

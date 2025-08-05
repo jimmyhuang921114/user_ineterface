@@ -166,6 +166,13 @@
                         <input type="text" id="dosage" name="dosage">
                     </div>
                 </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="prompt">🤖 AI提示詞 (用於智能推薦)</label>
+                        <textarea id="prompt" name="prompt" rows="2" placeholder="例：適用於感冒發燒，成人每次1-2錠，兒童減半..."></textarea>
+                    </div>
+                </div>
             </div>
             
             <!-- 詳細藥物資料區 -->
@@ -271,7 +278,8 @@
                     usage_days: parseInt(document.getElementById('usage_days').value) || null,
                     position: document.getElementById('position').value,
                     manufacturer: document.getElementById('manufacturer').value || "",
-                    dosage: document.getElementById('dosage').value || ""
+                    dosage: document.getElementById('dosage').value || "",
+                    prompt: document.getElementById('prompt').value || ""  // 添加prompt欄位
                 };
                 
                 // 收集詳細資料
