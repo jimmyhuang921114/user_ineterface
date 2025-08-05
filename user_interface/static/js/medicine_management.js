@@ -1,6 +1,6 @@
 /**
- * 藥物管理系統 JavaScript
- * Medicine Management System JavaScript
+ * 藥物管理系統 JavaScript (SQL版本)
+ * Medicine Management System JavaScript for SQL Version
  */
 
 // 全域變數
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * 系統初始化
  */
 function initializeSystem() {
-    console.log('💊 藥物管理系統初始化...');
+    console.log('💊 藥物管理系統初始化 (SQL版本)...');
 }
 
 /**
@@ -60,12 +60,20 @@ async function loadBasicMedicines() {
     try {
         const response = await fetch(`${API_BASE}/medicine/basic`);
         const data = await response.json();
-        availableMedicines = data.medicines || [];
+        
+        // SQL版本返回格式檢查
+        if (data.medicines) {
+            availableMedicines = data.medicines;
+        } else if (Array.isArray(data)) {
+            availableMedicines = data;
+        } else {
+            availableMedicines = [];
+        }
         
         // 更新詳細藥物的選擇器
         updateMedicineSelector();
         
-        console.log('✅ 已載入', availableMedicines.length, '種基本藥物');
+        console.log('✅ 已載入', availableMedicines.length, '種基本藥物 (SQL版本)');
     } catch (error) {
         console.error('載入基本藥物清單失敗:', error);
         availableMedicines = [];
@@ -154,7 +162,7 @@ async function handleBasicMedicineSubmit(event) {
             prompt: formData.get('basicMedicinePrompt') || ''
         };
         
-        // 發送請求
+        // 發送請求到SQL版本API
         const response = await fetch(`${API_BASE}/medicine/basic`, {
             method: 'POST',
             headers: {
@@ -163,16 +171,16 @@ async function handleBasicMedicineSubmit(event) {
             body: JSON.stringify(basicData)
         });
         
-        const result = await response.json();
-        
         if (response.ok) {
-            showStatus('✅ 基本藥物資料已成功保存', 'success', 'basicMedicineStatus');
+            const result = await response.json();
+            showStatus('✅ 基本藥物資料已成功保存到SQL資料庫', 'success', 'basicMedicineStatus');
             document.getElementById('basicMedicineForm').reset();
             
             // 重新載入藥物清單
             await loadBasicMedicines();
         } else {
-            throw new Error(result.detail || '保存失敗');
+            const errorData = await response.json();
+            throw new Error(errorData.detail || '保存失敗');
         }
         
     } catch (error) {
@@ -194,9 +202,9 @@ async function handleDetailedMedicineSubmit(event) {
     const formData = new FormData(event.target);
     
     try {
-        // 收集詳細資料
+        // 收集詳細資料 (適配SQL版本格式)
         const detailedData = {
-            medicine_name: selectedMedicine.name,
+            medicine_id: selectedMedicine.id, // SQL版本需要medicine_id
             description: formData.get('detailedMedicineDescription') || '',
             ingredient: formData.get('detailedMedicineIngredient') || '',
             category: formData.get('detailedMedicineCategory') || '',
@@ -210,7 +218,7 @@ async function handleDetailedMedicineSubmit(event) {
             notes: formData.get('detailedMedicineNotes') || ''
         };
         
-        // 發送請求
+        // 發送請求到SQL版本API
         const response = await fetch(`${API_BASE}/medicine/detailed`, {
             method: 'POST',
             headers: {
@@ -219,17 +227,17 @@ async function handleDetailedMedicineSubmit(event) {
             body: JSON.stringify(detailedData)
         });
         
-        const result = await response.json();
-        
         if (response.ok) {
-            showStatus(`✅ ${selectedMedicine.name} 的詳細資料已成功保存`, 'success', 'detailedMedicineStatus');
+            const result = await response.json();
+            showStatus(`✅ ${selectedMedicine.name} 的詳細資料已成功保存到SQL資料庫`, 'success', 'detailedMedicineStatus');
             document.getElementById('detailedMedicineForm').reset();
             hideBasicMedicineInfo();
             
             // 重置選擇器
             document.getElementById('detailedMedicineSelect').value = '';
         } else {
-            throw new Error(result.detail || '保存失敗');
+            const errorData = await response.json();
+            throw new Error(errorData.detail || '保存失敗');
         }
         
     } catch (error) {

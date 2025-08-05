@@ -199,6 +199,10 @@ async def unified_medicine_page():
 async def integrated_management_page():
     return FileResponse("static/html/integrated_medicine_management.html")
 
+@app.get("/medicine_management.html")
+async def medicine_management_page():
+    return FileResponse("static/html/medicine_management.html")
+
 # WebSocket端點
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
