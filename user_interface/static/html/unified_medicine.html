@@ -298,13 +298,17 @@
                     detailed_data: hasDetailedData ? detailedData : null
                 };
                 
-                // 發送請求
+                // 發送請求 - 修復API調用格式
+                const requestBody = hasDetailedData ? 
+                    `basic_data=${encodeURIComponent(JSON.stringify(basicData))}&detailed_data=${encodeURIComponent(JSON.stringify(detailedData))}` :
+                    `basic_data=${encodeURIComponent(JSON.stringify(basicData))}`;
+                
                 const response = await fetch('/api/medicine/unified', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify(requestData)
+                    body: requestBody
                 });
                 
                 const result = await response.json();
@@ -337,19 +341,23 @@
             }
         });
         
-        // 自動同步YAML
+        // 手動同步YAML (僅在需要時使用)
         async function syncYAML() {
             try {
-                const response = await fetch('/api/export/yaml/sync');
+                const response = await fetch('/api/export/yaml/sync', {
+                    method: 'POST'
+                });
                 const result = await response.json();
                 console.log('YAML同步:', result.message);
+                showMessage('✅ YAML同步完成', 'success');
             } catch (error) {
                 console.error('YAML同步失敗:', error);
+                showMessage('❌ YAML同步失敗', 'error');
             }
         }
         
-        // 頁面載入時同步YAML
-        window.addEventListener('load', syncYAML);
+        // 移除自動同步 - 只在用戶主動請求時同步
+        // window.addEventListener('load', syncYAML);
     </script>
 </body>
 </html>

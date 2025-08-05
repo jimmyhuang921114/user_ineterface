@@ -177,26 +177,7 @@ def save_prescriptions(data):
     with open("prescription_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# 靜態頁面路由
-@app.get("/")
-async def root():
-    return FileResponse("static/html/medicine_integrated.html")
-
-@app.get("/doctor.html")
-async def doctor_page():
-    return FileResponse("static/html/doctor.html")
-
-@app.get("/medicine_integrated.html")
-async def integrated_page():
-    return FileResponse("static/html/medicine_integrated.html")
-
-@app.get("/simple_test.html")
-async def test_page():
-    return FileResponse("static/html/simple_test.html")
-
-@app.get("/Prescription.html")
-async def prescription_page():
-    return FileResponse("static/html/Prescription.html")
+# === 清理重複的路由定義 ===
 
 # WebSocket端點 - 實時通知
 @app.websocket("/ws")
@@ -417,69 +398,7 @@ async def update_order_status(order_id: str, status: OrderStatus):
     
     raise HTTPException(status_code=404, detail="訂單未找到")
 
-# ROS2 API端點
-@app.get("/api/ros2/medicine/basic")
-async def ros2_get_basic_medicines():
-    medicines = load_basic_medicines()
-    return {
-        "status": "success",
-        "type": "basic_medicines",
-        "timestamp": datetime.now().isoformat(),
-        "count": len(medicines),
-        "data": medicines,
-        "ros2_compatible": True
-    }
-
-@app.get("/api/ros2/medicine/detailed")
-async def ros2_get_detailed_medicines():
-    medicines = load_detailed_medicines()
-    return {
-        "status": "success",
-        "type": "detailed_medicines",
-        "timestamp": datetime.now().isoformat(),
-        "count": len(medicines),
-        "data": medicines,
-        "ros2_compatible": True
-    }
-
-@app.get("/api/ros2/medicine/integrated/{medicine_name}")
-async def ros2_get_integrated_medicine(medicine_name: str):
-    basic_medicines = load_basic_medicines()
-    detailed_medicines = load_detailed_medicines()
-    
-    basic_data = next((m for m in basic_medicines if m["name"] == medicine_name), None)
-    detailed_data = next((m for m in detailed_medicines if m["medicine_name"] == medicine_name), None)
-    
-    if not basic_data and not detailed_data:
-        return {
-            "status": "error",
-            "type": "integrated_medicine",
-            "timestamp": datetime.now().isoformat(),
-            "error": "Medicine not found",
-            "ros2_compatible": True
-        }
-    
-    return {
-        "status": "success",
-        "type": "integrated_medicine",
-        "timestamp": datetime.now().isoformat(),
-        "medicine_name": medicine_name,
-        "basic_data": basic_data,
-        "detailed_data": detailed_data,
-        "ros2_compatible": True
-    }
-
-@app.get("/api/ros2/orders")
-async def ros2_get_orders():
-    orders = load_orders()
-    return {
-        "status": "success",
-        "type": "orders",
-        "timestamp": datetime.now().isoformat(),
-        "count": len(orders),
-        "data": orders,
-        "ros2_compatible": True
-    }
+# === 清理重複的ROS2 API端點 ===
 
 @app.post("/api/ros2/orders")
 async def ros2_create_order(order: MedicineOrder):
@@ -579,9 +498,10 @@ async def add_unified_medicine(basic_data: MedicineBasic, detailed_data: Optiona
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"保存失敗: {str(e)}")
 
-# YAML匯出API
-@app.get("/api/export/yaml/sync")
+# YAML匯出API - 改為POST避免意外觸發
+@app.post("/api/export/yaml/sync")
 async def sync_yaml_export():
+    """手動觸發YAML同步 - 只在需要時調用"""
     try:
         yaml_storage.sync_json_to_yaml()
         basic_path, detailed_path = yaml_storage.export_yaml_for_ros2()
@@ -594,6 +514,15 @@ async def sync_yaml_export():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"YAML匯出失敗: {str(e)}")
+
+# 自動YAML同步 - 僅在藥物資料變更時觸發
+async def auto_sync_yaml():
+    """自動同步YAML，靜默執行"""
+    try:
+        yaml_storage.sync_json_to_yaml()
+        yaml_storage.export_yaml_for_ros2()
+    except Exception as e:
+        print(f"⚠️ 自動YAML同步失敗: {e}")
 
 # 獲取YAML格式的藥物資料
 @app.get("/api/medicine/yaml/basic")
