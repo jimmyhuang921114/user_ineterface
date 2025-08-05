@@ -14,6 +14,8 @@ from typing import List, Optional, Dict, Any
 import json
 import asyncio
 import uvicorn
+import yaml
+from yaml_storage import YAMLMedicineStorage
 
 # Pydantic Models
 class MedicineBasic(BaseModel):
@@ -95,6 +97,10 @@ async def doctor_page():
 async def prescription_page():
     return FileResponse("static/html/Prescription.html")
 
+@app.get("/unified_medicine.html")
+async def unified_medicine_page():
+    return FileResponse("static/html/unified_medicine.html")
+
 # WebSocket連接管理
 class ConnectionManager:
     def __init__(self):
@@ -118,6 +124,9 @@ class ConnectionManager:
                 pass
 
 manager = ConnectionManager()
+
+# YAML儲存實例
+yaml_storage = YAMLMedicineStorage()
 
 # JSON文件操作函數
 def load_basic_medicines():
@@ -235,6 +244,17 @@ async def create_basic_medicine(medicine: MedicineBasic):
     await manager.broadcast(json.dumps(notification, ensure_ascii=False))
     
     return {"message": "基本藥物資料已保存", "medicine": medicine_dict}
+
+@app.get("/api/medicine/")
+async def get_all_medicines():
+    basic_medicines = load_basic_medicines()
+    detailed_medicines = load_detailed_medicines()
+    return {
+        "basic_medicines": basic_medicines,
+        "detailed_medicines": detailed_medicines,
+        "total_basic": len(basic_medicines),
+        "total_detailed": len(detailed_medicines)
+    }
 
 @app.get("/api/medicine/basic")
 async def get_basic_medicines():
@@ -505,6 +525,98 @@ async def create_prescription(prescription: Prescription):
     save_prescriptions(prescriptions)
     
     return {"message": "處方籤已保存", "prescription": prescription_dict}
+
+# 統一藥物添加API (基本+詳細)
+@app.post("/api/medicine/unified")
+async def add_unified_medicine(basic_data: MedicineBasic, detailed_data: Optional[MedicineDetailed] = None):
+    try:
+        # 添加到JSON檔案
+        basic_medicines = load_basic_medicines()
+        basic_dict = basic_data.dict()
+        basic_dict["created_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        basic_dict["updated_time"] = basic_dict["created_time"]
+        
+        basic_medicines.append(basic_dict)
+        save_basic_medicines(basic_medicines)
+        
+        detailed_dict = None
+        if detailed_data:
+            detailed_medicines = load_detailed_medicines()
+            detailed_dict = detailed_data.dict()
+            detailed_dict["medicine_name"] = basic_data.name
+            detailed_dict["created_time"] = basic_dict["created_time"]
+            detailed_dict["updated_time"] = basic_dict["created_time"]
+            
+            detailed_medicines.append(detailed_dict)
+            save_detailed_medicines(detailed_medicines)
+        
+        # 同步到YAML
+        yaml_storage.add_medicine_to_yaml(basic_dict, detailed_dict)
+        
+        # 導出ROS2格式
+        yaml_storage.export_yaml_for_ros2()
+        
+        # 實時通知
+        notification = {
+            "type": "unified_medicine_added",
+            "basic_medicine": basic_dict,
+            "detailed_medicine": detailed_dict,
+            "timestamp": basic_dict["created_time"]
+        }
+        await manager.broadcast(json.dumps(notification, ensure_ascii=False))
+        
+        return {
+            "message": "✅ 統一藥物資料已保存",
+            "basic_medicine": basic_dict,
+            "detailed_medicine": detailed_dict,
+            "yaml_exported": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"保存失敗: {str(e)}")
+
+# YAML匯出API
+@app.get("/api/export/yaml/sync")
+async def sync_yaml_export():
+    try:
+        yaml_storage.sync_json_to_yaml()
+        basic_path, detailed_path = yaml_storage.export_yaml_for_ros2()
+        
+        return {
+            "message": "✅ YAML同步和匯出完成",
+            "basic_yaml": str(basic_path),
+            "detailed_yaml": str(detailed_path),
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"YAML匯出失敗: {str(e)}")
+
+# 獲取YAML格式的藥物資料
+@app.get("/api/medicine/yaml/basic")
+async def get_basic_medicines_yaml():
+    try:
+        medicines = yaml_storage.get_basic_medicines_yaml()
+        return {
+            "medicines": medicines,
+            "total": len(medicines),
+            "format": "yaml",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"獲取YAML資料失敗: {str(e)}")
+
+@app.get("/api/medicine/yaml/detailed")
+async def get_detailed_medicines_yaml():
+    try:
+        medicines = yaml_storage.get_detailed_medicines_yaml()
+        return {
+            "medicines": medicines,
+            "total": len(medicines),
+            "format": "yaml",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"獲取YAML資料失敗: {str(e)}")
 
 @app.get("/api/ros2/prescription")
 async def ros2_get_prescriptions():

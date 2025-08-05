@@ -7,6 +7,12 @@ uvicorn[standard]>=0.23.0
 # 數據驗證和序列化
 pydantic>=2.0.0
 
+# YAML處理
+PyYAML>=6.0
+
+# HTTP請求 (用於ROS2節點)
+requests>=2.28.0
+
 # CORS 中間件 (已包含在 FastAPI 中)
 # fastapi 已包含 starlette，所以 CORS 功能已經可用
 

@@ -16,17 +16,25 @@
 ## ✨ 功能特色
 
 ### 🔧 核心功能
-- **藥物管理**: 完整的藥物庫存追蹤和管理
+- **統一藥物管理**: 在單一表單中填寫基本和詳細藥物資料
+- **YAML數據匯出**: 自動將數據匯出為ROS2兼容的YAML格式
 - **處方籤系統**: 數位化處方籤創建和管理
 - **醫生介面**: 專門為醫生設計的操作介面
 - **即時更新**: WebSocket支援的即時數據同步
 - **響應式設計**: 支援桌面和移動設備
 
+### 🤖 ROS2整合
+- **訂單服務**: ROS2服務獲取處方籤訂單並生成YAML輸出
+- **基本藥物提供者**: 自動發布基本藥物庫存資訊
+- **詳細藥物提供者**: 提供完整藥物詳細資訊和安全等級
+- **實時數據同步**: 定時更新和即時服務響應
+
 ### 🛡️ 技術特色
 - **FastAPI後端**: 高效能的Python Web框架
 - **現代化前端**: HTML5、CSS3、JavaScript ES6+
 - **RESTful API**: 標準化的API設計
-- **JSON數據存儲**: 輕量級數據持久化
+- **雙重數據存儲**: JSON + YAML格式並行存儲
+- **ROS2節點架構**: 完整的機器人系統整合
 - **CORS支援**: 跨域資源共享
 
 ## 🏗️ 系統架構
@@ -81,8 +89,20 @@ cd user_interface
 python main.py
 ```
 
-5. **訪問系統**
+5. **啟動整合系統** (建議)
+```bash
+python start_ros2_medicine_system.py
+```
+
+**或單獨啟動Web服務**
+```bash
+cd user_interface
+python3 main.py
+```
+
+6. **訪問系統**
 - 主頁面: http://localhost:8000
+- 統一藥物管理: http://localhost:8000/unified_medicine.html ⭐ 新功能
 - 藥物管理: http://localhost:8000/Medicine.html
 - 處方籤管理: http://localhost:8000/Prescription.html
 - 醫生介面: http://localhost:8000/doctor.html
