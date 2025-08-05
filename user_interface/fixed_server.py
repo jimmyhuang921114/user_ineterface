@@ -101,6 +101,10 @@ async def prescription_page():
 async def unified_medicine_page():
     return FileResponse("static/html/unified_medicine.html")
 
+@app.get("/integrated_medicine_management.html")
+async def integrated_medicine_management_page():
+    return FileResponse("static/html/integrated_medicine_management.html")
+
 # WebSocket連接管理
 class ConnectionManager:
     def __init__(self):
@@ -617,6 +621,215 @@ async def get_detailed_medicines_yaml():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取YAML資料失敗: {str(e)}")
+
+# 庫存調整API
+@app.post("/api/medicine/adjust-stock")
+async def adjust_medicine_stock(request: dict):
+    try:
+        medicine_name = request.get("medicine_name")
+        action = request.get("action")  # "add" or "subtract"
+        amount = request.get("amount", 1)
+        
+        if not medicine_name or not action:
+            raise HTTPException(status_code=400, detail="藥物名稱和操作類型不能為空")
+        
+        # 載入現有數據
+        medicines = load_basic_medicines()
+        medicine_found = False
+        
+        for medicine in medicines:
+            if medicine["name"] == medicine_name:
+                medicine_found = True
+                current_amount = medicine.get("amount", 0)
+                
+                if action == "add":
+                    medicine["amount"] = current_amount + amount
+                elif action == "subtract":
+                    new_amount = current_amount - amount
+                    if new_amount < 0:
+                        raise HTTPException(status_code=400, detail="庫存不足，無法減少指定數量")
+                    medicine["amount"] = new_amount
+                else:
+                    raise HTTPException(status_code=400, detail="無效的操作類型")
+                
+                medicine["updated_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                break
+        
+        if not medicine_found:
+            raise HTTPException(status_code=404, detail="找不到指定的藥物")
+        
+        # 保存更新後的數據
+        save_basic_medicines(medicines)
+        
+        # 同步到YAML
+        yaml_storage.sync_json_to_yaml()
+        
+        # 實時通知
+        notification = {
+            "type": "stock_adjusted",
+            "medicine_name": medicine_name,
+            "action": action,
+            "amount": amount,
+            "timestamp": datetime.now().isoformat()
+        }
+        await manager.broadcast(json.dumps(notification, ensure_ascii=False))
+        
+        return {
+            "message": f"✅ {medicine_name} 庫存已{action == 'add' and '增加' or '減少'} {amount}",
+            "medicine_name": medicine_name,
+            "new_amount": next(m["amount"] for m in medicines if m["name"] == medicine_name),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"庫存調整失敗: {str(e)}")
+
+# 刪除藥物API
+@app.delete("/api/medicine/{medicine_name}")
+async def delete_medicine(medicine_name: str):
+    try:
+        # 刪除基本藥物
+        basic_medicines = load_basic_medicines()
+        original_count = len(basic_medicines)
+        basic_medicines = [m for m in basic_medicines if m["name"] != medicine_name]
+        
+        if len(basic_medicines) == original_count:
+            raise HTTPException(status_code=404, detail="找不到指定的藥物")
+        
+        save_basic_medicines(basic_medicines)
+        
+        # 刪除詳細藥物資料
+        detailed_medicines = load_detailed_medicines()
+        detailed_medicines = [m for m in detailed_medicines if m.get("medicine_name") != medicine_name]
+        save_detailed_medicines(detailed_medicines)
+        
+        # 同步到YAML
+        yaml_storage.sync_json_to_yaml()
+        
+        # 實時通知
+        notification = {
+            "type": "medicine_deleted",
+            "medicine_name": medicine_name,
+            "timestamp": datetime.now().isoformat()
+        }
+        await manager.broadcast(json.dumps(notification, ensure_ascii=False))
+        
+        return {
+            "message": f"✅ 藥物 '{medicine_name}' 已成功刪除",
+            "deleted_medicine": medicine_name,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"刪除藥物失敗: {str(e)}")
+
+# 更新藥物API
+@app.put("/api/medicine/{medicine_name}")
+async def update_medicine(medicine_name: str, basic_data: MedicineBasic, detailed_data: Optional[MedicineDetailed] = None):
+    try:
+        # 更新基本藥物
+        basic_medicines = load_basic_medicines()
+        medicine_found = False
+        
+        for i, medicine in enumerate(basic_medicines):
+            if medicine["name"] == medicine_name:
+                medicine_found = True
+                # 保留原始創建時間
+                original_created_time = medicine.get("created_time")
+                
+                # 更新資料
+                updated_basic = basic_data.dict()
+                updated_basic["created_time"] = original_created_time
+                updated_basic["updated_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                basic_medicines[i] = updated_basic
+                break
+        
+        if not medicine_found:
+            raise HTTPException(status_code=404, detail="找不到指定的藥物")
+        
+        save_basic_medicines(basic_medicines)
+        
+        # 更新詳細藥物資料
+        updated_detailed = None
+        if detailed_data:
+            detailed_medicines = load_detailed_medicines()
+            detailed_found = False
+            
+            for i, detailed in enumerate(detailed_medicines):
+                if detailed.get("medicine_name") == medicine_name:
+                    detailed_found = True
+                    original_created_time = detailed.get("created_time")
+                    
+                    updated_detailed = detailed_data.dict()
+                    updated_detailed["medicine_name"] = basic_data.name
+                    updated_detailed["created_time"] = original_created_time
+                    updated_detailed["updated_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    detailed_medicines[i] = updated_detailed
+                    break
+            
+            if not detailed_found:
+                # 新增詳細資料
+                updated_detailed = detailed_data.dict()
+                updated_detailed["medicine_name"] = basic_data.name
+                updated_detailed["created_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                updated_detailed["updated_time"] = updated_detailed["created_time"]
+                detailed_medicines.append(updated_detailed)
+            
+            save_detailed_medicines(detailed_medicines)
+        
+        # 同步到YAML
+        yaml_storage.sync_json_to_yaml()
+        
+        # 實時通知
+        notification = {
+            "type": "medicine_updated",
+            "medicine_name": medicine_name,
+            "new_name": basic_data.name,
+            "timestamp": datetime.now().isoformat()
+        }
+        await manager.broadcast(json.dumps(notification, ensure_ascii=False))
+        
+        return {
+            "message": f"✅ 藥物 '{medicine_name}' 已成功更新",
+            "basic_medicine": updated_basic,
+            "detailed_medicine": updated_detailed,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"更新藥物失敗: {str(e)}")
+
+# 處方籤刪除API
+@app.delete("/api/prescription/{prescription_id}")
+async def delete_prescription(prescription_id: int):
+    try:
+        prescriptions = load_prescriptions()
+        
+        if prescription_id < 0 or prescription_id >= len(prescriptions):
+            raise HTTPException(status_code=404, detail="找不到指定的處方籤")
+        
+        deleted_prescription = prescriptions.pop(prescription_id)
+        save_prescriptions(prescriptions)
+        
+        # 實時通知
+        notification = {
+            "type": "prescription_deleted",
+            "prescription_id": prescription_id,
+            "patient_name": deleted_prescription.get("patient_name", "未知"),
+            "timestamp": datetime.now().isoformat()
+        }
+        await manager.broadcast(json.dumps(notification, ensure_ascii=False))
+        
+        return {
+            "message": "✅ 處方籤已成功刪除",
+            "deleted_prescription": deleted_prescription,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"刪除處方籤失敗: {str(e)}")
 
 @app.get("/api/ros2/prescription")
 async def ros2_get_prescriptions():
