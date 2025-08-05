@@ -1,360 +1,236 @@
-# 🏥 醫院藥物管理系統 (Hospital Medicine Management System)
+# 🏥 醫院藥物管理系統
+## Hospital Medicine Management System
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8+-blue.svg" />
-  <img src="https://img.shields.io/badge/FastAPI-0.100+-green.svg" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  <img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg" />
-</p>
+一個現代化的醫院藥物管理系統，提供完整的藥物庫存管理、處方籤管理和醫生操作介面。
 
-一個現代化的醫院藥物管理系統，提供完整的藥物庫存管理、處方籤開立和管理功能。系統採用 FastAPI 後端和響應式前端設計，支援多種數據格式和 API 接口。
+## 📋 目錄
+- [功能特色](#功能特色)
+- [系統架構](#系統架構)
+- [安裝指南](#安裝指南)
+- [使用說明](#使用說明)
+- [API文檔](#api文檔)
+- [專案結構](#專案結構)
+- [開發指南](#開發指南)
+- [故障排除](#故障排除)
 
-## ✨ 主要功能
+## ✨ 功能特色
 
-### 🏥 核心模組
+### 🔧 核心功能
+- **藥物管理**: 完整的藥物庫存追蹤和管理
+- **處方籤系統**: 數位化處方籤創建和管理
+- **醫生介面**: 專門為醫生設計的操作介面
+- **即時更新**: WebSocket支援的即時數據同步
+- **響應式設計**: 支援桌面和移動設備
 
-#### 1. 藥物庫存管理 (Medicine Management)
-- 📊 **即時庫存監控**: 動態顯示藥物數量、位置、使用期限
-- 🔍 **智能搜尋系統**: 支援藥物名稱、代碼、製造商等多維度搜尋
-- 📝 **詳細資訊管理**: 完整的藥物資訊（適應症、副作用、儲存條件等）
-- 📋 **批量操作**: 支援批量新增、編輯、匯出藥物資料
-- ⚠️ **庫存警報**: 自動低庫存提醒和過期提醒
+### 🛡️ 技術特色
+- **FastAPI後端**: 高效能的Python Web框架
+- **現代化前端**: HTML5、CSS3、JavaScript ES6+
+- **RESTful API**: 標準化的API設計
+- **JSON數據存儲**: 輕量級數據持久化
+- **CORS支援**: 跨域資源共享
 
-#### 2. 處方籤管理 (Prescription Management)
-- 👨‍⚕️ **醫生開立**: 直觀的處方籤開立界面
-- 📋 **狀態追蹤**: 處方籤狀態管理（待處理、處理中、已完成、已取消）
-- 🔍 **查詢功能**: 多條件搜尋和篩選處方籤
-- 📊 **統計報表**: 處方籤統計和分析報告
-- 📄 **列印功能**: 支援處方籤列印和匯出
+## 🏗️ 系統架構
 
-#### 3. 醫生工作界面 (Doctor Interface)
-- 🩺 **三合一工作台**: 基本藥物管理、詳細資訊編輯、處方籤開立
-- 📝 **快速開方**: 智能藥物選擇和劑量建議
-- 💾 **數據同步**: 即時數據更新和自動儲存
-- 🔄 **工作流程**: 完整的醫療工作流程支援
+```
+醫院藥物管理系統
+├── 前端界面 (Frontend)
+│   ├── 藥物管理頁面 (Medicine.html)
+│   ├── 處方籤管理 (Prescription.html)
+│   └── 醫生介面 (doctor.html)
+├── 後端API (Backend)
+│   ├── FastAPI應用 (fixed_server.py)
+│   ├── 數據模型 (Pydantic Models)
+│   └── WebSocket支援
+└── 數據層 (Data Layer)
+    ├── 藥物基本資料 (medicines.json)
+    ├── 藥物詳細資料 (detailed_medicines.json)
+    ├── 處方籤資料 (prescriptions.json)
+    └── 處方籤狀態 (prescription_status.json)
+```
 
-## 🚀 快速開始
+## 🚀 安裝指南
 
-### 系統需求
+### 前置需求
 - Python 3.8+
-- 8GB RAM (建議)
-- 1GB 可用硬碟空間
+- pip (Python套件管理器)
 
-### 一鍵啟動
+### 快速開始
+
+1. **克隆專案**
 ```bash
-# 克隆專案
 git clone <repository-url>
-cd user_interface
+cd <project-directory>
+```
 
-# 安裝依賴
+2. **建立虛擬環境** (建議)
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate     # Windows
+```
+
+3. **安裝依賴**
+```bash
 pip install -r requirements.txt
+```
 
-# 啟動系統
+4. **啟動系統**
+```bash
+cd user_interface
 python main.py
 ```
 
-### 系統啟動後
-系統啟動後會顯示：
+5. **訪問系統**
+- 主頁面: http://localhost:8000
+- 藥物管理: http://localhost:8000/Medicine.html
+- 處方籤管理: http://localhost:8000/Prescription.html
+- 醫生介面: http://localhost:8000/doctor.html
+- API文檔: http://localhost:8000/docs
+
+## 📖 使用說明
+
+### 藥物管理
+1. 訪問 `Medicine.html` 頁面
+2. 可以新增、查看、編輯和刪除藥物資料
+3. 支援基本資料和詳細資料管理
+4. 即時庫存狀態顯示
+
+### 處方籤管理
+1. 訪問 `Prescription.html` 頁面
+2. 創建新的處方籤
+3. 查看和管理現有處方籤
+4. 追蹤處方籤狀態
+
+### 醫生介面
+1. 訪問 `doctor.html` 頁面
+2. 專門為醫生設計的簡化介面
+3. 快速處方籤創建
+4. 病人資料管理
+
+## 🔗 API文檔
+
+### 主要端點
+
+#### 藥物管理 API
+- `GET /api/medicine/` - 獲取所有藥物
+- `POST /api/medicine/` - 新增藥物
+- `PUT /api/medicine/{name}` - 更新藥物資料
+- `DELETE /api/medicine/{name}` - 刪除藥物
+
+#### 處方籤管理 API
+- `GET /api/prescription/` - 獲取所有處方籤
+- `POST /api/prescription/` - 創建新處方籤
+- `GET /api/prescription/{id}` - 獲取特定處方籤
+- `PUT /api/prescription/{id}` - 更新處方籤
+
+#### WebSocket
+- `ws://localhost:8000/ws` - 即時數據更新
+
+完整的API文檔請訪問: http://localhost:8000/docs
+
+## 📁 專案結構
+
 ```
-🏥 醫院藥物管理系統
-==================================================
-🌐 藥物管理界面: http://localhost:8000/Medicine.html
-📋 處方籤管理: http://localhost:8000/Prescription.html
-👨‍⚕️ 醫生工作界面: http://localhost:8000/doctor.html
-📖 API 文檔: http://localhost:8000/docs
-==================================================
-```
-
-## 🎯 使用指南
-
-### 🔹 藥物管理界面 (`/Medicine.html`)
-
-**主要功能：**
-- 📊 **統計儀表板**: 顯示總藥物數、完整資料藥物數、低庫存警告、總庫存
-- 📋 **基本庫存管理**: 使用 Handsontable 進行即時編輯
-- 🔍 **詳細資訊查詢**: 支援名稱搜尋、代碼搜尋、整合查詢
-- 💾 **數據匯出**: 支援 CSV 和 JSON 格式
-
-**操作步驟：**
-1. 開啟藥物管理界面
-2. 查看統計信息了解庫存狀況
-3. 在基本藥物表格中新增或編輯藥物
-4. 使用搜尋功能查找特定藥物
-5. 匯出數據進行備份或分析
-
-### 🔹 醫生工作界面 (`/doctor.html`)
-
-**三個主要標籤頁：**
-
-#### 1. 基本藥物管理
-- 新增藥物：藥物名稱、數量、使用天數、儲存位置
-- 即時驗證和錯誤提示
-- 自動更新藥物選擇列表
-
-#### 2. 詳細藥物資訊
-- 選擇現有藥物或新增詳細資訊
-- 包含：製造商、劑量、顏色、形狀、副作用、儲存條件等
-- JSON 格式數據預覽和匯出
-
-#### 3. 開立處方籤
-- 患者基本資訊輸入
-- 診斷結果記錄
-- 互動式處方用藥表格
-- 支援多種藥物和複雜劑量
-
-### 🔹 處方籤管理界面 (`/Prescription.html`)
-
-**主要功能：**
-- 📊 **統計儀表板**: 總數、待處理、處理中、已完成
-- 🔍 **篩選功能**: 按狀態篩選處方籤
-- 📋 **詳細查看**: 點擊查看完整處方籤資訊
-- 🔄 **狀態更新**: 更新處方籤處理狀態
-- 📄 **報表匯出**: 匯出處方籤報表
-
-## 🛠️ 技術架構
-
-### 後端技術棧
-- **框架**: FastAPI (高性能異步 Web 框架)
-- **數據驗證**: Pydantic (類型安全的數據驗證)
-- **數據存儲**: JSON 文件系統 (可擴展到資料庫)
-- **API 文檔**: 自動生成的 OpenAPI/Swagger 文檔
-
-### 前端技術棧
-- **核心**: HTML5 + CSS3 + 原生 JavaScript
-- **表格組件**: Handsontable (專業數據表格)
-- **UI 設計**: 響應式設計，支援多設備
-- **數據交互**: Fetch API (RESTful 通信)
-
-### 文件結構
-```
-user_interface/
-├── main.py                 # 主程序入口
-├── fixed_server.py         # FastAPI 服務器
-├── static/                 # 前端靜態文件
-│   ├── html/              # HTML 頁面
-│   │   ├── Medicine.html  # 藥物管理
-│   │   ├── doctor.html    # 醫生界面
-│   │   └── Prescription.html # 處方籤管理
-│   ├── css/               # 樣式文件
-│   │   └── unified_style.css # 統一樣式
-│   └── js/                # JavaScript 文件
-│       ├── medicine.js    # 藥物管理邏輯
-│       ├── doctor.js      # 醫生界面邏輯
-│       └── Prescription.js # 處方籤邏輯
-├── data/                  # 數據文件
-│   ├── medicines.json     # 基本藥物數據
-│   ├── detailed_medicines.json # 詳細藥物數據
-│   └── prescriptions.json # 處方籤數據
-└── requirements.txt       # Python 依賴
+醫院藥物管理系統/
+├── user_interface/           # 主要應用程式目錄
+│   ├── main.py              # 應用程式入口點
+│   ├── fixed_server.py      # FastAPI後端伺服器
+│   ├── data/                # 數據檔案目錄
+│   │   ├── medicines.json           # 藥物基本資料
+│   │   ├── detailed_medicines.json  # 藥物詳細資料
+│   │   ├── prescriptions.json       # 處方籤資料
+│   │   └── prescription_status.json # 處方籤狀態
+│   └── static/              # 靜態資源目錄
+│       ├── html/            # HTML頁面
+│       │   ├── Medicine.html        # 藥物管理頁面
+│       │   ├── Prescription.html    # 處方籤管理頁面
+│       │   └── doctor.html          # 醫生介面
+│       ├── css/             # 樣式檔案
+│       │   └── unified_style.css    # 統一樣式表
+│       └── js/              # JavaScript檔案
+│           ├── medicine.js          # 藥物管理腳本
+│           ├── doctor.js            # 醫生介面腳本
+│           └── Prescription.js      # 處方籤管理腳本
+├── requirements.txt         # Python依賴清單
+└── README.md               # 專案說明文檔
 ```
 
-## 🔌 API 接口
+## 🛠️ 開發指南
 
-### 藥物管理 API
-```http
-GET    /api/medicine/                    # 獲取所有基本藥物
-POST   /api/medicine/                    # 新增基本藥物
-PUT    /api/medicine/{id}                # 更新基本藥物
-DELETE /api/medicine/{id}                # 刪除基本藥物
-GET    /api/medicine/detailed/{name}     # 獲取詳細藥物資訊
-POST   /api/medicine/detailed/           # 新增詳細藥物資訊
-GET    /api/medicine/integrated/{name}   # 獲取整合藥物資訊
-GET    /api/medicine/search/code/{code}  # 按代碼搜尋藥物
+### 技術棧
+- **後端**: FastAPI、Python 3.8+、Uvicorn
+- **前端**: HTML5、CSS3、JavaScript ES6+
+- **數據**: JSON檔案儲存
+- **通訊**: RESTful API、WebSocket
+
+### 開發環境設置
+1. 遵循安裝指南設置基本環境
+2. 啟用開發模式 (自動重載):
+```bash
+uvicorn fixed_server:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 處方籤管理 API
-```http
-GET    /api/prescription/                # 獲取所有處方籤
-POST   /api/prescription/                # 新增處方籤
-GET    /api/prescription/{id}            # 獲取特定處方籤
-PUT    /api/prescription/{id}/status     # 更新處方籤狀態
-DELETE /api/prescription/{id}            # 刪除處方籤
-```
+### 代碼規範
+- 使用Python PEP 8編碼規範
+- JavaScript使用ES6+語法
+- CSS使用模組化設計
+- 所有API端點都有適當的錯誤處理
 
-### 匯出功能 API
-```http
-GET    /api/export/medicines/basic      # 匯出基本藥物數據
-GET    /api/export/medicines/detailed   # 匯出詳細藥物數據
-GET    /api/export/medicines/integrated # 匯出整合藥物數據
-GET    /api/export/prescriptions        # 匯出處方籤數據
-```
-
-## 📊 數據格式
-
-### 基本藥物數據
-```json
-{
-  "id": 1,
-  "name": "阿斯匹靈",
-  "amount": 100,
-  "usage_days": 7,
-  "position": "A1-01",
-  "create_time": "2024-01-01T10:00:00"
-}
-```
-
-### 詳細藥物數據
-```json
-{
-  "basic_info": {
-    "name": "阿斯匹靈",
-    "manufacturer": "製藥公司",
-    "dosage": "100mg"
-  },
-  "appearance": {
-    "color": "白色",
-    "shape": "圓形"
-  },
-  "indications": "解熱鎮痛",
-  "side_effects": "可能引起胃部不適",
-  "storage_conditions": "室溫保存",
-  "expiry_date": "2025-12-31"
-}
-```
-
-### 處方籤數據
-```json
-{
-  "id": 1,
-  "patient_name": "王小明",
-  "doctor_name": "李醫師",
-  "diagnosis": "感冒",
-  "medicines": [
-    {
-      "medicine_name": "阿斯匹靈",
-      "dosage": "100mg",
-      "frequency": "每日三次",
-      "duration": "7天",
-      "instructions": "飯後服用"
-    }
-  ],
-  "status": "pending",
-  "prescription_date": "2024-01-01",
-  "created_time": "2024-01-01T10:00:00"
-}
-```
-
-## 🔧 高級功能
-
-### 智能搜尋
-- **模糊搜尋**: 支援部分關鍵字匹配
-- **多欄位搜尋**: 同時搜尋多個欄位
-- **即時結果**: 輸入即時顯示搜尋結果
-
-### 數據匯出
-- **多格式支援**: CSV、JSON、Excel
-- **自定義範圍**: 選擇性匯出數據
-- **批量操作**: 支援大量數據處理
-
-### 系統整合
-- **RESTful API**: 標準化 API 接口
-- **數據同步**: 多客戶端數據同步
-- **擴展性**: 易於擴展新功能
-
-## 🛡️ 安全性
-
-- **數據驗證**: 嚴格的輸入驗證和類型檢查
-- **錯誤處理**: 完善的錯誤處理機制
-- **數據備份**: 自動數據備份功能
-- **訪問控制**: 基於角色的訪問控制（可擴展）
+### 新增功能
+1. 在 `fixed_server.py` 中新增API端點
+2. 更新前端頁面和JavaScript
+3. 測試所有功能
+4. 更新API文檔
 
 ## 🐛 故障排除
 
 ### 常見問題
 
-**Q: 系統無法啟動**
-```bash
-# 檢查 Python 版本
-python --version  # 需要 3.8+
+**Q: 啟動時顯示端口被佔用**
+A: 請檢查8000端口是否被其他應用使用，或修改 `main.py` 中的端口設定
 
-# 檢查依賴
-pip install fastapi uvicorn
+**Q: 前端頁面顯示404錯誤**
+A: 確保靜態檔案路徑正確，檢查 `static` 目錄結構
 
-# 重新啟動
-python main.py
-```
+**Q: API請求失敗**
+A: 檢查CORS設定，確保前端和後端在同一域名或已正確配置跨域
 
-**Q: 頁面顯示空白**
-```bash
-# 檢查文件路徑
-ls static/html/  # 確認 HTML 文件存在
+**Q: 數據丟失**
+A: 檢查 `data/` 目錄中的JSON檔案是否存在且格式正確
 
-# 檢查服務器狀態
-curl http://localhost:8000/Medicine.html
-```
+### 日誌和除錯
+- 啟動時會顯示詳細的系統資訊
+- API錯誤會記錄在控制台
+- 檢查瀏覽器開發者工具的網路和控制台標籤
 
-**Q: API 無法訪問**
-```bash
-# 檢查端口占用
-netstat -an | grep 8000
+### 獲取幫助
+如果遇到問題，請：
+1. 檢查控制台輸出
+2. 查看API文檔 (http://localhost:8000/docs)
+3. 確認所有依賴已正確安裝
+4. 檢查網路連接和防火牆設定
 
-# 檢查防火牆設置
-# 確保 8000 端口開放
-```
+## 📝 更新記錄
 
-### 日誌檢查
-系統運行日誌會顯示詳細的請求信息：
-```
-INFO: 127.0.0.1:33562 - "GET /Medicine.html HTTP/1.1" 200 OK
-INFO: 127.0.0.1:33562 - "GET /css/unified_style.css HTTP/1.1" 304 Not Modified
-```
-
-## 🚀 性能優化
-
-### 建議配置
-- **開發環境**: 4GB RAM, 雙核心 CPU
-- **生產環境**: 8GB RAM, 四核心 CPU
-- **並發用戶**: 支援 100+ 同時用戶
-
-### 緩存策略
-- 靜態文件緩存
-- API 響應緩存
-- 前端數據緩存
-
-## 📈 未來規劃
-
-### 即將推出的功能
-- 🔐 用戶認證和權限管理
-- 📱 移動端應用支援
-- 🗄️ 資料庫整合（PostgreSQL/MySQL）
-- 📊 高級分析和報表功能
-- 🔔 即時通知系統
-- 🌐 多語言支援
-
-### 技術升級
-- Docker 容器化部署
-- Kubernetes 集群支援
-- Redis 緩存整合
-- WebSocket 即時通信
-
-## 🤝 貢獻指南
-
-歡迎貢獻代碼！請遵循以下步驟：
-
-1. Fork 專案
-2. 創建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟 Pull Request
-
-## 📄 授權條款
-
-本專案採用 MIT 授權條款。詳見 [LICENSE](LICENSE) 文件。
-
-## 📞 技術支援
-
-- **文檔**: 查看完整的 API 文檔：`http://localhost:8000/docs`
-- **問題回報**: 請在 GitHub Issues 中回報問題
-- **功能建議**: 歡迎在 Issues 中提出新功能建議
-
-## 🙏 致謝
-
-- FastAPI 團隊提供優秀的 Web 框架
-- Handsontable 提供專業的數據表格組件
-- 所有貢獻者和使用者的支持
+### v1.0.0 (目前版本)
+- 完整的藥物管理系統
+- 處方籤管理功能
+- 醫生專用介面
+- WebSocket即時更新
+- 響應式設計
+- RESTful API
 
 ---
 
-<p align="center">
-  <strong>🏥 醫院藥物管理系統 - 讓醫療管理更簡單、更高效 🚀</strong>
-</p>
+## 🤝 貢獻
+
+歡迎提交Issue和Pull Request來改善這個專案！
+
+## 📄 授權
+
+請參考專案授權條款。
+
+---
+
+**開發團隊** | **最後更新**: 2024年12月

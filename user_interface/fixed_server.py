@@ -78,6 +78,23 @@ app.add_middleware(
 app.mount("/css", StaticFiles(directory="static/css"), name="css")
 app.mount("/js", StaticFiles(directory="static/js"), name="js")
 
+# HTML頁面路由
+@app.get("/")
+async def read_root():
+    return FileResponse("static/html/Medicine.html")
+
+@app.get("/Medicine.html")
+async def medicine_page():
+    return FileResponse("static/html/Medicine.html")
+
+@app.get("/doctor.html")
+async def doctor_page():
+    return FileResponse("static/html/doctor.html")
+
+@app.get("/Prescription.html")
+async def prescription_page():
+    return FileResponse("static/html/Prescription.html")
+
 # WebSocket連接管理
 class ConnectionManager:
     def __init__(self):
