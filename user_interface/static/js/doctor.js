@@ -35,9 +35,6 @@ function initializeSystem() {
  * 設置事件監聽器
  */
 function setupEventListeners() {
-    // 統一藥物表單提交
-    document.getElementById('unifiedMedicineForm').addEventListener('submit', handleMedicineSubmit);
-    
     // 處方籤表單提交
     document.getElementById('prescriptionForm').addEventListener('submit', handlePrescriptionSubmit);
     
@@ -45,24 +42,7 @@ function setupEventListeners() {
     document.getElementById('patientIdCard').addEventListener('input', generatePatientNumber);
 }
 
-/**
- * 標籤切換
- */
-function switchTab(tabName) {
-    // 移除所有活動狀態
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    // 設置新的活動標籤
-    event.target.classList.add('active');
-    document.getElementById(tabName).classList.add('active');
-    
-    // 根據標籤執行特定操作
-    if (tabName === 'prescription') {
-        updatePrescriptionTime();
-        loadAvailableMedicines();
-    }
-}
+// 醫生頁面已簡化為只有處方籤功能，無需標籤切換
 
 /**
  * 載入可用藥物清單
@@ -114,72 +94,7 @@ function updateMedicineSelects() {
     });
 }
 
-/**
- * 處理統一藥物表單提交
- */
-async function handleMedicineSubmit(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    
-    try {
-        // 收集基本資料
-        const basicData = {
-            name: formData.get('medicineName'),
-            amount: parseInt(formData.get('medicineAmount')),
-            position: formData.get('medicinePosition'),
-            usage_days: parseInt(formData.get('medicineUsageDays')) || null,
-            manufacturer: formData.get('medicineManufacturer') || '',
-            dosage: formData.get('medicineDosage') || '',
-            prompt: formData.get('medicinePrompt') || ''  // 添加prompt欄位
-        };
-        
-        // 收集詳細資料
-        const detailedData = {
-            description: formData.get('medicineDescription') || '',
-            ingredient: formData.get('medicineIngredient') || '',
-            category: formData.get('medicineCategory') || '',
-            usage_method: formData.get('medicineUsageMethod') || '',
-            unit_dose: formData.get('medicineUnitDose') || '',
-            side_effects: formData.get('medicineSideEffects') || '',
-            storage_conditions: formData.get('medicineStorageConditions') || '',
-            expiry_date: formData.get('medicineExpiryDate') || '',
-            barcode: formData.get('medicineBarcode') || '',
-            appearance_type: formData.get('medicineAppearance') || '',
-            notes: formData.get('medicineNotes') || ''
-        };
-        
-        // 檢查是否有詳細資料
-        const hasDetailedData = Object.values(detailedData).some(value => value !== '');
-        
-        // 發送請求
-        const response = await fetch(`${API_BASE}/medicine/unified`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                basic_data: basicData,
-                detailed_data: hasDetailedData ? detailedData : null
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-            showStatus('✅ ' + result.message, 'success', 'medicineStatus');
-            document.getElementById('unifiedMedicineForm').reset();
-            
-            // 重新載入藥物清單供處方籤使用
-            await loadAvailableMedicines();
-        } else {
-            throw new Error(result.detail || '保存失敗');
-        }
-        
-    } catch (error) {
-        showStatus('❌ 錯誤: ' + error.message, 'error', 'medicineStatus');
-    }
-}
+// 藥物管理功能已移至專門的藥物管理頁面
 
 /**
  * 處理處方籤表單提交

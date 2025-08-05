@@ -284,7 +284,8 @@
     <div class="sidebar">
         <h2>🏥 系統選單</h2>
         <button onclick="location.href='doctor.html'" class="active">👨‍⚕️ 醫生工作台</button>
-        <button onclick="location.href='integrated_medicine_management.html'">💊 藥物管理</button>
+        <button onclick="location.href='medicine_management.html'">💊 藥物管理</button>
+        <button onclick="location.href='integrated_medicine_management.html'">🔧 整合管理</button>
         <button onclick="location.href='Prescription.html'">📋 處方籤管理</button>
         <button onclick="location.href='unified_medicine.html'">🔄 統一表單</button>
     </div>
@@ -295,144 +296,8 @@
                 👨‍⚕️ 醫生工作台
             </h1>
 
-            <!-- 標籤切換 -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('unified-medicine')">💊 統一藥物管理</button>
-                <button class="tab" onclick="switchTab('prescription')">📋 開立處方籤</button>
-            </div>
-
-            <!-- 統一藥物管理標籤 -->
-            <div id="unified-medicine" class="tab-content active">
-                <form id="unifiedMedicineForm">
-                    <div class="unified-medicine-form">
-                        <!-- 基本藥物資料 -->
-                        <div class="form-section">
-                            <div class="section-title">💊 基本藥物資料</div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineName">藥物名稱 <span class="required">*</span></label>
-                                    <input type="text" id="medicineName" name="medicineName" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineAmount">初始數量 <span class="required">*</span></label>
-                                    <input type="number" id="medicineAmount" name="medicineAmount" min="0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicinePosition">儲存位置 <span class="required">*</span></label>
-                                    <input type="text" id="medicinePosition" name="medicinePosition" required placeholder="例：A1-01">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineUsageDays">建議使用天數</label>
-                                    <input type="number" id="medicineUsageDays" name="medicineUsageDays" min="1">
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineManufacturer">製造商</label>
-                                    <input type="text" id="medicineManufacturer" name="medicineManufacturer">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineDosage">劑量</label>
-                                    <input type="text" id="medicineDosage" name="medicineDosage" placeholder="例：500mg">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="medicinePrompt">🤖 AI提示詞 (用於智能推薦)</label>
-                                <textarea id="medicinePrompt" name="medicinePrompt" rows="2" placeholder="例：適用於感冒發燒，成人每次1-2錠，兒童減半..."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- 詳細藥物資料 -->
-                        <div class="form-section">
-                            <div class="section-title">🔬 詳細藥物資料 (選填)</div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineIngredient">主要成分</label>
-                                    <input type="text" id="medicineIngredient" name="medicineIngredient">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineCategory">藥物分類</label>
-                                    <select id="medicineCategory" name="medicineCategory">
-                                        <option value="">請選擇</option>
-                                        <option value="抗生素">抗生素</option>
-                                        <option value="止痛藥">止痛藥</option>
-                                        <option value="消炎藥">消炎藥</option>
-                                        <option value="心血管藥物">心血管藥物</option>
-                                        <option value="腸胃藥">腸胃藥</option>
-                                        <option value="維生素">維生素</option>
-                                        <option value="其他">其他</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="medicineDescription">藥物描述</label>
-                                <textarea id="medicineDescription" name="medicineDescription" rows="3" placeholder="描述藥物的用途和特性..."></textarea>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineUsageMethod">使用方法</label>
-                                    <input type="text" id="medicineUsageMethod" name="medicineUsageMethod" placeholder="例：口服，每日三次">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineUnitDose">單位劑量</label>
-                                    <input type="text" id="medicineUnitDose" name="medicineUnitDose" placeholder="例：500mg">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="medicineSideEffects">副作用</label>
-                                <textarea id="medicineSideEffects" name="medicineSideEffects" rows="2" placeholder="列出可能的副作用..."></textarea>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineStorageConditions">儲存條件</label>
-                                    <input type="text" id="medicineStorageConditions" name="medicineStorageConditions" placeholder="例：室溫保存，避免陽光直射">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineExpiryDate">有效期限</label>
-                                    <input type="date" id="medicineExpiryDate" name="medicineExpiryDate">
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="medicineBarcode">條碼</label>
-                                    <input type="text" id="medicineBarcode" name="medicineBarcode">
-                                </div>
-                                <div class="form-group">
-                                    <label for="medicineAppearance">外觀</label>
-                                    <input type="text" id="medicineAppearance" name="medicineAppearance" placeholder="例：白色圓形片劑">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="medicineNotes">備註</label>
-                                <textarea id="medicineNotes" name="medicineNotes" rows="2" placeholder="其他重要資訊..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-success">💾 保存藥物資料</button>
-                        <button type="reset" class="btn btn-warning">🔄 重置表單</button>
-                    </div>
-                </form>
-                
-                <div id="medicineStatus" class="status-message"></div>
-            </div>
-
-            <!-- 開立處方籤標籤 -->
-            <div id="prescription" class="tab-content">
+                         <!-- 處方籤系統 (專注於醫師核心功能) -->
+            <div id="prescription" class="tab-content active">
                 <div class="prescription-form">
                     <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">📋 開立處方籤</h2>
                     
