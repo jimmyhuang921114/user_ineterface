@@ -16,10 +16,12 @@
 ## ✨ 功能特色
 
 ### 🔧 核心功能
-- **統一藥物管理**: 在單一表單中填寫基本和詳細藥物資料
+- **統一藥物管理**: 在單一表單中填寫基本和詳細藥物資料，無需換頁
+- **智能處方籤系統**: 自動生成病患編號、處方時間，美化藥物選擇介面
+- **庫存管理**: 完整的增刪改查功能，即時庫存調整
+- **身份證號驗證**: 自動驗證並生成唯一病患編號
+- **下拉式藥物選擇**: 美觀的藥物選擇介面，顯示庫存狀態
 - **YAML數據匯出**: 自動將數據匯出為ROS2兼容的YAML格式
-- **處方籤系統**: 數位化處方籤創建和管理
-- **醫生介面**: 專門為醫生設計的操作介面
 - **即時更新**: WebSocket支援的即時數據同步
 - **響應式設計**: 支援桌面和移動設備
 
@@ -102,50 +104,88 @@ python3 main.py
 
 6. **訪問系統**
 - 主頁面: http://localhost:8000
-- 統一藥物管理: http://localhost:8000/unified_medicine.html ⭐ 新功能
+- **醫生工作台**: http://localhost:8000/doctor.html ⭐ 全新設計
+- **整合藥物管理**: http://localhost:8000/integrated_medicine_management.html ⭐ 四合一介面
+- 統一藥物管理: http://localhost:8000/unified_medicine.html
 - 藥物管理: http://localhost:8000/Medicine.html
 - 處方籤管理: http://localhost:8000/Prescription.html
-- 醫生介面: http://localhost:8000/doctor.html
 - API文檔: http://localhost:8000/docs
 
 ## 📖 使用說明
 
-### 藥物管理
-1. 訪問 `Medicine.html` 頁面
-2. 可以新增、查看、編輯和刪除藥物資料
-3. 支援基本資料和詳細資料管理
-4. 即時庫存狀態顯示
+### 🏥 醫生工作台 (主要介面) ⭐ 推薦使用
+**訪問地址**: `http://localhost:8000/doctor.html`
 
-### 處方籤管理
-1. 訪問 `Prescription.html` 頁面
-2. 創建新的處方籤
-3. 查看和管理現有處方籤
-4. 追蹤處方籤狀態
+#### 💊 統一藥物管理標籤
+- **同頁表單**: 基礎資料 + 詳細資料在同一頁面，無需換頁
+- **必填欄位**: 藥物名稱、初始數量、儲存位置
+- **選填欄位**: 詳細資料包含成分、分類、描述、副作用等
+- **自動功能**: 保存後自動同步YAML和更新ROS2節點
 
-### 醫生介面
-1. 訪問 `doctor.html` 頁面
-2. 專門為醫生設計的簡化介面
-3. 快速處方籤創建
-4. 病人資料管理
+#### 📋 智能處方籤標籤
+- **病患資訊**:
+  - 病患姓名 (必填)
+  - 身份證號 (必填，10位數，自動驗證)
+  - 病患編號 (自動生成，格式: P+身份證後4位+時間戳)
+  - 處方時間 (自動生成並每分鐘更新)
+
+- **處方用藥**:
+  - 下拉式藥物選擇 (顯示庫存狀態)
+  - 庫存警告 (少於10時紅色標示)
+  - 自動填入建議劑量和天數
+  - 支援多種藥物 (可動態新增/移除)
+  - 必填: 藥物名稱、劑量、頻率、天數
+
+- **已移除功能**:
+  - ❌ 診斷結果欄位
+  - ❌ 醫生名稱輸入 (自動設為"系統醫生")
+
+### 🔧 整合藥物管理
+**訪問地址**: `http://localhost:8000/integrated_medicine_management.html`
+
+#### 四合一管理介面:
+1. **➕ 新增藥物**: 完整的藥物資料填寫
+2. **📦 庫存管理**: 增加/減少藥物數量，搜尋篩選
+3. **📋 藥物清單**: 查看、編輯、刪除藥物
+4. **🩺 病例管理**: 處方籤查看、編輯、刪除
+
+### 📊 傳統介面 (保留相容性)
+- **藥物管理**: `Medicine.html` - 原始藥物管理介面
+- **處方籤管理**: `Prescription.html` - 處方籤列表和狀態管理
+- **統一表單**: `unified_medicine.html` - 簡化版藥物表單
 
 ## 🔗 API文檔
 
 ### 主要端點
 
-#### 藥物管理 API
-- `GET /api/medicine/` - 獲取所有藥物
-- `POST /api/medicine/` - 新增藥物
+#### 💊 藥物管理 API
+- `GET /api/medicine/` - 獲取所有藥物 (基本+詳細)
+- `GET /api/medicine/basic` - 獲取基本藥物資料
+- `GET /api/medicine/detailed` - 獲取詳細藥物資料
+- `POST /api/medicine/unified` - **統一新增藥物** (基本+詳細)
 - `PUT /api/medicine/{name}` - 更新藥物資料
 - `DELETE /api/medicine/{name}` - 刪除藥物
+- `POST /api/medicine/adjust-stock` - **庫存調整** (增加/減少)
 
-#### 處方籤管理 API
+#### 📋 處方籤管理 API
 - `GET /api/prescription/` - 獲取所有處方籤
-- `POST /api/prescription/` - 創建新處方籤
+- `POST /api/prescription/` - **創建新處方籤** (含自動編號)
 - `GET /api/prescription/{id}` - 獲取特定處方籤
-- `PUT /api/prescription/{id}` - 更新處方籤
+- `DELETE /api/prescription/{id}` - 刪除處方籤
 
-#### WebSocket
+#### 📄 YAML匯出 API
+- `GET /api/export/yaml/sync` - 同步JSON到YAML並匯出ROS2格式
+- `GET /api/medicine/yaml/basic` - 獲取基本藥物YAML格式
+- `GET /api/medicine/yaml/detailed` - 獲取詳細藥物YAML格式
+
+#### 🤖 ROS2整合 API
+- `GET /api/ros2/prescription` - ROS2格式的處方籤資料
+
+#### 🔄 WebSocket
 - `ws://localhost:8000/ws` - 即時數據更新
+  - 藥物新增/更新/刪除通知
+  - 庫存調整通知
+  - 處方籤狀態變更通知
 
 完整的API文檔請訪問: http://localhost:8000/docs
 
@@ -233,12 +273,20 @@ A: 檢查 `data/` 目錄中的JSON檔案是否存在且格式正確
 
 ## 📝 更新記錄
 
-### v1.0.0 (目前版本)
-- 完整的藥物管理系統
-- 處方籤管理功能
-- 醫生專用介面
+### v2.0.0 (目前版本) ⭐ 重大更新
+- **全新醫生工作台**: 統一藥物表單 + 智能處方籤系統
+- **自動化功能**: 病患編號生成、處方時間、庫存警告
+- **美化介面**: 下拉式藥物選擇、響應式設計
+- **整合管理**: 四合一藥物管理介面 (新增、庫存、清單、病例)
+- **CRUD完整性**: 藥物和處方籤的完整增刪改查
+- **ROS2深度整合**: 三個專用ROS2節點 + YAML自動匯出
+- **身份證號驗證**: 台灣身份證號格式驗證和編號生成
+
+### v1.0.0 (舊版本)
+- 基礎藥物管理系統
+- 簡單處方籤功能
+- 基本醫生介面
 - WebSocket即時更新
-- 響應式設計
 - RESTful API
 
 ---
