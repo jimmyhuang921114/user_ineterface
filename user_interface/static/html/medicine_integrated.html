@@ -242,16 +242,63 @@
                 <div style="border: 2px solid #28a745; border-radius: 8px; padding: 20px; background: #f8fff8;">
                     <h4 style="color: #28a745; margin-bottom: 15px;">📊 詳細藥物資訊</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="description">藥物描述</label>
-                            <textarea id="description" name="description" rows="3" 
-                                      placeholder="詳細的藥物描述與用途"></textarea>
+                        <div class="form-group">
+                            <label for="ingredient">藥物成分</label>
+                            <input type="text" id="ingredient" name="ingredient" 
+                                   placeholder="主要成分名稱">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category">藥物分類</label>
+                            <input type="text" id="category" name="category" 
+                                   placeholder="例如: 3CL proteinase inhibitors">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="usageMethod">服用方式</label>
+                            <select id="usageMethod" name="usageMethod">
+                                <option value="口服 (Oral use)">口服 (Oral use)</option>
+                                <option value="注射 (Injection)">注射 (Injection)</option>
+                                <option value="外用 (Topical)">外用 (Topical)</option>
+                                <option value="吸入 (Inhalation)">吸入 (Inhalation)</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="unitDose">單位劑量</label>
+                            <input type="text" id="unitDose" name="unitDose" 
+                                   placeholder="例如: 1 special pill">
                         </div>
                         
                         <div class="form-group" style="grid-column: span 2;">
-                            <label for="sideEffects">副作用</label>
+                            <label for="description">藥物描述/適應症</label>
+                            <textarea id="description" name="description" rows="3" 
+                                      placeholder="詳細的藥物描述、適應症與用途"></textarea>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="sideEffects">可能副作用</label>
                             <textarea id="sideEffects" name="sideEffects" rows="3" 
                                       placeholder="可能的副作用與注意事項"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="barcode">條碼編號</label>
+                            <input type="text" id="barcode" name="barcode" 
+                                   placeholder="例如: TEST-367842394">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="appearanceType">外觀類型</label>
+                            <select id="appearanceType" name="appearanceType">
+                                <option value="藥片">藥片</option>
+                                <option value="膠囊">膠囊</option>
+                                <option value="液體">液體</option>
+                                <option value="注射劑">注射劑</option>
+                                <option value="軟膏">軟膏</option>
+                                <option value="其他">其他</option>
+                            </select>
                         </div>
                         
                         <div class="form-group">
@@ -343,8 +390,14 @@
             // 收集詳細資料
             const detailedData = {
                 medicine_name: basicData.name,
+                ingredient: document.getElementById('ingredient').value.trim(),
+                category: document.getElementById('category').value.trim(),
+                usage_method: document.getElementById('usageMethod').value,
+                unit_dose: document.getElementById('unitDose').value.trim(),
                 description: document.getElementById('description').value.trim(),
                 side_effects: document.getElementById('sideEffects').value.trim(),
+                barcode: document.getElementById('barcode').value.trim(),
+                appearance_type: document.getElementById('appearanceType').value,
                 appearance: {
                     color: document.getElementById('color').value.trim(),
                     shape: document.getElementById('shape').value
