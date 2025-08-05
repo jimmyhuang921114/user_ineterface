@@ -1,304 +1,426 @@
 # 🏥 醫院藥物管理系統
-## Hospital Medicine Management System
 
-一個現代化的醫院藥物管理系統，提供完整的藥物庫存管理、處方籤管理和醫生操作介面。
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
+[![ROS2](https://img.shields.io/badge/ROS2-Humble+-orange.svg)](https://docs.ros.org/en/humble/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📋 目錄
-- [功能特色](#功能特色)
-- [系統架構](#系統架構)
-- [安裝指南](#安裝指南)
-- [使用說明](#使用說明)
-- [API文檔](#api文檔)
-- [專案結構](#專案結構)
-- [開發指南](#開發指南)
-- [故障排除](#故障排除)
+專為醫院和診所設計的現代化藥物管理系統，支援**JSON**和**SQL**雙版本資料庫，提供完整的藥物庫存、處方籤管理、ROS2整合和即時數據監控功能。
 
-## ✨ 功能特色
+---
 
-### 🔧 核心功能
-- **統一藥物管理**: 在單一表單中填寫基本和詳細藥物資料，無需換頁
-- **智能處方籤系統**: 自動生成病患編號、處方時間，美化藥物選擇介面
-- **庫存管理**: 完整的增刪改查功能，即時庫存調整
-- **身份證號驗證**: 自動驗證並生成唯一病患編號
-- **下拉式藥物選擇**: 美觀的藥物選擇介面，顯示庫存狀態
-- **YAML數據匯出**: 自動將數據匯出為ROS2兼容的YAML格式
-- **即時更新**: WebSocket支援的即時數據同步
-- **響應式設計**: 支援桌面和移動設備
+## ✨ 主要功能
 
-### 🤖 ROS2整合
-- **訂單服務**: ROS2服務獲取處方籤訂單並生成YAML輸出
-- **基本藥物提供者**: 自動發布基本藥物庫存資訊
-- **詳細藥物提供者**: 提供完整藥物詳細資訊和安全等級
-- **實時數據同步**: 定時更新和即時服務響應
+### 🎯 核心系統
+- **👨‍⚕️ 醫生工作台**: 專業的處方籤開立系統
+- **🔧 整合管理**: 全功能的藥物庫存和處方管理
+- **📋 處方籤管理**: 完整的處方記錄查看和管理
+- **🔄 統一表單**: 快速一次性藥物資料新增
 
-### 🛡️ 技術特色
-- **FastAPI後端**: 高效能的Python Web框架
-- **現代化前端**: HTML5、CSS3、JavaScript ES6+
-- **RESTful API**: 標準化的API設計
-- **雙重數據存儲**: JSON + YAML格式並行存儲
-- **ROS2節點架構**: 完整的機器人系統整合
-- **CORS支援**: 跨域資源共享
+### 💡 智能功能
+- **🤖 AI提示詞**: 每種藥物可設定智能推薦提示
+- **📊 自動編號**: 根據身份證號自動生成病患編號
+- **⏰ 即時更新**: 自動生成處方時間和數據同步
+- **🔍 智能選擇**: 下拉式藥物選擇，顯示庫存和AI提示
 
-## 🏗️ 系統架構
+### 🚀 技術特色
+- **📡 ROS2整合**: 完整的服務和主題支援
+- **💾 雙資料庫**: JSON輕量級 + SQL企業級選擇
+- **🌐 即時通訊**: WebSocket支援的即時數據同步
+- **📱 響應式設計**: 支援桌面和移動設備
 
-```
-醫院藥物管理系統
-├── 前端界面 (Frontend)
-│   ├── 藥物管理頁面 (Medicine.html)
-│   ├── 處方籤管理 (Prescription.html)
-│   └── 醫生介面 (doctor.html)
-├── 後端API (Backend)
-│   ├── FastAPI應用 (fixed_server.py)
-│   ├── 數據模型 (Pydantic Models)
-│   └── WebSocket支援
-└── 數據層 (Data Layer)
-    ├── 藥物基本資料 (medicines.json)
-    ├── 藥物詳細資料 (detailed_medicines.json)
-    ├── 處方籤資料 (prescriptions.json)
-    └── 處方籤狀態 (prescription_status.json)
-```
+---
 
-## 🚀 安裝指南
+## 🌐 系統訪問
 
-### 前置需求
-- Python 3.8+
-- pip (Python套件管理器)
+### 📍 主要頁面
+| 頁面 | 網址 | 功能描述 |
+|------|------|----------|
+| **👨‍⚕️ 醫生工作台** | http://localhost:8000/doctor.html | 專業處方籤開立系統 |
+| **🔧 整合管理** | http://localhost:8000/integrated_medicine_management.html | 全功能管理介面 |
+| **📋 處方籤管理** | http://localhost:8000/Prescription.html | 處方記錄查看管理 |
+| **🔄 統一表單** | http://localhost:8000/unified_medicine.html | 快速新增藥物資料 |
 
-### 快速開始
+### 🔗 API和文檔
+- **📖 API文檔**: http://localhost:8000/docs
+- **💾 JSON版本**: 預設資料夾系統
+- **🗄️ SQL版本**: `feature/sql-database` 分支
 
-1. **克隆專案**
+---
+
+## 🚀 快速開始
+
+### 📋 系統需求
+- **Python**: 3.8 或更高版本
+- **作業系統**: Windows, macOS, Linux
+- **記憶體**: 最少 1GB RAM
+- **硬碟**: 最少 500MB 可用空間
+
+### ⚡ 安裝步驟
+
+#### 1. 下載專案
 ```bash
-git clone <repository-url>
-cd <project-directory>
+git clone https://github.com/jimmyhuang921114/user_ineterface.git
+cd user_ineterface
 ```
 
-2. **建立虛擬環境** (建議)
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或
-venv\Scripts\activate     # Windows
-```
+#### 2. 選擇版本
 
-3. **安裝依賴**
+**📁 JSON版本 (輕量級)**
 ```bash
+git checkout cursor/git-afed  # 主要分支
 pip install -r requirements.txt
 ```
 
-4. **啟動系統**
+**🗄️ SQL版本 (企業級)**
 ```bash
-cd user_interface
-python main.py
+git checkout feature/sql-database
+pip install -r requirements_sql.txt
 ```
 
-5. **啟動整合系統** (建議)
-```bash
-python start_ros2_medicine_system.py
-```
+#### 3. 啟動系統
 
-**或單獨啟動Web服務**
+**JSON版本啟動**
 ```bash
 cd user_interface
 python3 main.py
 ```
 
-6. **訪問系統**
-- 主頁面: http://localhost:8000
-- **醫生工作台**: http://localhost:8000/doctor.html ⭐ 全新設計
-- **整合藥物管理**: http://localhost:8000/integrated_medicine_management.html ⭐ 四合一介面
-- 統一藥物管理: http://localhost:8000/unified_medicine.html
-- 藥物管理: http://localhost:8000/Medicine.html
-- 處方籤管理: http://localhost:8000/Prescription.html
-- API文檔: http://localhost:8000/docs
+**SQL版本啟動**
+```bash
+cd user_interface
+python3 database.py    # 初始化資料庫
+python3 sql_server.py  # 啟動SQL伺服器
+```
 
-## 📖 使用說明
+#### 4. 訪問系統
+開啟瀏覽器訪問: http://localhost:8000
 
-### 🏥 醫生工作台 (主要介面) ⭐ 推薦使用
-**訪問地址**: `http://localhost:8000/doctor.html`
+---
 
-#### 💊 統一藥物管理標籤
-- **同頁表單**: 基礎資料 + 詳細資料在同一頁面，無需換頁
-- **必填欄位**: 藥物名稱、初始數量、儲存位置
-- **選填欄位**: 詳細資料包含成分、分類、描述、副作用等
-- **自動功能**: 保存後自動同步YAML和更新ROS2節點
+## 🎯 功能導覽
 
-#### 📋 智能處方籤標籤
-- **病患資訊**:
-  - 病患姓名 (必填)
-  - 身份證號 (必填，10位數，自動驗證)
-  - 病患編號 (自動生成，格式: P+身份證後4位+時間戳)
-  - 處方時間 (自動生成並每分鐘更新)
+### 👨‍⚕️ 醫生工作台
+**專為醫師設計的處方籤開立系統**
 
-- **處方用藥**:
-  - 下拉式藥物選擇 (顯示庫存狀態)
-  - 庫存警告 (少於10時紅色標示)
-  - 自動填入建議劑量和天數
-  - 支援多種藥物 (可動態新增/移除)
-  - 必填: 藥物名稱、劑量、頻率、天數
+✅ **核心功能**
+- 自動病患編號生成 (基於身份證號)
+- 自動處方時間生成
+- 智能藥物選擇下拉選單
+- 庫存狀態即時顯示
+- AI提示詞智能推薦
 
-- **已移除功能**:
-  - ❌ 診斷結果欄位
-  - ❌ 醫生名稱輸入 (自動設為"系統醫生")
+✅ **使用流程**
+1. 輸入病患基本資訊
+2. 選擇藥物並設定劑量
+3. 系統自動驗證庫存
+4. 生成完整處方籤
 
-### 🔧 整合藥物管理
-**訪問地址**: `http://localhost:8000/integrated_medicine_management.html`
+### 🔧 整合管理
+**全功能的系統管理介面**
 
-#### 四合一管理介面:
-1. **➕ 新增藥物**: 完整的藥物資料填寫
-2. **📦 庫存管理**: 增加/減少藥物數量，搜尋篩選
+✅ **四大管理模組**
+1. **➕ 新增藥物**: 統一的藥物資料新增
+2. **📦 庫存管理**: 增加/減少數量，操作記錄
 3. **📋 藥物清單**: 查看、編輯、刪除藥物
-4. **🩺 病例管理**: 處方籤查看、編輯、刪除
+4. **🩺 處方管理**: 查看、編輯、取消處方
 
-### 📊 傳統介面 (保留相容性)
-- **藥物管理**: `Medicine.html` - 原始藥物管理介面
-- **處方籤管理**: `Prescription.html` - 處方籤列表和狀態管理
-- **統一表單**: `unified_medicine.html` - 簡化版藥物表單
+✅ **進階功能**
+- 即時搜尋和篩選
+- 批量操作支援
+- 詳細統計分析
+- 完整的操作記錄
+
+### 📋 處方籤管理
+**專業的處方記錄管理**
+
+✅ **管理功能**
+- 處方籤列表查看
+- 詳細資訊檢視
+- 處方狀態更新
+- 歷史記錄追蹤
+
+### 🔄 統一表單
+**快速藥物資料新增**
+
+✅ **特色設計**
+- 一次性填寫基本和詳細資料
+- 智能表單驗證
+- 自動資料關聯
+- 快速導航面板
+
+✅ **新增側邊導航**
+- 🚀 快速導航到其他頁面
+- 📝 表單功能說明
+- ✅ 操作指引提示
+
+---
+
+## 🤖 ROS2整合
+
+### 📡 ROS2服務
+```bash
+# 傳統服務 (向後兼容)
+/get_basic_medicines      # 基本藥物資料
+/get_detailed_medicines   # 詳細藥物資料  
+/get_medicine_orders      # 藥物訂單資料
+
+# 增強服務 (新功能)
+/get_single_order         # 單筆訂單查詢
+/get_all_basic_medicines  # 所有基本藥物
+/get_medicine_info        # 程式用結構化資料
+```
+
+### 📤 ROS2主題
+```bash
+# 傳統主題
+/basic_medicines_output    # 基本藥物輸出
+/detailed_medicines_output # 詳細藥物輸出
+/medicine_order_output     # 訂單輸出
+
+# 增強主題
+/single_order_output           # 單筆訂單
+/enhanced_basic_medicines_output # 增強基本藥物
+/structured_medicine_data      # 程式結構化資料
+```
+
+### 🎛️ 一鍵啟動ROS2
+```bash
+# 啟動完整ROS2服務系統
+python3 start_enhanced_ros2_system.py
+
+# 啟動傳統ROS2服務
+python3 start_ros2_medicine_system.py
+```
+
+### 📁 輸出檔案位置
+```bash
+~/ros2_medicine_output/
+├── single_order_20241212_143000.yaml
+├── all_basic_medicines_20241212_143100.yaml  
+├── structured_medicines_20241212_143200.json
+└── structured_medicines_20241212_143200.yaml
+```
+
+---
+
+## 🗄️ 資料庫架構
+
+### 📁 JSON版本 (輕量級)
+```
+user_interface/data/
+├── basic_medicines.json     # 基本藥物資料
+├── detailed_medicines.json  # 詳細藥物資料
+├── prescriptions.json       # 處方籤資料
+├── basic_medicines.yaml     # YAML匯出 (ROS2)
+└── detailed_medicines.yaml  # YAML匯出 (ROS2)
+```
+
+### 🗄️ SQL版本 (企業級)
+```sql
+-- 資料庫表格結構
+medicine_basic              # 基本藥物資料表
+├── id (PK)                # 主鍵
+├── name (UNIQUE)          # 藥物名稱
+├── amount                 # 庫存數量
+├── position               # 儲存位置
+├── prompt                 # AI提示詞 🤖
+└── is_active             # 軟刪除標記
+
+medicine_detailed           # 詳細藥物資料表
+├── id (PK)
+├── medicine_id (FK)       # 關聯基本藥物
+├── description            # 詳細描述
+└── side_effects          # 副作用
+
+prescriptions              # 處方籤主表
+prescription_medicines     # 處方藥物明細表  
+stock_logs                # 庫存異動記錄表
+system_logs               # 系統操作記錄表
+```
+
+---
 
 ## 🔗 API文檔
 
-### 主要端點
+### 💊 藥物管理API
+```http
+GET    /api/medicine/basic          # 獲取所有基本藥物
+POST   /api/medicine/basic          # 創建基本藥物
+POST   /api/medicine/detailed       # 創建詳細資料
+POST   /api/medicine/unified        # 統一創建(基本+詳細)
+POST   /api/medicine/adjust-stock   # 庫存調整
+DELETE /api/medicine/{name}         # 刪除藥物
+```
 
-#### 💊 藥物管理 API
-- `GET /api/medicine/` - 獲取所有藥物 (基本+詳細)
-- `GET /api/medicine/basic` - 獲取基本藥物資料
-- `GET /api/medicine/detailed` - 獲取詳細藥物資料
-- `POST /api/medicine/unified` - **統一新增藥物** (基本+詳細)
-- `PUT /api/medicine/{name}` - 更新藥物資料
-- `DELETE /api/medicine/{name}` - 刪除藥物
-- `POST /api/medicine/adjust-stock` - **庫存調整** (增加/減少)
+### 📋 處方籤管理API
+```http
+GET    /api/prescription/           # 獲取所有處方籤
+POST   /api/prescription/           # 創建新處方籤
+DELETE /api/prescription/{id}       # 取消處方籤
+```
 
-#### 📋 處方籤管理 API
-- `GET /api/prescription/` - 獲取所有處方籤
-- `POST /api/prescription/` - **創建新處方籤** (含自動編號)
-- `GET /api/prescription/{id}` - 獲取特定處方籤
-- `DELETE /api/prescription/{id}` - 刪除處方籤
+### 🤖 ROS2整合API
+```http
+GET    /api/ros2/prescription       # ROS2格式處方資料
+POST   /api/export/yaml/sync        # 手動YAML同步
+```
 
-#### 📄 YAML匯出 API
-- `GET /api/export/yaml/sync` - 同步JSON到YAML並匯出ROS2格式
-- `GET /api/medicine/yaml/basic` - 獲取基本藥物YAML格式
-- `GET /api/medicine/yaml/detailed` - 獲取詳細藥物YAML格式
+---
 
-#### 🤖 ROS2整合 API
-- `GET /api/ros2/prescription` - ROS2格式的處方籤資料
-
-#### 🔄 WebSocket
-- `ws://localhost:8000/ws` - 即時數據更新
-  - 藥物新增/更新/刪除通知
-  - 庫存調整通知
-  - 處方籤狀態變更通知
-
-完整的API文檔請訪問: http://localhost:8000/docs
-
-## 📁 專案結構
+## 🗂️ 專案結構
 
 ```
 醫院藥物管理系統/
-├── user_interface/           # 主要應用程式目錄
-│   ├── main.py              # 應用程式入口點
-│   ├── fixed_server.py      # FastAPI後端伺服器
-│   ├── data/                # 數據檔案目錄
-│   │   ├── medicines.json           # 藥物基本資料
-│   │   ├── detailed_medicines.json  # 藥物詳細資料
-│   │   ├── prescriptions.json       # 處方籤資料
-│   │   └── prescription_status.json # 處方籤狀態
-│   └── static/              # 靜態資源目錄
-│       ├── html/            # HTML頁面
-│       │   ├── Medicine.html        # 藥物管理頁面
-│       │   ├── Prescription.html    # 處方籤管理頁面
-│       │   └── doctor.html          # 醫生介面
-│       ├── css/             # 樣式檔案
-│       │   └── unified_style.css    # 統一樣式表
-│       └── js/              # JavaScript檔案
-│           ├── medicine.js          # 藥物管理腳本
-│           ├── doctor.js            # 醫生介面腳本
-│           └── Prescription.js      # 處方籤管理腳本
-├── requirements.txt         # Python依賴清單
-└── README.md               # 專案說明文檔
+├── user_interface/                 # 主要應用程式
+│   ├── main.py                    # JSON版本伺服器
+│   ├── sql_server.py              # SQL版本伺服器 ⭐
+│   ├── database.py                # SQL資料庫模型 ⭐
+│   ├── fixed_server.py            # 固定版伺服器
+│   ├── yaml_storage.py            # YAML處理模組
+│   ├── data/                      # 資料儲存目錄
+│   │   ├── *.json                # JSON資料檔案
+│   │   ├── *.yaml                # YAML匯出檔案
+│   │   └── hospital_management.db # SQL資料庫 ⭐
+│   └── static/                    # 靜態檔案
+│       ├── html/                  # HTML頁面
+│       │   ├── doctor.html        # 醫生工作台
+│       │   ├── integrated_medicine_management.html # 整合管理
+│       │   ├── Prescription.html  # 處方籤管理
+│       │   └── unified_medicine.html # 統一表單 ⭐
+│       ├── css/                   # 樣式表
+│       └── js/                    # JavaScript邏輯
+├── ros2_packages/                 # ROS2整合套件
+│   ├── medicine_order_service/    # 訂單服務
+│   ├── medicine_basic_provider/   # 基本藥物服務
+│   └── medicine_detailed_provider/ # 詳細藥物服務
+├── start_enhanced_ros2_system.py  # 增強版ROS2啟動器 ⭐
+├── start_ros2_medicine_system.py  # 傳統ROS2啟動器
+├── requirements.txt               # JSON版本依賴
+├── requirements_sql.txt           # SQL版本依賴 ⭐
+└── README.md                      # 專案說明
 ```
 
-## 🛠️ 開發指南
+---
 
-### 技術棧
-- **後端**: FastAPI、Python 3.8+、Uvicorn
-- **前端**: HTML5、CSS3、JavaScript ES6+
-- **數據**: JSON檔案儲存
-- **通訊**: RESTful API、WebSocket
+## 🆚 版本比較
 
-### 開發環境設置
-1. 遵循安裝指南設置基本環境
-2. 啟用開發模式 (自動重載):
+| 功能特色 | JSON版本 | SQL版本 ⭐ |
+|---------|----------|-----------|
+| **資料儲存** | JSON檔案 | SQLite資料庫 |
+| **資料關聯** | 手動維護 | 自動Foreign Key |
+| **查詢效能** | 線性搜尋 | 索引優化查詢 |
+| **交易安全** | ❌ | ✅ ACID特性 |
+| **歷史記錄** | 基本 | 完整操作日誌 |
+| **備份還原** | 檔案複製 | 專業資料庫工具 |
+| **擴展性** | 有限 | 高度可擴展 |
+| **複雜查詢** | ❌ | ✅ SQL強大查詢 |
+| **資料完整性** | 手動檢查 | 約束自動檢查 |
+| **並發處理** | 有限 | 完整並發支援 |
+
+---
+
+## 🔧 開發指南
+
+### 🧪 測試
 ```bash
-uvicorn fixed_server:app --reload --host 0.0.0.0 --port 8000
+# JSON版本測試
+cd user_interface
+python3 main.py
+
+# SQL版本測試
+cd user_interface  
+python3 sql_server.py
+
+# ROS2服務測試
+python3 start_enhanced_ros2_system.py
 ```
 
-### 代碼規範
-- 使用Python PEP 8編碼規範
-- JavaScript使用ES6+語法
-- CSS使用模組化設計
-- 所有API端點都有適當的錯誤處理
+### 🐛 除錯
+```bash
+# 檢查依賴
+pip install -r requirements.txt      # JSON版本
+pip install -r requirements_sql.txt  # SQL版本
 
-### 新增功能
-1. 在 `fixed_server.py` 中新增API端點
-2. 更新前端頁面和JavaScript
-3. 測試所有功能
-4. 更新API文檔
+# 檢查連接埠
+netstat -tulpn | grep :8000
 
-## 🐛 故障排除
+# 檢查ROS2環境
+source /opt/ros/humble/setup.bash  # 根據您的ROS2版本調整
+```
 
-### 常見問題
+### 📝 自定義設定
+- **連接埠**: 預設8000，可在伺服器檔案中修改
+- **資料庫**: SQL版本使用SQLite，可切換到PostgreSQL/MySQL
+- **ROS2**: 可自定義服務名稱和主題名稱
 
-**Q: 啟動時顯示端口被佔用**
-A: 請檢查8000端口是否被其他應用使用，或修改 `main.py` 中的端口設定
+---
 
-**Q: 前端頁面顯示404錯誤**
-A: 確保靜態檔案路徑正確，檢查 `static` 目錄結構
+## 🎊 更新記錄
 
-**Q: API請求失敗**
-A: 檢查CORS設定，確保前端和後端在同一域名或已正確配置跨域
+### v3.0.0 (目前版本) ⭐
+- **🎯 頁面功能優化**: 統一導航系統，移除重複頁面
+- **🔄 統一表單增強**: 新增快速導航面板和功能說明
+- **👨‍⚕️ 醫生工作台精簡**: 專注於處方籤開立功能
+- **🚀 ROS2服務增強**: 新增單筆訂單和結構化資料服務
+- **📋 完整README**: 全新的使用者指南和技術文檔
 
-**Q: 數據丟失**
-A: 檢查 `data/` 目錄中的JSON檔案是否存在且格式正確
+### v2.1.0 (SQL版本)
+- **🗄️ 完整SQL資料庫**: SQLite/PostgreSQL/MySQL支援
+- **🤖 AI提示詞功能**: 每種藥物可設定AI推薦提示
+- **📊 歷史記錄追蹤**: 完整的操作和庫存異動記錄
+- **🔒 企業級安全**: IP追蹤、操作日誌、資料驗證
 
-### 日誌和除錯
-- 啟動時會顯示詳細的系統資訊
-- API錯誤會記錄在控制台
-- 檢查瀏覽器開發者工具的網路和控制台標籤
-
-### 獲取幫助
-如果遇到問題，請：
-1. 檢查控制台輸出
-2. 查看API文檔 (http://localhost:8000/docs)
-3. 確認所有依賴已正確安裝
-4. 檢查網路連接和防火牆設定
-
-## 📝 更新記錄
-
-### v2.0.0 (目前版本) ⭐ 重大更新
-- **全新醫生工作台**: 統一藥物表單 + 智能處方籤系統
-- **自動化功能**: 病患編號生成、處方時間、庫存警告
-- **美化介面**: 下拉式藥物選擇、響應式設計
-- **整合管理**: 四合一藥物管理介面 (新增、庫存、清單、病例)
-- **CRUD完整性**: 藥物和處方籤的完整增刪改查
-- **ROS2深度整合**: 三個專用ROS2節點 + YAML自動匯出
-- **身份證號驗證**: 台灣身份證號格式驗證和編號生成
-
-### v1.0.0 (舊版本)
-- 基礎藥物管理系統
-- 簡單處方籤功能
-- 基本醫生介面
+### v2.0.0 (JSON版本)
+- 基礎JSON檔案儲存
+- 統一藥物表單
+- ROS2整合
 - WebSocket即時更新
-- RESTful API
 
 ---
 
-## 🤝 貢獻
+## 🤝 貢獻指南
 
-歡迎提交Issue和Pull Request來改善這個專案！
+我們歡迎各種形式的貢獻！
 
-## 📄 授權
+### 🐛 報告問題
+- 使用GitHub Issues報告bug
+- 提供詳細的錯誤訊息和重現步驟
 
-請參考專案授權條款。
+### 💡 功能建議
+- 在Issues中提出功能請求
+- 說明使用場景和預期效果
+
+### 🔧 程式碼貢獻
+1. Fork此專案
+2. 創建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交變更 (`git commit -m 'Add amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 開啟Pull Request
 
 ---
 
-**開發團隊** | **最後更新**: 2024年12月
+## 📞 支援與聯絡
+
+- **GitHub**: [專案頁面](https://github.com/jimmyhuang921114/user_ineterface)
+- **Issues**: [問題回報](https://github.com/jimmyhuang921114/user_ineterface/issues)
+- **JSON版本分支**: `cursor/git-afed` (主分支)
+- **SQL版本分支**: `feature/sql-database`
+
+---
+
+## 📄 授權條款
+
+本專案採用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 檔案
+
+---
+
+**🏥 醫院藥物管理系統 - 為現代醫療提供專業的數位化解決方案！**
+
+## 🎯 系統特色總結
+
+✨ **四個核心頁面，完整功能覆蓋**  
+✨ **雙資料庫支援，彈性部署選擇**  
+✨ **ROS2深度整合，支援機器人應用**  
+✨ **AI智能提示，提升醫療決策品質**  
+✨ **現代化介面，優秀的使用者體驗**

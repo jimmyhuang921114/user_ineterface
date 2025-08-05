@@ -6,12 +6,61 @@
     <title>🏥 統一藥物管理系統</title>
     <link rel="stylesheet" href="/css/unified_style.css">
     <style>
+        .unified-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
         .unified-form {
             background: white;
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             margin: 20px;
+            flex: 1;
+        }
+        
+        .quick-nav {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 20px 20px 0;
+            min-width: 250px;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .quick-nav h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        .nav-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: left;
+        }
+        
+        .nav-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(5px);
+        }
+        
+        .nav-button.current {
+            background: rgba(255,255,255,0.4);
+            font-weight: 600;
         }
         
         .form-section {
@@ -124,7 +173,36 @@
     </style>
 </head>
 <body>
-    <div class="unified-form">
+    <div class="unified-container">
+        <!-- 快速導航面板 -->
+        <div class="quick-nav">
+            <h3>🚀 快速導航</h3>
+            <button class="nav-button" onclick="location.href='doctor.html'">
+                👨‍⚕️ 醫生工作台
+            </button>
+            <button class="nav-button" onclick="location.href='integrated_medicine_management.html'">
+                🔧 整合管理
+            </button>
+            <button class="nav-button" onclick="location.href='Prescription.html'">
+                📋 處方籤管理
+            </button>
+            <button class="nav-button current">
+                🔄 統一表單 (目前)
+            </button>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <h4 style="color: rgba(255,255,255,0.8); margin-bottom: 15px; font-size: 0.9em;">📝 表單功能</h4>
+                <div style="color: rgba(255,255,255,0.7); font-size: 0.85em; line-height: 1.4;">
+                    <p>✅ 一次性填寫基本和詳細藥物資料</p>
+                    <p>✅ 自動建立資料關聯</p>
+                    <p>✅ 智能表單驗證</p>
+                    <p>✅ YAML自動匯出</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主要表單區域 -->
+        <div class="unified-form">
         <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
             🏥 統一藥物管理系統
         </h1>
@@ -367,5 +445,6 @@
         // 移除自動同步 - 只在用戶主動請求時同步
         // window.addEventListener('load', syncYAML);
     </script>
+    </div>
 </body>
 </html>
