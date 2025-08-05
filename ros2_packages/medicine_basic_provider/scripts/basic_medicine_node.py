@@ -116,6 +116,7 @@ class BasicMedicineProviderNode(Node):
                 'position': medicine.get('position', 'N/A'),
                 'manufacturer': medicine.get('manufacturer', ''),
                 'dosage': medicine.get('dosage', ''),
+                'prompt': medicine.get('prompt', ''),  # 新增prompt欄位
                 'created_time': medicine.get('created_time', ''),
                 'stock_status': 'sufficient' if medicine.get('amount', 0) > 10 else 'low'
             }
