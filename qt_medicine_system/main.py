@@ -68,6 +68,10 @@ class QtMedicineSystem(QMainWindow):
         try:
             rclpy.init()
             self.ros2_interface = ROS2Interface()
+            
+            # 添加狀態回調
+            self.ros2_interface.add_status_callback(self.on_ros2_status_update)
+            
             print("✅ ROS2初始化成功")
         except Exception as e:
             print(f"❌ ROS2初始化失敗: {e}")
@@ -612,7 +616,21 @@ class QtMedicineSystem(QMainWindow):
         dialog = MedicineDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             medicine_data = dialog.get_medicine_data()
+            
+            # 先儲存到本地
             self.data_manager.add_medicine(medicine_data)
+            
+            # 通過ROS2服務同步到其他系統
+            if self.ros2_interface:
+                try:
+                    result = self.ros2_interface.create_medicine_via_service(medicine_data)
+                    if result:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物已同步到ROS2系統: {medicine_data.get('name', '')}")
+                    else:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步失敗: {medicine_data.get('name', '')}")
+                except Exception as e:
+                    self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步錯誤: {e}")
+            
             self.refresh_medicine_table()
             self.refresh_inventory_table()
             self.status_label.setText("藥物新增成功")
@@ -630,7 +648,21 @@ class QtMedicineSystem(QMainWindow):
         dialog = MedicineDialog(self, medicine)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             medicine_data = dialog.get_medicine_data()
+            
+            # 先更新本地資料
             self.data_manager.update_medicine(medicine_id, medicine_data)
+            
+            # 通過ROS2服務同步到其他系統
+            if self.ros2_interface:
+                try:
+                    result = self.ros2_interface.update_medicine_via_service(medicine_id, medicine_data)
+                    if result:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物已同步更新到ROS2系統: {medicine_data.get('name', '')}")
+                    else:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步更新失敗: {medicine_data.get('name', '')}")
+                except Exception as e:
+                    self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步更新錯誤: {e}")
+            
             self.refresh_medicine_table()
             self.refresh_inventory_table()
             self.status_label.setText("藥物更新成功")
@@ -652,7 +684,20 @@ class QtMedicineSystem(QMainWindow):
         )
         
         if reply == QMessageBox.StandardButton.Yes:
+            # 先從本地刪除
             self.data_manager.delete_medicine(medicine_id)
+            
+            # 通過ROS2服務同步到其他系統
+            if self.ros2_interface:
+                try:
+                    result = self.ros2_interface.delete_medicine_via_service(medicine_id)
+                    if result:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物已同步刪除到ROS2系統: {medicine_name}")
+                    else:
+                        self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步刪除失敗: {medicine_name}")
+                except Exception as e:
+                    self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 藥物同步刪除錯誤: {e}")
+            
             self.refresh_medicine_table()
             self.refresh_inventory_table()
             self.status_label.setText("藥物刪除成功")
@@ -667,7 +712,7 @@ class QtMedicineSystem(QMainWindow):
             self.status_label.setText("處方籤新增成功")
             
     def process_prescription(self):
-        """處理處方籤"""
+        """處理處方籤（串行處理）"""
         current_row = self.prescription_table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "警告", "請選擇要處理的處方籤")
@@ -680,16 +725,29 @@ class QtMedicineSystem(QMainWindow):
             QMessageBox.information(self, "資訊", "此處方籤已完成處理")
             return
             
+        # 檢查是否已在處理中
+        if self.ros2_interface:
+            order_status = self.ros2_interface.get_order_status()
+            if order_status['processing_order']:
+                QMessageBox.information(self, "資訊", f"當前正在處理訂單: {order_status['current_order']['id']}\n請等待完成後再處理下一筆")
+                return
+                
+            # 檢查是否已在待處理列表中
+            pending_ids = [order['id'] for order in order_status['pending_orders']]
+            if prescription_id in pending_ids:
+                QMessageBox.information(self, "資訊", "此處方籤已在待處理列表中")
+                return
+        
         # 更新狀態為處理中
         self.data_manager.update_prescription_status(prescription_id, "processing")
         
-        # 發送ROS2訊息
+        # 發送ROS2訊息（串行處理）
         if self.ros2_interface:
             self.ros2_interface.send_prescription(prescription_id)
-            self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 發送處方籤處理請求: {prescription_id}")
+            self.ros2_log.append(f"[{datetime.now().strftime('%H:%M:%S')}] 添加處方籤到處理佇列: {prescription_id}")
             
         self.refresh_prescription_table()
-        self.status_label.setText("處方籤處理中...")
+        self.status_label.setText("處方籤已加入處理佇列...")
         
     def view_prescription(self):
         """查看處方籤詳情"""
@@ -805,8 +863,45 @@ ID: {prescription['id']}
                 topic_count = self.ros2_interface.get_topic_count()
                 self.ros2_node_label.setText(str(node_count))
                 self.ros2_topic_label.setText(str(topic_count))
+                
+                # 更新訂單處理狀態
+                processing_status = self.ros2_interface.get_processing_status()
+                self.status_label.setText(f"ROS2: {processing_status}")
+                
             except:
                 pass
+                
+    def on_ros2_status_update(self, event_type: str, data):
+        """ROS2狀態更新回調"""
+        timestamp = datetime.now().strftime('%H:%M:%S')
+        
+        if event_type == 'order_processing_started':
+            self.ros2_log.append(f"[{timestamp}] 🚀 開始處理訂單: {data['id']}")
+            self.status_label.setText(f"處理中: {data['id']}")
+            
+        elif event_type == 'order_completed':
+            self.ros2_log.append(f"[{timestamp}] ✅ 訂單處理完成: {data['id']} - {data.get('result', 'Unknown')}")
+            self.status_label.setText(f"完成: {data['id']}")
+            
+            # 更新處方籤狀態
+            if data.get('result') == 'success':
+                self.data_manager.update_prescription_status(data['id'], 'completed')
+            else:
+                self.data_manager.update_prescription_status(data['id'], 'failed')
+                
+            self.refresh_prescription_table()
+            
+        elif event_type == 'prescription_response':
+            self.ros2_log.append(f"[{timestamp}] 📋 處方籤回應: {data}")
+            
+        elif event_type == 'status_update':
+            self.ros2_log.append(f"[{timestamp}] 📊 狀態更新: {data}")
+            
+        elif event_type == 'medicine_info_response':
+            self.ros2_log.append(f"[{timestamp}] 💊 藥物資訊回應: {data}")
+            
+        elif event_type == 'error':
+            self.ros2_log.append(f"[{timestamp}] ❌ 錯誤: {data}")
                 
     def closeEvent(self, event):
         """關閉事件"""

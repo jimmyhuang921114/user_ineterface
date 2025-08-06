@@ -40,6 +40,12 @@ class ROS2Interface(Node):
         self.node_count = 0
         self.topic_count = 0
         
+        # 串行訂單處理狀態
+        self.processing_order = False
+        self.pending_orders = []
+        self.current_order = None
+        self.order_processing_lock = threading.Lock()
+        
         # 設置QoS配置
         self.qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
@@ -66,6 +72,10 @@ class ROS2Interface(Node):
         # 啟動執行器線程
         self.executor_thread = threading.Thread(target=self._run_executor, daemon=True)
         self.executor_thread.start()
+        
+        # 啟動訂單處理監控線程
+        self.order_monitor_thread = threading.Thread(target=self._monitor_orders, daemon=True)
+        self.order_monitor_thread.start()
         
         self.get_logger().info("ROS2介面初始化完成")
         
@@ -155,6 +165,20 @@ class ROS2Interface(Node):
             # 使用標準服務作為替代
             pass
             
+        # 訂單處理服務客戶端
+        self.order_processor_client = self.create_client(
+            String, 
+            '/medicine/order_processor',
+            callback_group=self.callback_group
+        )
+        
+        # 藥物資訊服務客戶端
+        self.medicine_info_client = self.create_client(
+            String,
+            '/medicine/info_service',
+            callback_group=self.callback_group
+        )
+            
     def _run_executor(self):
         """執行器線程"""
         try:
@@ -203,14 +227,87 @@ class ROS2Interface(Node):
             self.get_logger().error(f"清理失敗: {e}")
             
     def send_prescription(self, prescription_id: str):
-        """發送處方籤處理請求"""
-        try:
-            msg = String()
-            msg.data = prescription_id
-            self.prescription_pub.publish(msg)
-            self.get_logger().info(f"發送處方籤處理請求: {prescription_id}")
-        except Exception as e:
-            self.get_logger().error(f"發送處方籤請求失敗: {e}")
+        """發送處方籤處理請求（串行處理）"""
+        with self.order_processing_lock:
+            # 添加到待處理列表
+            if prescription_id not in [order['id'] for order in self.pending_orders]:
+                self.pending_orders.append({
+                    'id': prescription_id,
+                    'timestamp': datetime.now().isoformat(),
+                    'status': 'pending'
+                })
+                self.get_logger().info(f"添加處方籤到待處理列表: {prescription_id}")
+            else:
+                self.get_logger().warning(f"處方籤已在待處理列表中: {prescription_id}")
+                
+    def process_next_order(self):
+        """處理下一個訂單"""
+        with self.order_processing_lock:
+            if self.processing_order:
+                self.get_logger().info("當前有訂單正在處理中，等待完成...")
+                return False
+                
+            if not self.pending_orders:
+                self.get_logger().info("沒有待處理的訂單")
+                return False
+                
+            # 取出第一個待處理訂單
+            self.current_order = self.pending_orders.pop(0)
+            self.processing_order = True
+            
+            self.get_logger().info(f"開始處理訂單: {self.current_order['id']}")
+            
+            # 發送訂單處理請求
+            try:
+                msg = String()
+                msg.data = self.current_order['id']
+                self.prescription_pub.publish(msg)
+                
+                # 通知回調函數
+                for callback in self.status_callbacks:
+                    try:
+                        callback('order_processing_started', self.current_order)
+                    except Exception as e:
+                        self.get_logger().error(f"回調函數錯誤: {e}")
+                        
+            except Exception as e:
+                self.get_logger().error(f"發送訂單處理請求失敗: {e}")
+                self.processing_order = False
+                self.current_order = None
+                return False
+                
+            return True
+            
+    def complete_current_order(self, result: str):
+        """完成當前訂單處理"""
+        with self.order_processing_lock:
+            if self.current_order:
+                self.current_order['status'] = 'completed'
+                self.current_order['result'] = result
+                self.current_order['completion_time'] = datetime.now().isoformat()
+                
+                self.get_logger().info(f"訂單處理完成: {self.current_order['id']} - {result}")
+                
+                # 通知回調函數
+                for callback in self.status_callbacks:
+                    try:
+                        callback('order_completed', self.current_order)
+                    except Exception as e:
+                        self.get_logger().error(f"回調函數錯誤: {e}")
+                        
+                self.processing_order = False
+                self.current_order = None
+                
+    def _monitor_orders(self):
+        """監控訂單處理狀態"""
+        while rclpy.ok():
+            try:
+                if not self.processing_order and self.pending_orders:
+                    self.process_next_order()
+                time.sleep(1.0)  # 每秒檢查一次
+            except Exception as e:
+                self.get_logger().error(f"訂單監控錯誤: {e}")
+                time.sleep(5.0)  # 錯誤時等待更長時間
             
     def send_test_message(self, message: str):
         """發送測試訊息"""
@@ -241,11 +338,149 @@ class ROS2Interface(Node):
         except Exception as e:
             self.get_logger().error(f"請求藥物資訊失敗: {e}")
             
+    def get_medicine_info_via_service(self, medicine_id: str, timeout: float = 10.0):
+        """通過服務獲取藥物資訊"""
+        try:
+            if not self.medicine_info_client.wait_for_service(timeout_sec=timeout):
+                self.get_logger().error("藥物資訊服務不可用")
+                return None
+                
+            request = String()
+            request.data = medicine_id
+            
+            future = self.medicine_info_client.call_async(request)
+            
+            # 等待回應
+            rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
+            
+            if future.done():
+                response = future.result()
+                self.get_logger().info(f"收到藥物資訊回應: {response.data}")
+                return response.data
+            else:
+                self.get_logger().error("藥物資訊服務請求超時")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"獲取藥物資訊失敗: {e}")
+            return None
+            
+    def get_all_medicines_via_service(self, timeout: float = 30.0):
+        """通過服務獲取所有藥物資訊"""
+        try:
+            if not self.medicine_info_client.wait_for_service(timeout_sec=timeout):
+                self.get_logger().error("藥物資訊服務不可用")
+                return None
+                
+            request = String()
+            request.data = "ALL"  # 特殊標識符表示請求所有藥物
+            
+            future = self.medicine_info_client.call_async(request)
+            
+            # 等待回應
+            rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
+            
+            if future.done():
+                response = future.result()
+                self.get_logger().info("收到所有藥物資訊回應")
+                return response.data
+            else:
+                self.get_logger().error("藥物資訊服務請求超時")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"獲取所有藥物資訊失敗: {e}")
+            return None
+            
+    def create_medicine_via_service(self, medicine_data: dict, timeout: float = 10.0):
+        """通過服務創建藥物"""
+        try:
+            if not self.medicine_info_client.wait_for_service(timeout_sec=timeout):
+                self.get_logger().error("藥物資訊服務不可用")
+                return None
+                
+            request = String()
+            request.data = f"CREATE:{json.dumps(medicine_data, ensure_ascii=False)}"
+            
+            future = self.medicine_info_client.call_async(request)
+            
+            # 等待回應
+            rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
+            
+            if future.done():
+                response = future.result()
+                self.get_logger().info(f"藥物創建回應: {response.data}")
+                return response.data
+            else:
+                self.get_logger().error("藥物創建服務請求超時")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"創建藥物失敗: {e}")
+            return None
+            
+    def update_medicine_via_service(self, medicine_id: str, medicine_data: dict, timeout: float = 10.0):
+        """通過服務更新藥物"""
+        try:
+            if not self.medicine_info_client.wait_for_service(timeout_sec=timeout):
+                self.get_logger().error("藥物資訊服務不可用")
+                return None
+                
+            request = String()
+            request.data = f"UPDATE:{medicine_id}:{json.dumps(medicine_data, ensure_ascii=False)}"
+            
+            future = self.medicine_info_client.call_async(request)
+            
+            # 等待回應
+            rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
+            
+            if future.done():
+                response = future.result()
+                self.get_logger().info(f"藥物更新回應: {response.data}")
+                return response.data
+            else:
+                self.get_logger().error("藥物更新服務請求超時")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"更新藥物失敗: {e}")
+            return None
+            
+    def delete_medicine_via_service(self, medicine_id: str, timeout: float = 10.0):
+        """通過服務刪除藥物"""
+        try:
+            if not self.medicine_info_client.wait_for_service(timeout_sec=timeout):
+                self.get_logger().error("藥物資訊服務不可用")
+                return None
+                
+            request = String()
+            request.data = f"DELETE:{medicine_id}"
+            
+            future = self.medicine_info_client.call_async(request)
+            
+            # 等待回應
+            rclpy.spin_until_future_complete(self, future, timeout_sec=timeout)
+            
+            if future.done():
+                response = future.result()
+                self.get_logger().info(f"藥物刪除回應: {response.data}")
+                return response.data
+            else:
+                self.get_logger().error("藥物刪除服務請求超時")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"刪除藥物失敗: {e}")
+            return None
+            
     def _prescription_response_callback(self, msg: String):
         """處方籤處理回應回調"""
         try:
             response_data = msg.data
             self.get_logger().info(f"收到處方籤處理回應: {response_data}")
+            
+            # 完成當前訂單處理
+            self.complete_current_order(response_data)
             
             # 通知回調函數
             for callback in self.status_callbacks:
@@ -256,6 +491,8 @@ class ROS2Interface(Node):
                     
         except Exception as e:
             self.get_logger().error(f"處理處方籤回應失敗: {e}")
+            # 即使出錯也要完成當前訂單
+            self.complete_current_order("error")
             
     def _status_update_callback(self, msg: String):
         """狀態更新回調"""
@@ -362,6 +599,26 @@ class ROS2Interface(Node):
     def get_connection_status(self) -> bool:
         """獲取連接狀態"""
         return self.is_connected
+        
+    def get_order_status(self) -> dict:
+        """獲取訂單處理狀態"""
+        with self.order_processing_lock:
+            return {
+                'processing_order': self.processing_order,
+                'current_order': self.current_order,
+                'pending_count': len(self.pending_orders),
+                'pending_orders': self.pending_orders.copy()
+            }
+            
+    def get_processing_status(self) -> str:
+        """獲取處理狀態描述"""
+        with self.order_processing_lock:
+            if self.processing_order:
+                return f"處理中: {self.current_order['id'] if self.current_order else 'Unknown'}"
+            elif self.pending_orders:
+                return f"等待中: {len(self.pending_orders)} 筆訂單"
+            else:
+                return "閒置中"
         
     def get_available_topics(self) -> List[str]:
         """獲取可用的主題列表"""
