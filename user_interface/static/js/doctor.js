@@ -145,8 +145,7 @@ async function handlePrescriptionSubmit(event) {
             patient_name: patientName,
             patient_id: patientNumber,
             doctor_name: '系統醫生', // 預設醫生名稱
-            medicines: medicines,
-            created_at: new Date().toISOString()
+            medicines: medicines
         };
         
         // 發送請求

@@ -21,28 +21,14 @@ from yaml_storage import YAMLMedicineStorage
 class MedicineBasic(BaseModel):
     name: str
     amount: int
-    usage_days: Optional[int] = None
     position: str
-    manufacturer: Optional[str] = ""
-    dosage: Optional[str] = ""
-    prompt: Optional[str] = ""  # 新增prompt提示詞欄位
+    prompt: Optional[str] = ""  # AI提示詞欄位
     created_time: Optional[str] = None
     updated_time: Optional[str] = None
 
 class MedicineDetailed(BaseModel):
     medicine_name: str
     description: Optional[str] = ""
-    side_effects: Optional[str] = ""
-    appearance: Optional[Dict[str, str]] = {}
-    storage_conditions: Optional[str] = ""
-    expiry_date: Optional[str] = ""
-    notes: Optional[str] = ""
-    ingredient: Optional[str] = ""
-    category: Optional[str] = ""
-    usage_method: Optional[str] = ""
-    unit_dose: Optional[str] = ""
-    barcode: Optional[str] = ""
-    appearance_type: Optional[str] = ""
     created_time: Optional[str] = None
     updated_time: Optional[str] = None
 
@@ -63,7 +49,7 @@ class Prescription(BaseModel):
     patient_id: str
     doctor_name: str
     medicines: List[List[str]]
-    created_at: str
+    created_at: Optional[str] = None
 
 # FastAPI App
 app = FastAPI(title="醫院藥物管理系統", version="2.0.0")

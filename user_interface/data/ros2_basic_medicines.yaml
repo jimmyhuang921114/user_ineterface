@@ -6,7 +6,21 @@ ros2_medicine_basic:
     name: 測試藥物
     position: A1-01
     updated_time: '2025-08-06 05:18:57'
+  - amount: 50
+    created_at: '2025-08-06T06:04:56.381458'
+    created_time: '2025-08-06 06:04:56'
+    name: 測試藥物2
+    position: 1-1
+    prompt: 測試用的AI提示詞
+    updated_time: '2025-08-06 06:04:56'
+  - amount: 75
+    created_at: '2025-08-06T06:07:37.362788'
+    created_time: '2025-08-06 06:07:37'
+    name: 測試藥物3
+    position: 2-2
+    prompt: 用於頭痛的AI提示詞
+    updated_time: '2025-08-06 06:07:37'
   node_info:
     name: medicine_basic_provider
-    timestamp: '2025-08-06T05:18:57.031761'
+    timestamp: '2025-08-06T06:07:37.366439'
     type: service_provider

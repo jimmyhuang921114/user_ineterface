@@ -269,17 +269,28 @@
             const yamlDiv = document.getElementById('yamlOutput');
             
             try {
+                // 檢查所有必要元素是否存在
+                const nameElement = document.getElementById('name');
+                const amountElement = document.getElementById('amount');
+                const positionElement = document.getElementById('position');
+                const promptElement = document.getElementById('prompt');
+                const descriptionElement = document.getElementById('description');
+                
+                if (!nameElement || !amountElement || !positionElement) {
+                    throw new Error('必要的表單元素缺失');
+                }
+                
                 // 收集基本資料
                 const basicData = {
-                    name: document.getElementById('name').value,
-                    amount: parseInt(document.getElementById('amount').value),
-                    position: document.getElementById('position').value,
-                    prompt: document.getElementById('prompt').value || ""  // AI提示詞
+                    name: nameElement.value,
+                    amount: parseInt(amountElement.value),
+                    position: positionElement.value,
+                    prompt: promptElement ? promptElement.value || "" : ""  // AI提示詞
                 };
                 
                 // 收集詳細資料 (只保留描述)
                 const detailedData = {
-                    description: document.getElementById('description').value || ""
+                    description: descriptionElement ? descriptionElement.value || "" : ""
                 };
                 
                 // 檢查是否有詳細資料

@@ -34,20 +34,14 @@ from yaml_storage import YAMLMedicineStorage
 class MedicineBasicCreate(BaseModel):
     name: str
     amount: int
-    usage_days: Optional[int] = None
     position: str
-    manufacturer: Optional[str] = ""
-    dosage: Optional[str] = ""
     prompt: Optional[str] = ""
 
 class MedicineBasicResponse(BaseModel):
     id: int
     name: str
     amount: int
-    usage_days: Optional[int]
     position: str
-    manufacturer: Optional[str]
-    dosage: Optional[str]
     prompt: Optional[str]
     created_time: datetime
     updated_time: datetime
@@ -72,16 +66,6 @@ class MedicineDetailedCreate(BaseModel):
 
 class MedicineDetailedForUnified(BaseModel):
     description: Optional[str] = ""
-    ingredient: Optional[str] = ""
-    category: Optional[str] = ""
-    usage_method: Optional[str] = ""
-    unit_dose: Optional[str] = ""
-    side_effects: Optional[str] = ""
-    storage_conditions: Optional[str] = ""
-    expiry_date: Optional[date] = None
-    barcode: Optional[str] = ""
-    appearance_type: Optional[str] = ""
-    notes: Optional[str] = ""
 
 class MedicineDetailedResponse(BaseModel):
     id: int
@@ -550,13 +534,14 @@ async def create_prescription(prescription: PrescriptionCreate, request: Request
             # 根據藥物名稱查找ID
             medicine = db.query(DBMedicineBasic).filter(DBMedicineBasic.name == med_data[0]).first()
             if medicine:
+                # 新格式：[藥物名稱, 個數, 天數, 備註]
                 db_med = DBPrescriptionMedicine(
                     prescription_id=db_prescription.id,
                     medicine_id=medicine.id,
-                    dosage=med_data[1],
-                    frequency=med_data[2],
-                    duration=med_data[3],
-                    instructions=med_data[4] if len(med_data) > 4 else ""
+                    dosage=f"{med_data[1]}個",  # 個數
+                    frequency="",  # 不再使用頻率
+                    duration=f"{med_data[2]}天",  # 天數
+                    instructions=med_data[3] if len(med_data) > 3 else ""  # 備註
                 )
                 db.add(db_med)
         

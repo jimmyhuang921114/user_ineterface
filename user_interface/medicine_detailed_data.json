@@ -23,5 +23,17 @@
     "medicine_name": "測試藥物",
     "created_time": "2025-08-06 05:18:57",
     "updated_time": "2025-08-06 05:18:57"
+  },
+  {
+    "description": "這是一個測試藥物的描述",
+    "medicine_name": "測試藥物2",
+    "created_time": "2025-08-06 06:04:56",
+    "updated_time": "2025-08-06 06:04:56"
+  },
+  {
+    "description": "這是測試藥物3的詳細描述",
+    "medicine_name": "測試藥物3",
+    "created_time": "2025-08-06 06:07:37",
+    "updated_time": "2025-08-06 06:07:37"
   }
 ]

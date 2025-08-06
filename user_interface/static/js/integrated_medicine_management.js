@@ -147,7 +147,8 @@ async function handleMedicineSubmit(event) {
         const basicData = {
             name: formData.get('name'),
             amount: parseInt(formData.get('amount')),
-            position: formData.get('position')
+            position: formData.get('position'),
+            prompt: formData.get('prompt') || ""
         };
         
         // 收集詳細資料 (只保留描述)

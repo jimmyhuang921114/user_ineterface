@@ -14,5 +14,21 @@
     "position": "A1-01",
     "created_time": "2025-08-06 05:18:57",
     "updated_time": "2025-08-06 05:18:57"
+  },
+  {
+    "name": "測試藥物2",
+    "amount": 50,
+    "position": "1-1",
+    "prompt": "測試用的AI提示詞",
+    "created_time": "2025-08-06 06:04:56",
+    "updated_time": "2025-08-06 06:04:56"
+  },
+  {
+    "name": "測試藥物3",
+    "amount": 75,
+    "position": "2-2",
+    "prompt": "用於頭痛的AI提示詞",
+    "created_time": "2025-08-06 06:07:37",
+    "updated_time": "2025-08-06 06:07:37"
   }
 ]
