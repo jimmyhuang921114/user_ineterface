@@ -1,0 +1,97 @@
+medicines:
+  - id: "M001"
+    name: "阿司匹林"
+    english_name: "Aspirin"
+    category: "解熱鎮痛藥"
+    dosage_form: "錠劑"
+    strength: "100mg"
+    manufacturer: "台灣拜耳"
+    stock_quantity: 500
+    unit: "錠"
+    price: 15.5
+    description: "用於解熱、鎮痛、抗發炎"
+    side_effects: "可能引起胃部不適"
+    storage_conditions: "室溫保存"
+    expiry_date: "2025-12-31"
+    
+  - id: "M002"
+    name: "布洛芬"
+    english_name: "Ibuprofen"
+    category: "解熱鎮痛藥"
+    dosage_form: "膠囊"
+    strength: "200mg"
+    manufacturer: "中美製藥"
+    stock_quantity: 300
+    unit: "顆"
+    price: 25.0
+    description: "用於緩解疼痛和發炎"
+    side_effects: "可能引起胃部刺激"
+    storage_conditions: "室溫保存"
+    expiry_date: "2025-10-15"
+    
+  - id: "M003"
+    name: "維生素C"
+    english_name: "Vitamin C"
+    category: "維生素"
+    dosage_form: "錠劑"
+    strength: "500mg"
+    manufacturer: "永信藥品"
+    stock_quantity: 800
+    unit: "錠"
+    price: 8.5
+    description: "補充維生素C，增強免疫力"
+    side_effects: "過量可能引起腹瀉"
+    storage_conditions: "避光保存"
+    expiry_date: "2026-03-20"
+    
+  - id: "M004"
+    name: "撲熱息痛"
+    english_name: "Paracetamol"
+    category: "解熱鎮痛藥"
+    dosage_form: "錠劑"
+    strength: "500mg"
+    manufacturer: "台灣神隆"
+    stock_quantity: 600
+    unit: "錠"
+    price: 12.0
+    description: "用於退燒和止痛"
+    side_effects: "過量可能損害肝臟"
+    storage_conditions: "室溫保存"
+    expiry_date: "2025-08-30"
+    
+  - id: "M005"
+    name: "鈣片"
+    english_name: "Calcium"
+    category: "礦物質"
+    dosage_form: "錠劑"
+    strength: "600mg"
+    manufacturer: "生達化學"
+    stock_quantity: 400
+    unit: "錠"
+    price: 18.0
+    description: "補充鈣質，強化骨骼"
+    side_effects: "可能引起便秘"
+    storage_conditions: "室溫保存"
+    expiry_date: "2026-01-15"
+
+categories:
+  - "解熱鎮痛藥"
+  - "維生素"
+  - "礦物質"
+  - "抗生素"
+  - "心血管藥物"
+  - "消化系統藥物"
+  - "呼吸系統藥物"
+  - "皮膚用藥"
+  - "眼科用藥"
+  - "其他"
+
+dosage_forms:
+  - "錠劑"
+  - "膠囊"
+  - "液劑"
+  - "注射劑"
+  - "軟膏"
+  - "眼藥水"
+  - "吸入劑"
+  - "貼片"

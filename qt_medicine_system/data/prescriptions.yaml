@@ -1,0 +1,62 @@
+prescriptions:
+  - id: "P20241202001"
+    patient_name: "張小明"
+    patient_id: "P001"
+    doctor_name: "李醫師"
+    timestamp: "2024-12-02T10:30:00"
+    status: "completed"
+    medicines:
+      - medicine_id: "M001"
+        medicine_name: "阿司匹林"
+        dosage: "100mg"
+        frequency: "每日三次"
+        quantity: 30
+        notes: "飯後服用"
+    total_price: 465.0
+    notes: "感冒發燒"
+    
+  - id: "P20241202002"
+    patient_name: "王大華"
+    patient_id: "P002"
+    doctor_name: "陳醫師"
+    timestamp: "2024-12-02T14:15:00"
+    status: "pending"
+    medicines:
+      - medicine_id: "M002"
+        medicine_name: "布洛芬"
+        dosage: "200mg"
+        frequency: "每日兩次"
+        quantity: 20
+        notes: "疼痛時服用"
+      - medicine_id: "M003"
+        medicine_name: "維生素C"
+        dosage: "500mg"
+        frequency: "每日一次"
+        quantity: 60
+        notes: "增強免疫力"
+    total_price: 710.0
+    notes: "關節疼痛"
+    
+  - id: "P20241202003"
+    patient_name: "李小芳"
+    patient_id: "P003"
+    doctor_name: "林醫師"
+    timestamp: "2024-12-02T16:45:00"
+    status: "processing"
+    medicines:
+      - medicine_id: "M004"
+        medicine_name: "撲熱息痛"
+        dosage: "500mg"
+        frequency: "每6小時一次"
+        quantity: 24
+        notes: "發燒時服用"
+    total_price: 288.0
+    notes: "發燒頭痛"
+
+system_config:
+  auto_save_interval: 300  # 5分鐘自動儲存
+  backup_enabled: true
+  backup_interval: 86400   # 24小時備份
+  max_prescription_history: 1000
+  low_stock_threshold: 50
+  expiry_warning_days: 30
