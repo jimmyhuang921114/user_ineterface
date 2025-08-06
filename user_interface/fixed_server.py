@@ -454,11 +454,18 @@ async def create_prescription(prescription: Prescription):
 
 # 統一藥物添加API (基本+詳細)
 @app.post("/api/medicine/unified")
-async def add_unified_medicine(basic_data: MedicineBasic, detailed_data: Optional[MedicineDetailed] = None):
+async def add_unified_medicine(request: dict):
     try:
+        # 從請求中提取資料
+        basic_data = request.get("basic_data")
+        detailed_data = request.get("detailed_data")
+        
+        if not basic_data:
+            raise HTTPException(status_code=400, detail="basic_data is required")
+        
         # 添加到JSON檔案
         basic_medicines = load_basic_medicines()
-        basic_dict = basic_data.dict()
+        basic_dict = basic_data.copy()
         basic_dict["created_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         basic_dict["updated_time"] = basic_dict["created_time"]
         
@@ -468,8 +475,8 @@ async def add_unified_medicine(basic_data: MedicineBasic, detailed_data: Optiona
         detailed_dict = None
         if detailed_data:
             detailed_medicines = load_detailed_medicines()
-            detailed_dict = detailed_data.dict()
-            detailed_dict["medicine_name"] = basic_data.name
+            detailed_dict = detailed_data.copy()
+            detailed_dict["medicine_name"] = basic_data["name"]
             detailed_dict["created_time"] = basic_dict["created_time"]
             detailed_dict["updated_time"] = basic_dict["created_time"]
             

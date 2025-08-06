@@ -70,6 +70,19 @@ class MedicineDetailedCreate(BaseModel):
     appearance_type: Optional[str] = ""
     notes: Optional[str] = ""
 
+class MedicineDetailedForUnified(BaseModel):
+    description: Optional[str] = ""
+    ingredient: Optional[str] = ""
+    category: Optional[str] = ""
+    usage_method: Optional[str] = ""
+    unit_dose: Optional[str] = ""
+    side_effects: Optional[str] = ""
+    storage_conditions: Optional[str] = ""
+    expiry_date: Optional[date] = None
+    barcode: Optional[str] = ""
+    appearance_type: Optional[str] = ""
+    notes: Optional[str] = ""
+
 class MedicineDetailedResponse(BaseModel):
     id: int
     medicine_id: int
@@ -92,7 +105,7 @@ class MedicineDetailedResponse(BaseModel):
 
 class UnifiedMedicineCreate(BaseModel):
     basic_data: MedicineBasicCreate
-    detailed_data: Optional[MedicineDetailedCreate] = None
+    detailed_data: Optional[MedicineDetailedForUnified] = None
 
 class PrescriptionCreate(BaseModel):
     patient_name: str

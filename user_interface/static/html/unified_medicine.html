@@ -384,17 +384,13 @@
                     detailed_data: hasDetailedData ? detailedData : null
                 };
                 
-                // 發送請求 - 修復API調用格式
-                const requestBody = hasDetailedData ? 
-                    `basic_data=${encodeURIComponent(JSON.stringify(basicData))}&detailed_data=${encodeURIComponent(JSON.stringify(detailedData))}` :
-                    `basic_data=${encodeURIComponent(JSON.stringify(basicData))}`;
-                
+                // 發送請求 - 使用JSON格式
                 const response = await fetch('/api/medicine/unified', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/json',
                     },
-                    body: requestBody
+                    body: JSON.stringify(requestData)
                 });
                 
                 const result = await response.json();
