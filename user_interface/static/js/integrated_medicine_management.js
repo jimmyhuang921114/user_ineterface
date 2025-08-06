@@ -147,25 +147,12 @@ async function handleMedicineSubmit(event) {
         const basicData = {
             name: formData.get('name'),
             amount: parseInt(formData.get('amount')),
-            position: formData.get('position'),
-            usage_days: parseInt(formData.get('usage_days')) || null,
-            manufacturer: formData.get('manufacturer') || '',
-            dosage: formData.get('dosage') || ''
+            position: formData.get('position')
         };
         
-        // 收集詳細資料
+        // 收集詳細資料 (只保留描述)
         const detailedData = {
-            description: formData.get('description') || '',
-            ingredient: formData.get('ingredient') || '',
-            category: formData.get('category') || '',
-            usage_method: formData.get('usage_method') || '',
-            unit_dose: formData.get('unit_dose') || '',
-            side_effects: formData.get('side_effects') || '',
-            storage_conditions: formData.get('storage_conditions') || '',
-            expiry_date: formData.get('expiry_date') || '',
-            barcode: formData.get('barcode') || '',
-            appearance_type: formData.get('appearance_type') || '',
-            notes: formData.get('notes') || ''
+            description: formData.get('description') || ''
         };
         
         // 檢查是否有詳細資料

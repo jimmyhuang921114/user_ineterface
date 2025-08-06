@@ -122,16 +122,14 @@ async function handlePrescriptionSubmit(event) {
         
         medicineItems.forEach(item => {
             const medicineName = item.querySelector('.medicine-select select').value;
-            const dosage = item.querySelector('input[placeholder*="劑量"]').value.trim();
-            const frequency = item.querySelector('input[placeholder*="頻率"]').value.trim();
+            const quantity = item.querySelector('input[placeholder*="個數"]').value.trim();
             const duration = item.querySelector('input[placeholder*="天數"]').value.trim();
             const notes = item.querySelector('input[placeholder*="備註"]').value.trim();
             
-            if (medicineName && dosage && frequency && duration) {
+            if (medicineName && quantity && duration) {
                 medicines.push([
                     medicineName,
-                    dosage,
-                    frequency,
+                    quantity,
                     duration,
                     notes || ''
                 ]);
@@ -244,12 +242,8 @@ function addMedicineItem() {
             </select>
         </div>
         <div class="medicine-input">
-            <label>劑量 *</label>
-            <input type="text" placeholder="例：500mg" required>
-        </div>
-        <div class="medicine-input">
-            <label>頻率 *</label>
-            <input type="text" placeholder="例：每日三次" required>
+            <label>個數 *</label>
+            <input type="number" placeholder="例：30" min="1" required>
         </div>
         <div class="medicine-input">
             <label>天數 *</label>

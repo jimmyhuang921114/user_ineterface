@@ -225,23 +225,8 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="usage_days">使用天數</label>
-                        <input type="number" id="usage_days" name="usage_days" min="1">
-                    </div>
-                    <div class="form-group">
                         <label for="position">儲存位置 <span class="required">*</span></label>
-                        <input type="text" id="position" name="position" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="manufacturer">製造商</label>
-                        <input type="text" id="manufacturer" name="manufacturer">
-                    </div>
-                    <div class="form-group">
-                        <label for="dosage">劑量</label>
-                        <input type="text" id="dosage" name="dosage">
+                        <input type="text" id="position" name="position" required placeholder="例：1-1, 2-1, A-3">
                     </div>
                 </div>
                 
@@ -258,74 +243,9 @@
                 <div class="section-title">🔬 詳細藥物資料 (選填)</div>
                 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="description">描述</label>
-                        <textarea id="description" name="description" rows="3"></textarea>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="ingredient">成分</label>
-                        <input type="text" id="ingredient" name="ingredient">
-                    </div>
-                    <div class="form-group">
-                        <label for="category">分類</label>
-                        <select id="category" name="category">
-                            <option value="">請選擇</option>
-                            <option value="抗生素">抗生素</option>
-                            <option value="止痛藥">止痛藥</option>
-                            <option value="消炎藥">消炎藥</option>
-                            <option value="維生素">維生素</option>
-                            <option value="其他">其他</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="usage_method">使用方法</label>
-                        <input type="text" id="usage_method" name="usage_method">
-                    </div>
-                    <div class="form-group">
-                        <label for="unit_dose">單位劑量</label>
-                        <input type="text" id="unit_dose" name="unit_dose">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="side_effects">副作用</label>
-                        <textarea id="side_effects" name="side_effects" rows="2"></textarea>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="storage_conditions">儲存條件</label>
-                        <input type="text" id="storage_conditions" name="storage_conditions">
-                    </div>
-                    <div class="form-group">
-                        <label for="expiry_date">有效期限</label>
-                        <input type="date" id="expiry_date" name="expiry_date">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="barcode">條碼</label>
-                        <input type="text" id="barcode" name="barcode">
-                    </div>
-                    <div class="form-group">
-                        <label for="appearance_type">外觀</label>
-                        <input type="text" id="appearance_type" name="appearance_type" placeholder="例：白色圓形片劑">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="notes">備註</label>
-                        <textarea id="notes" name="notes" rows="2"></textarea>
+                    <div class="form-group full-width">
+                        <label for="description">藥物描述</label>
+                        <textarea id="description" name="description" rows="4" placeholder="請詳細描述藥物的用途、功效、注意事項等..."></textarea>
                     </div>
                 </div>
             </div>
@@ -353,26 +273,13 @@
                 const basicData = {
                     name: document.getElementById('name').value,
                     amount: parseInt(document.getElementById('amount').value),
-                    usage_days: parseInt(document.getElementById('usage_days').value) || null,
                     position: document.getElementById('position').value,
-                    manufacturer: document.getElementById('manufacturer').value || "",
-                    dosage: document.getElementById('dosage').value || "",
-                    prompt: document.getElementById('prompt').value || ""  // 添加prompt欄位
+                    prompt: document.getElementById('prompt').value || ""  // AI提示詞
                 };
                 
-                // 收集詳細資料
+                // 收集詳細資料 (只保留描述)
                 const detailedData = {
-                    description: document.getElementById('description').value || "",
-                    ingredient: document.getElementById('ingredient').value || "",
-                    category: document.getElementById('category').value || "",
-                    usage_method: document.getElementById('usage_method').value || "",
-                    unit_dose: document.getElementById('unit_dose').value || "",
-                    side_effects: document.getElementById('side_effects').value || "",
-                    storage_conditions: document.getElementById('storage_conditions').value || "",
-                    expiry_date: document.getElementById('expiry_date').value || "",
-                    barcode: document.getElementById('barcode').value || "",
-                    appearance_type: document.getElementById('appearance_type').value || "",
-                    notes: document.getElementById('notes').value || ""
+                    description: document.getElementById('description').value || ""
                 };
                 
                 // 檢查是否有詳細資料
