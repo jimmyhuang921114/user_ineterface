@@ -51,15 +51,15 @@ class MedicineManagementClient(Node):
             self.check_for_new_batch
         )
         
-        self.get_logger().info(f'🚀 Medicine Management Client 已啟動 (串行批次處理模式)')
-        self.get_logger().info(f'📡 批次檢查間隔: {self.batch_check_interval}秒')
+        self.get_logger().info(f'🚀 Medicine Management Client 已啟動 (串行單筆處理模式)')
+        self.get_logger().info(f'📡 查詢間隔: {self.batch_check_interval}秒')
         self.get_logger().info(f'🌐 API地址: {self.api_base_url}')
-        self.get_logger().info(f'⚙️  處理模式: 串行處理 - 每次處理完整批次，一次一筆')
+        self.get_logger().info(f'⚙️  處理模式: 查詢→處理一筆→完成→再查詢下一筆')
     
     def check_for_new_batch(self):
-        """檢查是否有新的批次需要處理"""
+        """查詢是否有新訂單需要處理（一次處理一筆）"""
         if self.is_processing:
-            self.get_logger().debug('⏳ 正在處理中，跳過批次檢查')
+            self.get_logger().debug('⏳ 正在處理中，跳過查詢')
             return
         
         try:
@@ -73,77 +73,48 @@ class MedicineManagementClient(Node):
             data = response.json()
             prescriptions = data.get('prescriptions', [])
             
-            # 找出新的處方籤
-            new_prescriptions = []
+            # 找出第一筆新的處方籤
+            next_prescription = None
             for prescription in prescriptions:
                 prescription_id = self.generate_prescription_id(prescription)
                 
                 if prescription_id not in self.processed_prescriptions:
-                    new_prescriptions.append(prescription)
+                    next_prescription = prescription
+                    break  # 只取第一筆
             
-            if new_prescriptions:
-                self.get_logger().info(f'📦 發現新批次: {len(new_prescriptions)} 張處方籤')
-                self.current_batch = new_prescriptions.copy()
-                self.start_batch_processing()
+            if next_prescription:
+                patient_name = next_prescription.get("patient_name")
+                self.get_logger().info(f'📋 發現新訂單: {patient_name}')
+                self.process_single_prescription(next_prescription)
             else:
-                self.get_logger().debug('📊 無新處方籤，等待中...')
+                self.get_logger().debug('📊 無新訂單，繼續監控...')
             
         except requests.exceptions.RequestException as e:
             self.get_logger().error(f'🌐 網路請求錯誤: {str(e)}')
         except Exception as e:
-            self.get_logger().error(f'❌ 批次檢查錯誤: {str(e)}')
+            self.get_logger().error(f'❌ 查詢錯誤: {str(e)}')
     
-    def start_batch_processing(self):
-        """開始串行處理當前批次"""
-        if not self.current_batch:
-            self.get_logger().info('📭 無處方籤需要處理')
-            return
+    def process_single_prescription(self, prescription):
+        """處理單筆處方籤"""
+        patient_name = prescription.get("patient_name")
         
+        # 設置處理狀態
         self.is_processing = True
-        batch_size = len(self.current_batch)
-        
-        self.get_logger().info(f'🚀 開始串行處理批次 - 共 {batch_size} 張處方籤')
-        self.get_logger().info(f'⚙️  處理模式: 依序處理，每次等待完成後再處理下一筆')
-        
-        # 發布批次開始狀態
-        status_msg = String()
-        status_msg.data = f"開始處理批次 - 總數: {batch_size}"
-        self.status_publisher.publish(status_msg)
-        
-        # 開始處理第一筆
-        self.process_next_prescription()
-    
-    def process_next_prescription(self):
-        """處理下一張處方籤"""
-        if not self.current_batch:
-            self.finish_batch_processing()
-            return
-        
-        # 取出第一張處方籤
-        prescription = self.current_batch.pop(0)
-        remaining = len(self.current_batch)
-        
-        self.get_logger().info(f'🏥 處理處方籤: {prescription.get("patient_name")} (剩餘: {remaining})')
         
         # 標記為已處理
         prescription_id = self.generate_prescription_id(prescription)
         self.processed_prescriptions.add(prescription_id)
         
-        # 處理這張處方籤
-        self.process_prescription_sync(prescription)
-    
-    def finish_batch_processing(self):
-        """完成批次處理"""
-        self.is_processing = False
-        self.get_logger().info('✅ 批次處理完成，等待下一個批次')
+        self.get_logger().info(f'🚀 開始處理單筆訂單: {patient_name}')
+        self.get_logger().info(f'⚙️  處理流程: 查詢→處理→完成→再查詢下一筆')
         
-        # 發布批次完成狀態
+        # 發布處理開始狀態
         status_msg = String()
-        status_msg.data = "批次處理完成，等待新批次"
+        status_msg.data = f"開始處理訂單: {patient_name}"
         self.status_publisher.publish(status_msg)
         
-        # 顯示處理統計
-        self.get_prescription_status_summary()
+        # 同步處理這張處方籤
+        self.process_prescription_sync(prescription)
     
     def generate_prescription_id(self, prescription):
         """生成處方籤唯一ID"""
@@ -209,14 +180,20 @@ class MedicineManagementClient(Node):
             else:
                 self.get_logger().error(f'⏰ 處方籤處理超時: {patient_name}')
             
-            # 處理完成，繼續下一筆
-            self.get_logger().info(f'➡️  準備處理下一張處方籤...')
-            self.process_next_prescription()
+            # 處理完成，設置為可接受新訂單
+            self.is_processing = False
+            self.get_logger().info(f'✅ 處方籤處理完成: {patient_name}')
+            self.get_logger().info(f'🔄 準備查詢下一筆新訂單...')
+            
+            # 發布處理完成狀態
+            status_msg = String()
+            status_msg.data = f"處理完成: {patient_name}，等待下一筆"
+            self.status_publisher.publish(status_msg)
             
         except Exception as e:
             self.get_logger().error(f'❌ 處理處方籤錯誤: {str(e)}')
-            # 即使出錯也要繼續處理下一筆
-            self.process_next_prescription()
+            # 即使出錯也要設置為可接受新訂單
+            self.is_processing = False
     
 
     
@@ -246,8 +223,8 @@ def main(args=None):
         # 運行一次狀態摘要
         client.get_prescription_status_summary()
         
-        client.get_logger().info('📡 開始監控新處方籤批次...')
-        client.get_logger().info('⚙️  處理模式: 串行批次處理 - 依序完成每張處方籤')
+        client.get_logger().info('📡 開始監控新處方籤...')
+        client.get_logger().info('⚙️  處理模式: 串行單筆處理 - 查詢→處理→完成→再查詢')
         
         # 開始批次監控和處理
         rclpy.spin(client)
