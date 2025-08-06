@@ -59,6 +59,34 @@ async def health_check():
     }
 
 # 藥物管理API
+@app.post("/api/medicine/")
+async def create_medicine(medicine_data: dict, db: Session = Depends(get_db)):
+    """創建新藥物"""
+    try:
+        medicine = MedicineBasic(**medicine_data)
+        db.add(medicine)
+        db.commit()
+        db.refresh(medicine)
+        
+        result = {"message": "藥物創建成功", "id": medicine.id}
+        
+        # 如果ROS2可用，發布新藥物資料
+        if ROS2_AVAILABLE and ros2_node:
+            ros2_node.publish_medicine_data({
+                "id": medicine.id,
+                "name": medicine.name,
+                "amount": medicine.amount,
+                "position": medicine.position,
+                "manufacturer": medicine.manufacturer,
+                "dosage": medicine.dosage,
+                "action": "created"
+            })
+        
+        return result
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"創建失敗: {str(e)}")
+
 @app.get("/api/medicine/basic")
 async def get_basic_medicines(db: Session = Depends(get_db)):
     """獲取基本藥物列表"""
@@ -108,27 +136,98 @@ async def get_medicine_detail(medicine_id: int, db: Session = Depends(get_db)):
     
     return result
 
-@app.post("/api/medicine/")
-async def create_medicine(medicine_data: dict, db: Session = Depends(get_db)):
-    """創建新藥物"""
+@app.get("/api/medicine/detailed")
+async def get_detailed_medicines(db: Session = Depends(get_db)):
+    """獲取詳細藥物列表"""
+    detailed_medicines = db.query(MedicineDetailed).all()
+    return [
+        {
+            "id": med.id,
+            "medicine_id": med.medicine_id,
+            "description": med.description,
+            "ingredient": med.ingredient,
+            "category": med.category,
+            "usage_method": med.usage_method,
+            "unit_dose": med.unit_dose,
+            "side_effects": med.side_effects,
+            "storage_conditions": med.storage_conditions,
+            "expiry_date": med.expiry_date.isoformat() if med.expiry_date else None,
+            "barcode": med.barcode,
+            "appearance_type": med.appearance_type,
+            "notes": med.notes
+        }
+        for med in detailed_medicines
+    ]
+
+@app.post("/api/medicine/detailed")
+async def create_detailed_medicine(medicine_data: dict, db: Session = Depends(get_db)):
+    """創建詳細藥物"""
     try:
-        medicine = MedicineBasic(**medicine_data)
-        db.add(medicine)
+        detailed_medicine = MedicineDetailed(**medicine_data)
+        db.add(detailed_medicine)
         db.commit()
-        db.refresh(medicine)
+        db.refresh(detailed_medicine)
+        return {"message": "詳細藥物創建成功", "id": detailed_medicine.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"創建失敗: {str(e)}")
+
+@app.post("/api/medicine/unified")
+async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get_db)):
+    """創建統一藥物（基本+詳細）"""
+    try:
+        # 分離基本和詳細資料
+        basic_data = {
+            "name": medicine_data.get("name"),
+            "amount": medicine_data.get("amount", 0),
+            "position": medicine_data.get("position"),
+            "manufacturer": medicine_data.get("manufacturer"),
+            "dosage": medicine_data.get("dosage"),
+            "prompt": medicine_data.get("prompt")
+        }
         
-        result = {"message": "藥物創建成功", "id": medicine.id}
+        # 創建基本藥物
+        basic_medicine = MedicineBasic(**basic_data)
+        db.add(basic_medicine)
+        db.flush()  # 獲取ID但不提交
+        
+        # 創建詳細藥物
+        detailed_data = {
+            "medicine_id": basic_medicine.id,
+            "description": medicine_data.get("description"),
+            "ingredient": medicine_data.get("ingredient"),
+            "category": medicine_data.get("category"),
+            "usage_method": medicine_data.get("usage_method"),
+            "unit_dose": medicine_data.get("unit_dose"),
+            "side_effects": medicine_data.get("side_effects"),
+            "storage_conditions": medicine_data.get("storage_conditions"),
+            "expiry_date": medicine_data.get("expiry_date"),
+            "barcode": medicine_data.get("barcode"),
+            "appearance_type": medicine_data.get("appearance_type"),
+            "notes": medicine_data.get("notes")
+        }
+        
+        detailed_medicine = MedicineDetailed(**detailed_data)
+        db.add(detailed_medicine)
+        
+        db.commit()
+        
+        result = {
+            "message": "統一藥物創建成功",
+            "basic_id": basic_medicine.id,
+            "detailed_id": detailed_medicine.id
+        }
         
         # 如果ROS2可用，發布新藥物資料
         if ROS2_AVAILABLE and ros2_node:
             ros2_node.publish_medicine_data({
-                "id": medicine.id,
-                "name": medicine.name,
-                "amount": medicine.amount,
-                "position": medicine.position,
-                "manufacturer": medicine.manufacturer,
-                "dosage": medicine.dosage,
-                "action": "created"
+                "id": basic_medicine.id,
+                "name": basic_medicine.name,
+                "amount": basic_medicine.amount,
+                "position": basic_medicine.position,
+                "manufacturer": basic_medicine.manufacturer,
+                "dosage": basic_medicine.dosage,
+                "action": "created_unified"
             })
         
         return result
@@ -265,6 +364,11 @@ async def get_ros2_queue():
     return ros2_node.get_queue_status()
 
 # 網頁界面路由
+@app.get("/favicon.ico")
+async def favicon():
+    """網站圖標"""
+    return FileResponse("static/favicon.ico", media_type="image/x-icon")
+
 @app.get("/Medicine.html")
 async def medicine_page():
     """藥物管理頁面"""
