@@ -33,9 +33,18 @@ from database import get_db, MedicineBasic, MedicineDetailed, Prescription, Pres
 try:
     from ros2_integration import init_ros2_node, get_ros2_node
     ROS2_AVAILABLE = True
+    ROS2_MODE = "full"
+    print("✅ 完整ROS2模組已載入")
 except ImportError:
-    ROS2_AVAILABLE = False
-    print("⚠️ ROS2模組不可用，將使用模擬模式")
+    try:
+        from ros2_mock import init_ros2_node, get_ros2_node
+        ROS2_AVAILABLE = True
+        ROS2_MODE = "mock"
+        print("🤖 使用模擬ROS2模式")
+    except ImportError:
+        ROS2_AVAILABLE = False
+        ROS2_MODE = "none"
+        print("⚠️ ROS2模組不可用，將使用模擬模式")
 
 # 創建FastAPI應用
 app = FastAPI(title="醫院藥物管理系統", version="1.0.0")
@@ -129,11 +138,12 @@ async def root():
 async def health_check():
     """健康檢查"""
     logger.info("💓 系統健康檢查請求")
-    ros2_status = "available" if ROS2_AVAILABLE and ros2_node else "unavailable"
+    ros2_status = "full" if ROS2_MODE == "full" else "mock" if ROS2_MODE == "mock" else "unavailable"
     result = {
         "status": "healthy", 
         "message": "系統運行正常",
-        "ros2_status": ros2_status
+        "ros2_status": ros2_status,
+        "ros2_mode": ROS2_MODE
     }
     logger.info(f"💓 健康檢查結果: {result}")
     return result
@@ -544,7 +554,7 @@ if __name__ == "__main__":
     print("📋 處方籤管理: http://localhost:8001/Prescription.html")
     print("👨‍⚕️ 醫生界面: http://localhost:8001/doctor.html")
     print("📖 API文檔: http://localhost:8001/docs")
-    print(f"🤖 ROS2狀態: {'可用' if ROS2_AVAILABLE else '不可用'}")
+    print(f"🤖 ROS2狀態: {'完整模式' if ROS2_MODE == 'full' else '模擬模式' if ROS2_MODE == 'mock' else '不可用'}")
     print("=" * 50)
     
     uvicorn.run(app, host="0.0.0.0", port=8001, log_level="info")
