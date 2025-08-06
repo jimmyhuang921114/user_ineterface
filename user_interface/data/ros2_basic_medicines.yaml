@@ -20,7 +20,14 @@ ros2_medicine_basic:
     position: 2-2
     prompt: 用於頭痛的AI提示詞
     updated_time: '2025-08-06 06:07:37'
+  - amount: 200
+    created_at: '2025-08-06T06:18:43.301098'
+    created_time: '2025-08-06 06:18:43'
+    name: 提示詞測試藥物
+    position: T-2
+    prompt: 這是一個測試AI提示詞：適用於頭痛、感冒症狀，成人每次2錠，兒童減半，飯後服用
+    updated_time: '2025-08-06 06:18:43'
   node_info:
     name: medicine_basic_provider
-    timestamp: '2025-08-06T06:07:37.366439'
+    timestamp: '2025-08-06T06:18:43.305412'
     type: service_provider

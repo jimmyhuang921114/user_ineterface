@@ -38,6 +38,7 @@ class OrderProcessorNode(Node):
         
         self.get_logger().info('🏥 藥物訂單處理節點已啟動')
         self.get_logger().info(f'📁 輸出目錄: {self.output_dir}')
+        self.get_logger().info(f'🌐 API地址: {self.api_base_url}')
 
     def medicine_order_callback(self, request, response):
         """處理藥物訂單服務請求"""
@@ -113,6 +114,9 @@ class OrderProcessorNode(Node):
             
             self.get_logger().info(f'✅ 訂單 {order_id} 處理完成 (耗時: {processing_time:.2f}s)')
             
+            # 回報狀態到Web API
+            self.report_status_to_web(order_id, "completed", response.message, request)
+            
         except Exception as e:
             # 處理異常
             self.get_logger().error(f'❌ 訂單處理錯誤: {str(e)}')
@@ -124,6 +128,9 @@ class OrderProcessorNode(Node):
             response.processing_status = []
             response.completion_time = datetime.now().isoformat()
             response.error_details = str(e)
+            
+            # 回報錯誤狀態到Web API
+            self.report_status_to_web(order_id, "failed", response.message, request, str(e))
             
             # 更新錯誤狀態
             if order_id in self.processing_orders:
@@ -315,6 +322,55 @@ class OrderProcessorNode(Node):
             
         except Exception as e:
             self.get_logger().error(f'❌ 保存處理記錄失敗: {str(e)}')
+
+    def report_status_to_web(self, order_id, status, message, request=None, error_details=None):
+        """回報處理狀態到Web API"""
+        try:
+            # 構建狀態更新資料
+            status_data = {
+                "order_id": order_id,
+                "status": status,  # "processing", "completed", "failed"
+                "message": message,
+                "timestamp": datetime.now().isoformat(),
+                "processed_by": "ROS2_OrderProcessor"
+            }
+            
+            # 添加處理詳情
+            if request:
+                status_data["patient_name"] = request.patient_name
+                status_data["patient_id"] = request.patient_id
+                status_data["medicine_count"] = len(request.medicine_names)
+                status_data["medicines"] = []
+                
+                for i, medicine_name in enumerate(request.medicine_names):
+                    medicine_info = {
+                        "name": medicine_name,
+                        "quantity": request.quantities[i] if i < len(request.quantities) else 0,
+                        "dosage": request.dosages[i] if i < len(request.dosages) else "",
+                        "status": status
+                    }
+                    status_data["medicines"].append(medicine_info)
+            
+            # 添加錯誤詳情
+            if error_details:
+                status_data["error_details"] = error_details
+            
+            # 發送狀態更新到Web API
+            response = requests.post(
+                f"{self.api_base_url}/prescription/status-update",
+                json=status_data,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                self.get_logger().info(f'📊 狀態回報成功: {order_id} -> {status}')
+            else:
+                self.get_logger().warning(f'⚠️ 狀態回報失敗 ({response.status_code}): {response.text}')
+        
+        except requests.exceptions.RequestException as e:
+            self.get_logger().error(f'🌐 狀態回報網路錯誤: {str(e)}')
+        except Exception as e:
+            self.get_logger().error(f'❌ 狀態回報錯誤: {str(e)}')
 
 def main(args=None):
     rclpy.init(args=args)

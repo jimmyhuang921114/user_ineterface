@@ -1,8 +1,8 @@
 metadata:
   type: detailed_medicines
-  created_at: '2025-08-06T06:07:37.363763'
+  created_at: '2025-08-06T06:18:43.302280'
   version: '1.0'
-  total_records: 3
+  total_records: 4
 data:
 - description: 這是一個測試藥物
   category: 測試分類
@@ -20,3 +20,8 @@ data:
   created_time: '2025-08-06 06:07:37'
   updated_time: '2025-08-06 06:07:37'
   created_at: '2025-08-06T06:07:37.363759'
+- description: 包含AI提示詞的測試藥物，用於驗證提示詞功能是否正常運作
+  medicine_name: 提示詞測試藥物
+  created_time: '2025-08-06 06:18:43'
+  updated_time: '2025-08-06 06:18:43'
+  created_at: '2025-08-06T06:18:43.302275'

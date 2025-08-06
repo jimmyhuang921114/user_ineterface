@@ -166,6 +166,18 @@ def save_prescriptions(data):
     with open("prescription_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+# 狀態更新記錄管理
+def load_status_updates():
+    try:
+        with open("prescription_status_updates.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def save_status_updates(data):
+    with open("prescription_status_updates.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
 # === 清理重複的路由定義 ===
 
 # WebSocket端點 - 實時通知
@@ -432,11 +444,91 @@ async def create_prescription(prescription: Prescription):
     
     prescription_dict = prescription.dict()
     prescription_dict["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    prescription_dict["status"] = "pending"  # 新增狀態欄位
+    prescription_dict["processing_history"] = []  # 處理歷史記錄
     
     prescriptions.append(prescription_dict)
     save_prescriptions(prescriptions)
     
     return {"message": "處方籤已保存", "prescription": prescription_dict}
+
+# ROS2狀態更新API
+@app.post("/api/prescription/status-update")
+async def update_prescription_status(status_data: dict):
+    """接收ROS2節點的處方籤狀態更新"""
+    try:
+        order_id = status_data.get("order_id")
+        status = status_data.get("status")
+        message = status_data.get("message")
+        timestamp = status_data.get("timestamp")
+        
+        if not order_id or not status:
+            raise HTTPException(status_code=400, detail="order_id和status為必填欄位")
+        
+        # 載入現有處方籤
+        prescriptions = load_prescriptions()
+        
+        # 創建狀態更新記錄
+        status_update = {
+            "order_id": order_id,
+            "status": status,
+            "message": message,
+            "timestamp": timestamp or datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "processed_by": status_data.get("processed_by", "ROS2"),
+            "patient_name": status_data.get("patient_name"),
+            "patient_id": status_data.get("patient_id"),
+            "medicine_count": status_data.get("medicine_count", 0),
+            "medicines": status_data.get("medicines", []),
+            "error_details": status_data.get("error_details")
+        }
+        
+        # 查找對應的處方籤並更新狀態
+        prescription_found = False
+        for prescription in prescriptions:
+            # 透過病患資訊匹配處方籤
+            if (status_data.get("patient_name") and 
+                prescription.get("patient_name") == status_data.get("patient_name") and
+                prescription.get("patient_id") == status_data.get("patient_id")):
+                
+                prescription["ros2_status"] = status
+                prescription["ros2_message"] = message
+                prescription["last_ros2_update"] = timestamp
+                
+                # 添加到處理歷史
+                if "processing_history" not in prescription:
+                    prescription["processing_history"] = []
+                prescription["processing_history"].append(status_update)
+                
+                prescription_found = True
+                break
+        
+        # 保存更新後的處方籤
+        save_prescriptions(prescriptions)
+        
+        # 載入處理狀態記錄
+        status_updates = load_status_updates()
+        status_updates.append(status_update)
+        save_status_updates(status_updates)
+        
+        # 記錄日誌
+        print(f"📊 收到ROS2狀態更新: {order_id} -> {status}")
+        if status_data.get("patient_name"):
+            print(f"👤 病患: {status_data.get('patient_name')} ({status_data.get('patient_id')})")
+        if message:
+            print(f"💬 訊息: {message}")
+        
+        response_data = {
+            "message": "狀態更新成功",
+            "order_id": order_id,
+            "status": status,
+            "prescription_found": prescription_found,
+            "timestamp": timestamp
+        }
+        
+        return response_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"狀態更新失敗: {str(e)}")
 
 # 統一藥物添加API (基本+詳細)
 @app.post("/api/medicine/unified")
