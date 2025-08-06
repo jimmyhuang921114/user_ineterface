@@ -6,7 +6,6 @@
 // 全域變數
 let basicMedicines = [];
 let detailedMedicines = [];
-let prescriptions = [];
 let currentEditingMedicine = null;
 
 // API基礎URL
@@ -419,68 +418,9 @@ function viewMedicineDetails(medicineName) {
 
 
 
-/**
- * 查看處方籤詳細資訊
- */
-function viewPrescriptionDetails(index) {
-    const prescription = prescriptions[index];
-    
-    const medicinesHTML = prescription.medicines?.map(med => 
-        Array.isArray(med) ? 
-        `<li>${med.join(' - ')}</li>` : 
-        `<li>${JSON.stringify(med)}</li>`
-    ).join('') || '<li>無藥物記錄</li>';
-    
-    const detailsHTML = `
-        <div style="max-width: 600px; margin: 0 auto;">
-            <h3 style="color: #2c3e50; margin-bottom: 20px;">🩺 處方籤詳細資訊</h3>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
-                <p><strong>病人姓名:</strong> ${prescription.patient_name || '未指定'}</p>
-                <p><strong>病人ID:</strong> ${prescription.patient_id || '未指定'}</p>
-                <p><strong>主治醫生:</strong> ${prescription.doctor_name || '未指定'}</p>
-                <p><strong>開立時間:</strong> ${prescription.created_at || '未記錄'}</p>
-            </div>
-            
-            <div style="background: #e8f5e8; padding: 15px; border-radius: 5px;">
-                <h4 style="color: #27ae60;">處方藥物清單</h4>
-                <ul>${medicinesHTML}</ul>
-            </div>
-        </div>
-    `;
-    
-    showModal(detailsHTML);
-}
 
-/**
- * 刪除處方籤
- */
-async function deletePrescription(index) {
-    if (!confirm('確定要刪除此處方籤嗎？此操作不可恢復。')) {
-        return;
-    }
-    
-    try {
-        // 假設有刪除API
-        const prescription = prescriptions[index];
-        const response = await fetch(`${API_BASE}/prescription/${index}`, {
-            method: 'DELETE'
-        });
-        
-        if (response.ok) {
-            showStatus('✅ 處方籤已刪除', 'success', 'prescriptionStatus');
-            await refreshPrescriptions();
-        } else {
-            throw new Error('刪除失敗');
-        }
-        
-    } catch (error) {
-        // 本地刪除（如果API不支援）
-        prescriptions.splice(index, 1);
-        renderPrescriptionList();
-        showStatus('✅ 處方籤已刪除 (本地操作)', 'success', 'prescriptionStatus');
-    }
-}
+
+
 
 /**
  * 篩選功能
@@ -536,23 +476,7 @@ function filterMedicineList() {
     renderMedicineList(filtered);
 }
 
-function filterPrescriptions() {
-    const searchTerm = document.getElementById('prescriptionSearch').value.toLowerCase();
-    const statusFilter = document.getElementById('prescriptionStatusFilter').value;
-    
-    let filtered = prescriptions.filter(prescription => {
-        const matchesSearch = 
-            (prescription.patient_name || '').toLowerCase().includes(searchTerm) ||
-            (prescription.doctor_name || '').toLowerCase().includes(searchTerm);
-        
-        // 注意：這裡可能需要根據實際的狀態欄位調整
-        const matchesStatus = !statusFilter; // 暫時忽略狀態篩選
-        
-        return matchesSearch && matchesStatus;
-    });
-    
-    renderPrescriptionList(filtered);
-}
+
 
 /**
  * 顯示狀態訊息
