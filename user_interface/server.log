@@ -1,0 +1,23 @@
+nohup: ignoring input
+INFO:     Started server process [36102]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+⚠️ ROS2模組不可用，將使用模擬模式
+✅ 資料庫表格創建完成
+INFO:     127.0.0.1:36552 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59546 - "POST /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60026 - "POST /api/medicine/unified HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60034 - "GET /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55534 - "GET /api/prescription/19 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48646 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48652 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48668 - "GET /api/medicine/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48674 - "POST /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48678 - "GET /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48684 - "GET /api/ros2/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48690 - "GET /api/ros2/queue HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:48694 - "POST /api/ros2/order HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:40734 - "GET /integrated_medicine_management.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40736 - "GET /Prescription.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40744 - "GET /Medicine.html HTTP/1.1" 404 Not Found

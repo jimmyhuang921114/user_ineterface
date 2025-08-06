@@ -257,10 +257,40 @@ async def get_prescriptions(db: Session = Depends(get_db)):
 async def create_prescription(prescription_data: dict, db: Session = Depends(get_db)):
     """創建新處方籤"""
     try:
+        # 提取藥物列表
+        medicines_list = prescription_data.pop('medicines', [])
+        
+        # 創建處方籤
         prescription = Prescription(**prescription_data)
         db.add(prescription)
         db.commit()
         db.refresh(prescription)
+        
+        # 處理藥物列表
+        for medicine_info in medicines_list:
+            if isinstance(medicine_info, list) and len(medicine_info) >= 4:
+                # 格式: [藥物名稱, 劑量, 數量, 頻率]
+                medicine_name = medicine_info[0]
+                dosage = medicine_info[1]
+                quantity_str = str(medicine_info[2])
+                quantity = int(quantity_str) if quantity_str.isdigit() else 1
+                frequency = medicine_info[3]
+                
+                # 查找藥物ID
+                medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+                if medicine:
+                    prescription_medicine = PrescriptionMedicine(
+                        prescription_id=prescription.id,
+                        medicine_id=medicine.id,
+                        dosage=dosage,
+                        frequency=frequency,
+                        duration="7天",  # 預設療程
+                        quantity=quantity,
+                        instructions=""
+                    )
+                    db.add(prescription_medicine)
+        
+        db.commit()
         
         result = {"message": "處方籤創建成功", "id": prescription.id}
         
