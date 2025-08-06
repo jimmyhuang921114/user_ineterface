@@ -1,0 +1,22 @@
+# 訂單請求
+string order_id                 # 訂單ID
+string patient_name             # 病患姓名
+string patient_id               # 病患編號
+string doctor_name              # 醫生姓名
+string[] medicine_names         # 藥物名稱列表
+string[] dosages                # 劑量列表
+string[] frequencies            # 頻率列表
+int32[] quantities              # 數量列表
+string notes                    # 備註
+int64 timestamp                 # 時間戳
+
+---
+
+# 訂單回應
+bool success                    # 處理是否成功
+string message                  # 回應訊息
+string processed_order_id       # 處理後的訂單ID
+string[] processed_medicines    # 處理的藥物列表
+string[] processing_status      # 每個藥物的處理狀態
+string completion_time          # 完成時間
+string error_details            # 錯誤詳情 (如果有)
