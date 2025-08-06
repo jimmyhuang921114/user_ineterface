@@ -31,6 +31,10 @@ app = FastAPI(title="醫院藥物管理系統", version="1.0.0")
 # 掛載靜態檔案
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 額外掛載CSS和JS路徑
+app.mount("/css", StaticFiles(directory="static/css"), name="css")
+app.mount("/js", StaticFiles(directory="static/js"), name="js")
+
 # 初始化資料庫
 init_database()
 
@@ -290,11 +294,11 @@ if __name__ == "__main__":
     import uvicorn
     print("🏥 簡化醫院藥物管理系統")
     print("=" * 50)
-    print("🌐 網頁界面: http://localhost:8000/Medicine.html")
-    print("📋 處方籤管理: http://localhost:8000/Prescription.html")
-    print("👨‍⚕️ 醫生界面: http://localhost:8000/doctor.html")
-    print("📖 API文檔: http://localhost:8000/docs")
+    print("🌐 網頁界面: http://localhost:8001/Medicine.html")
+    print("📋 處方籤管理: http://localhost:8001/Prescription.html")
+    print("👨‍⚕️ 醫生界面: http://localhost:8001/doctor.html")
+    print("📖 API文檔: http://localhost:8001/docs")
     print(f"🤖 ROS2狀態: {'可用' if ROS2_AVAILABLE else '不可用'}")
     print("=" * 50)
     
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=8001, log_level="info")

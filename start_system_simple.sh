@@ -26,11 +26,12 @@ python3 database.py
 
 # 啟動系統
 echo "🚀 啟動系統..."
-echo "📖 API文檔: http://localhost:8000/docs"
-echo "🌐 藥物管理: http://localhost:8000/Medicine.html"
-echo "📋 處方籤管理: http://localhost:8000/Prescription.html"
-echo "👨‍⚕️ 醫生工作站: http://localhost:8000/doctor.html"
+echo "📖 API文檔: http://localhost:8001/docs"
+echo "🌐 藥物管理: http://localhost:8001/Medicine.html"
+echo "📋 處方籤管理: http://localhost:8001/Prescription.html"
+echo "👨‍⚕️ 醫生工作站: http://localhost:8001/doctor.html"
 echo "🤖 ROS2整合: 模擬模式（如需真實ROS2請安裝rclpy）"
 echo "=" * 50
 
-python3 main.py
+# 使用uvicorn直接啟動
+python3 -m uvicorn simple_server:app --host 0.0.0.0 --port 8001

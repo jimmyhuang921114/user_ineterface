@@ -26,10 +26,10 @@
 ```
 
 ### 2. 訪問系統
-- 🌐 藥物管理: http://localhost:8000/Medicine.html
-- 📋 處方籤管理: http://localhost:8000/Prescription.html
-- 👨‍⚕️ 醫生工作站: http://localhost:8000/doctor.html
-- 📖 API文檔: http://localhost:8000/docs
+- 🌐 藥物管理: http://localhost:8001/Medicine.html
+- 📋 處方籤管理: http://localhost:8001/Prescription.html
+- 👨‍⚕️ 醫生工作站: http://localhost:8001/doctor.html
+- 📖 API文檔: http://localhost:8001/docs
 
 ## 🤖 ROS2整合
 
@@ -124,17 +124,17 @@ self.order_timer = self.create_timer(2.0, self.process_order_queue)
 
 ### 系統狀態檢查
 ```bash
-curl http://localhost:8000/api/health
+curl http://localhost:8001/api/health
 ```
 
 ### ROS2狀態檢查
 ```bash
-curl http://localhost:8000/api/ros2/status
+curl http://localhost:8001/api/ros2/status
 ```
 
 ### 佇列狀態檢查
 ```bash
-curl http://localhost:8000/api/ros2/queue
+curl http://localhost:8001/api/ros2/queue
 ```
 
 ## 🚨 故障排除
