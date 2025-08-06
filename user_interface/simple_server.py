@@ -110,6 +110,29 @@ async def get_basic_medicines(db: Session = Depends(get_db)):
     
     return result
 
+@app.get("/api/medicine/detailed")
+async def get_detailed_medicines(db: Session = Depends(get_db)):
+    """獲取詳細藥物列表"""
+    detailed_medicines = db.query(MedicineDetailed).all()
+    return [
+        {
+            "id": med.id,
+            "medicine_id": med.medicine_id,
+            "description": med.description,
+            "ingredient": med.ingredient,
+            "category": med.category,
+            "usage_method": med.usage_method,
+            "unit_dose": med.unit_dose,
+            "side_effects": med.side_effects,
+            "storage_conditions": med.storage_conditions,
+            "expiry_date": med.expiry_date.isoformat() if med.expiry_date else None,
+            "barcode": med.barcode,
+            "appearance_type": med.appearance_type,
+            "notes": med.notes
+        }
+        for med in detailed_medicines
+    ]
+
 @app.get("/api/medicine/{medicine_id}")
 async def get_medicine_detail(medicine_id: int, db: Session = Depends(get_db)):
     """獲取藥物詳細資訊"""
@@ -135,29 +158,6 @@ async def get_medicine_detail(medicine_id: int, db: Session = Depends(get_db)):
         ros2_node.publish_medicine_data(result)
     
     return result
-
-@app.get("/api/medicine/detailed")
-async def get_detailed_medicines(db: Session = Depends(get_db)):
-    """獲取詳細藥物列表"""
-    detailed_medicines = db.query(MedicineDetailed).all()
-    return [
-        {
-            "id": med.id,
-            "medicine_id": med.medicine_id,
-            "description": med.description,
-            "ingredient": med.ingredient,
-            "category": med.category,
-            "usage_method": med.usage_method,
-            "unit_dose": med.unit_dose,
-            "side_effects": med.side_effects,
-            "storage_conditions": med.storage_conditions,
-            "expiry_date": med.expiry_date.isoformat() if med.expiry_date else None,
-            "barcode": med.barcode,
-            "appearance_type": med.appearance_type,
-            "notes": med.notes
-        }
-        for med in detailed_medicines
-    ]
 
 @app.post("/api/medicine/detailed")
 async def create_detailed_medicine(medicine_data: dict, db: Session = Depends(get_db)):
