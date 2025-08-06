@@ -73,3 +73,73 @@
 2025-08-06 16:19:31,501 - ros2_mock - INFO - 🤖 包裝藥物中...
 2025-08-06 16:19:34,501 - ros2_mock - INFO - 🤖 品質檢查中...
 2025-08-06 16:19:36,501 - ros2_mock - INFO - ✅ 訂單處理完成
+2025-08-06 16:32:42,214 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:32:42,214 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
+2025-08-06 16:32:42,214 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
+2025-08-06 16:32:42,215 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
+2025-08-06 16:32:42,215 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
+2025-08-06 16:32:42,242 - asyncio - DEBUG - Using selector: EpollSelector
+2025-08-06 16:33:18,654 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:33:18,654 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
+2025-08-06 16:33:18,654 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
+2025-08-06 16:33:18,655 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
+2025-08-06 16:33:18,655 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
+2025-08-06 16:33:18,676 - asyncio - DEBUG - Using selector: EpollSelector
+2025-08-06 16:33:25,915 - hospital_system - INFO - 💓 系統健康檢查請求
+2025-08-06 16:33:25,915 - hospital_system - INFO - 💓 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'mock', 'ros2_mode': 'mock'}
+2025-08-06 16:34:25,074 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:34:25,074 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
+2025-08-06 16:34:25,074 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
+2025-08-06 16:34:25,075 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
+2025-08-06 16:34:25,075 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
+2025-08-06 16:34:25,094 - asyncio - DEBUG - Using selector: EpollSelector
+2025-08-06 16:34:34,496 - hospital_system - INFO - 📋 獲取處方籤列表
+2025-08-06 16:34:34,505 - hospital_system - INFO - ✅ 返回 23 張處方籤
+2025-08-06 16:34:42,734 - hospital_system - INFO - 📋 開始創建新處方籤
+2025-08-06 16:34:42,734 - hospital_system - DEBUG - 📋 接收到的處方數據: {'patient_name': '新測試病患', 'patient_id': 'P999999999', 'doctor_name': '新測試醫生', 'diagnosis': '新測試診斷', 'medicines': [['普拿疼', '500mg', '30', '每日三次'], ['阿斯匹靈', '100mg', '20', '每日兩次'], ['維他命C', '500mg', '60', '每日一次']]}
+2025-08-06 16:34:42,734 - hospital_system - INFO - 💊 處方包含 3 種藥物
+2025-08-06 16:34:42,741 - hospital_system - INFO - ✅ 處方籤基本資料已創建，ID: 24
+2025-08-06 16:34:42,741 - hospital_system - DEBUG - 💊 處理第 1 個藥物: ['普拿疼', '500mg', '30', '每日三次']
+2025-08-06 16:34:42,741 - hospital_system - DEBUG - 💊 藥物詳情 - 名稱: 普拿疼, 劑量: 500mg, 數量: 30, 頻率: 每日三次
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - ✅ 藥物 普拿疼 已加入處方籤
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - 💊 處理第 2 個藥物: ['阿斯匹靈', '100mg', '20', '每日兩次']
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - 💊 藥物詳情 - 名稱: 阿斯匹靈, 劑量: 100mg, 數量: 20, 頻率: 每日兩次
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - ✅ 藥物 阿斯匹靈 已加入處方籤
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - 💊 處理第 3 個藥物: ['維他命C', '500mg', '60', '每日一次']
+2025-08-06 16:34:42,742 - hospital_system - DEBUG - 💊 藥物詳情 - 名稱: 維他命C, 劑量: 500mg, 數量: 60, 頻率: 每日一次
+2025-08-06 16:34:42,743 - hospital_system - WARNING - ⚠️ 找不到藥物: 維他命C
+2025-08-06 16:34:42,746 - hospital_system - INFO - ✅ 處方籤創建完成，共添加 2 種藥物
+2025-08-06 16:34:42,747 - hospital_system - INFO - 📡 ROS2可用，準備創建訂單
+2025-08-06 16:34:42,747 - ros2_mock - INFO - 📦 訂單已加入佇列: ORDER_0024
+2025-08-06 16:34:42,747 - ros2_mock - DEBUG - 📦 訂單詳情: {
+  "order_id": "ORDER_0024",
+  "prescription_id": 24,
+  "patient_name": "新測試病患",
+  "patient_id": "P999999999",
+  "doctor_name": "新測試醫生",
+  "diagnosis": "新測試診斷",
+  "status": "pending",
+  "created_at": "2025-08-06 16:34:42",
+  "timestamp": 1754498082.747233
+}
+2025-08-06 16:34:42,747 - hospital_system - INFO - 📡 ROS2訂單已創建: ORDER_0024
+2025-08-06 16:34:43,076 - ros2_mock - INFO - 🤖 開始處理訂單: ORDER_0024
+2025-08-06 16:34:43,077 - ros2_mock - INFO - 🤖 驗證處方籤中...
+2025-08-06 16:34:45,077 - ros2_mock - INFO - 🤖 定位藥物中...
+2025-08-06 16:34:48,077 - ros2_mock - INFO - 🤖 移動機器人中...
+2025-08-06 16:34:49,448 - hospital_system - INFO - 📋 獲取處方籤列表
+2025-08-06 16:34:49,455 - hospital_system - INFO - ✅ 返回 24 張處方籤
+2025-08-06 16:34:52,077 - ros2_mock - INFO - 🤖 分配藥物中...
+2025-08-06 16:34:57,077 - ros2_mock - INFO - 🤖 包裝藥物中...
+2025-08-06 16:35:00,078 - ros2_mock - INFO - 🤖 品質檢查中...
+2025-08-06 16:35:02,078 - ros2_mock - INFO - ✅ 訂單處理完成
+2025-08-06 16:36:00,069 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:36:00,069 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
+2025-08-06 16:36:00,069 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
+2025-08-06 16:36:00,069 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
+2025-08-06 16:36:00,069 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
+2025-08-06 16:36:00,091 - asyncio - DEBUG - Using selector: EpollSelector
+2025-08-06 16:36:07,730 - hospital_system - INFO - 📋 獲取處方籤詳細資訊: 24
+2025-08-06 16:36:07,735 - hospital_system - INFO - ✅ 返回處方籤 24 詳細資訊，包含 2 種藥物
+2025-08-06 16:36:13,846 - hospital_system - INFO - 📋 獲取處方籤詳細資訊: 24
+2025-08-06 16:36:13,849 - hospital_system - INFO - ✅ 返回處方籤 24 詳細資訊，包含 2 種藥物

@@ -342,19 +342,29 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
 @app.get("/api/prescription/")
 async def get_prescriptions(db: Session = Depends(get_db)):
     """獲取處方籤列表"""
+    logger.info("📋 獲取處方籤列表")
     prescriptions = db.query(Prescription).all()
-    return [
-        {
+    
+    result = []
+    for p in prescriptions:
+        # 獲取每張處方籤的藥物數量
+        medicine_count = db.query(PrescriptionMedicine).filter(PrescriptionMedicine.prescription_id == p.id).count()
+        
+        result.append({
             "id": p.id,
             "patient_name": p.patient_name,
             "patient_id": p.patient_id,
             "doctor_name": p.doctor_name,
             "diagnosis": p.diagnosis,
             "status": p.status,
-            "created_at": p.created_at.isoformat()
-        }
-        for p in prescriptions
-    ]
+            "created_at": p.created_at.isoformat(),
+            "prescription_date": p.created_at.isoformat(),  # 添加處方日期
+            "medicine_count": medicine_count,
+            "medicines": [{"length": medicine_count}]  # 兼容前端的 medicines.length
+        })
+    
+    logger.info(f"✅ 返回 {len(result)} 張處方籤")
+    return result
 
 @app.post("/api/prescription/")
 async def create_prescription(prescription_data: dict, db: Session = Depends(get_db)):
@@ -441,13 +451,29 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
 @app.get("/api/prescription/{prescription_id}")
 async def get_prescription_detail(prescription_id: int, db: Session = Depends(get_db)):
     """獲取處方籤詳細資訊"""
+    logger.info(f"📋 獲取處方籤詳細資訊: {prescription_id}")
     prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
     if not prescription:
         raise HTTPException(status_code=404, detail="處方籤不存在")
     
     medicines = db.query(PrescriptionMedicine).filter(PrescriptionMedicine.prescription_id == prescription_id).all()
     
-    return {
+    # 獲取藥物詳細資訊
+    medicine_details = []
+    for pm in medicines:
+        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine_details.append({
+            "id": pm.id,
+            "medicine_id": pm.medicine_id,
+            "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "instructions": pm.instructions,
+            "quantity": pm.quantity
+        })
+    
+    result = {
         "id": prescription.id,
         "patient_name": prescription.patient_name,
         "patient_id": prescription.patient_id,
@@ -455,19 +481,11 @@ async def get_prescription_detail(prescription_id: int, db: Session = Depends(ge
         "diagnosis": prescription.diagnosis,
         "status": prescription.status,
         "created_at": prescription.created_at.isoformat(),
-        "medicines": [
-            {
-                "id": pm.id,
-                "medicine_id": pm.medicine_id,
-                "dosage": pm.dosage,
-                "frequency": pm.frequency,
-                "duration": pm.duration,
-                "instructions": pm.instructions,
-                "quantity": pm.quantity
-            }
-            for pm in medicines
-        ]
+        "medicines": medicine_details
     }
+    
+    logger.info(f"✅ 返回處方籤 {prescription_id} 詳細資訊，包含 {len(medicine_details)} 種藥物")
+    return result
 
 # ROS2相關API
 @app.get("/api/ros2/status")

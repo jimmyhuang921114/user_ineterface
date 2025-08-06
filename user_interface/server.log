@@ -1,16 +1,16 @@
 nohup: ignoring input
-2025-08-06 16:19:02,498 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
-2025-08-06 16:19:02,498 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
-2025-08-06 16:19:02,498 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
-2025-08-06 16:19:02,498 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
-2025-08-06 16:19:02,498 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
-2025-08-06 16:19:02,517 - asyncio - DEBUG - Using selector: EpollSelector
-INFO:     Started server process [8512]
+2025-08-06 16:36:00,069 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:36:00,069 - ros2_mock - INFO - 🚀 啟動模擬ROS2整合...
+2025-08-06 16:36:00,069 - ros2_mock - INFO - 🤖 初始化模擬ROS2節點...
+2025-08-06 16:36:00,069 - ros2_mock - INFO - ✅ 模擬ROS2節點初始化完成
+2025-08-06 16:36:00,069 - ros2_mock - INFO - ✅ 模擬ROS2整合啟動成功
+2025-08-06 16:36:00,091 - asyncio - DEBUG - Using selector: EpollSelector
+INFO:     Started server process [12023]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-2025-08-06 16:19:10,046 - hospital_system - INFO - 💓 系統健康檢查請求
-2025-08-06 16:19:10,046 - hospital_system - INFO - 💓 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'mock', 'ros2_mode': 'mock'}
+2025-08-06 16:36:07,730 - hospital_system - INFO - 📋 獲取處方籤詳細資訊: 24
+2025-08-06 16:36:07,735 - hospital_system - INFO - ✅ 返回處方籤 24 詳細資訊，包含 2 種藥物
 🤖 使用模擬ROS2模式
 ✅ 資料庫表格創建完成
 🏥 簡化醫院藥物管理系統
@@ -21,39 +21,7 @@ INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
 📖 API文檔: http://localhost:8001/docs
 🤖 ROS2狀態: 模擬模式
 ==================================================
-INFO:     127.0.0.1:35112 - "GET /api/health HTTP/1.1" 200 OK
-2025-08-06 16:19:16,721 - hospital_system - INFO - 📋 開始創建新處方籤
-2025-08-06 16:19:16,721 - hospital_system - DEBUG - 📋 接收到的處方數據: {'patient_name': '測試病患', 'patient_id': 'P987654321', 'doctor_name': '測試醫生', 'diagnosis': '測試診斷', 'medicines': [['普拿疼', '500mg', '30', '每日三次'], ['阿斯匹靈', '100mg', '20', '每日兩次']]}
-2025-08-06 16:19:16,721 - hospital_system - INFO - 💊 處方包含 2 種藥物
-2025-08-06 16:19:16,728 - hospital_system - INFO - ✅ 處方籤基本資料已創建，ID: 23
-2025-08-06 16:19:16,728 - hospital_system - DEBUG - 💊 處理第 1 個藥物: ['普拿疼', '500mg', '30', '每日三次']
-2025-08-06 16:19:16,728 - hospital_system - DEBUG - 💊 藥物詳情 - 名稱: 普拿疼, 劑量: 500mg, 數量: 30, 頻率: 每日三次
-2025-08-06 16:19:16,730 - hospital_system - DEBUG - ✅ 藥物 普拿疼 已加入處方籤
-2025-08-06 16:19:16,730 - hospital_system - DEBUG - 💊 處理第 2 個藥物: ['阿斯匹靈', '100mg', '20', '每日兩次']
-2025-08-06 16:19:16,730 - hospital_system - DEBUG - 💊 藥物詳情 - 名稱: 阿斯匹靈, 劑量: 100mg, 數量: 20, 頻率: 每日兩次
-2025-08-06 16:19:16,730 - hospital_system - DEBUG - ✅ 藥物 阿斯匹靈 已加入處方籤
-2025-08-06 16:19:16,733 - hospital_system - INFO - ✅ 處方籤創建完成，共添加 2 種藥物
-2025-08-06 16:19:16,735 - hospital_system - INFO - 📡 ROS2可用，準備創建訂單
-2025-08-06 16:19:16,735 - ros2_mock - INFO - 📦 訂單已加入佇列: ORDER_0023
-2025-08-06 16:19:16,735 - ros2_mock - DEBUG - 📦 訂單詳情: {
-  "order_id": "ORDER_0023",
-  "prescription_id": 23,
-  "patient_name": "測試病患",
-  "patient_id": "P987654321",
-  "doctor_name": "測試醫生",
-  "diagnosis": "測試診斷",
-  "status": "pending",
-  "created_at": "2025-08-06 16:19:16",
-  "timestamp": 1754497156.7352552
-}
-2025-08-06 16:19:16,735 - hospital_system - INFO - 📡 ROS2訂單已創建: ORDER_0023
-INFO:     127.0.0.1:35104 - "POST /api/prescription/ HTTP/1.1" 200 OK
-2025-08-06 16:19:17,500 - ros2_mock - INFO - 🤖 開始處理訂單: ORDER_0023
-2025-08-06 16:19:17,500 - ros2_mock - INFO - 🤖 驗證處方籤中...
-2025-08-06 16:19:19,500 - ros2_mock - INFO - 🤖 定位藥物中...
-2025-08-06 16:19:22,500 - ros2_mock - INFO - 🤖 移動機器人中...
-2025-08-06 16:19:26,500 - ros2_mock - INFO - 🤖 分配藥物中...
-2025-08-06 16:19:31,501 - ros2_mock - INFO - 🤖 包裝藥物中...
-2025-08-06 16:19:34,501 - ros2_mock - INFO - 🤖 品質檢查中...
-2025-08-06 16:19:36,501 - ros2_mock - INFO - ✅ 訂單處理完成
-INFO:     127.0.0.1:56610 - "GET /doctor.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42840 - "GET /api/prescription/24 HTTP/1.1" 200 OK
+2025-08-06 16:36:13,846 - hospital_system - INFO - 📋 獲取處方籤詳細資訊: 24
+2025-08-06 16:36:13,849 - hospital_system - INFO - ✅ 返回處方籤 24 詳細資訊，包含 2 種藥物
+INFO:     127.0.0.1:42856 - "GET /api/prescription/24 HTTP/1.1" 200 OK
