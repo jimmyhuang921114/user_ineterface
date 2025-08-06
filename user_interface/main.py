@@ -4,7 +4,7 @@ Hospital Medicine Management System - Main Entry Point
 醫院藥物管理系統 - 主要入口點
 """
 
-from fixed_server import app
+from simple_server import app
 import uvicorn
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ DATABASE_URL = "sqlite:///./data/hospital_management.db"
 engine = create_engine(
     DATABASE_URL, 
     connect_args={"check_same_thread": False},  # SQLite特定配置
-    echo=True  # 開發時顯示SQL查詢
+    echo=False  # 關閉SQL查詢顯示以提高性能
 )
 
 # 創建Session
@@ -34,7 +34,6 @@ class MedicineBasic(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(200), unique=True, index=True, nullable=False)
     amount = Column(Integer, nullable=False, default=0)
-    usage_days = Column(Integer, nullable=True)
     position = Column(String(100), nullable=False)
     manufacturer = Column(String(200), nullable=True)
     dosage = Column(String(100), nullable=True)
@@ -166,7 +165,6 @@ def init_database():
                 MedicineBasic(
                     name="普拿疼",
                     amount=100,
-                    usage_days=7,
                     position="A1-01",
                     manufacturer="Johnson & Johnson",
                     dosage="500mg",
@@ -175,7 +173,6 @@ def init_database():
                 MedicineBasic(
                     name="阿斯匹靈",
                     amount=50,
-                    usage_days=5,
                     position="A1-02",
                     manufacturer="Bayer",
                     dosage="100mg",
