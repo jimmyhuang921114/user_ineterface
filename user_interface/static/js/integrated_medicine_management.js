@@ -88,7 +88,8 @@ async function loadBasicMedicines() {
     try {
         const response = await fetch(`${API_BASE}/medicine/basic`);
         const data = await response.json();
-        basicMedicines = data.medicines || [];
+        // API直接返回藥物數組，不是 {medicines: [...]} 格式
+        basicMedicines = Array.isArray(data) ? data : [];
         return basicMedicines;
     } catch (error) {
         console.error('載入基本藥物失敗:', error);
@@ -103,7 +104,8 @@ async function loadDetailedMedicines() {
     try {
         const response = await fetch(`${API_BASE}/medicine/detailed`);
         const data = await response.json();
-        detailedMedicines = data.medicines || [];
+        // API直接返回藥物數組，不是 {medicines: [...]} 格式
+        detailedMedicines = Array.isArray(data) ? data : [];
         return detailedMedicines;
     } catch (error) {
         console.error('載入詳細藥物失敗:', error);
@@ -146,6 +148,13 @@ async function handleMedicineSubmit(event) {
             showStatus('✅ ' + result.message, 'success', 'addMedicineStatus');
             document.getElementById('medicineForm').reset();
             await loadAllData(); // 重新載入數據
+            // 更新當前顯示的標籤
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab && activeTab.textContent.includes('新增藥物')) {
+                // 如果當前在新增藥物標籤，刷新庫存和藥物列表
+                await refreshInventory();
+                await refreshMedicineList();
+            }
         } else {
             throw new Error(result.detail || '保存失敗');
         }

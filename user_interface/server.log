@@ -21,3 +21,19 @@ INFO:     127.0.0.1:48694 - "POST /api/ros2/order HTTP/1.1" 503 Service Unavaila
 INFO:     127.0.0.1:40734 - "GET /integrated_medicine_management.html HTTP/1.1" 200 OK
 INFO:     127.0.0.1:40736 - "GET /Prescription.html HTTP/1.1" 200 OK
 INFO:     127.0.0.1:40744 - "GET /Medicine.html HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42638 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43808 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35252 - "GET /api/medicine/detailed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54538 - "POST /api/medicine/unified HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54554 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54564 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44294 - "GET /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41722 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41728 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41732 - "GET /api/medicine/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41748 - "POST /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41760 - "GET /api/prescription/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41764 - "GET /api/ros2/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41778 - "GET /api/ros2/queue HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:41794 - "POST /api/ros2/order HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:41804 - "GET /integrated_medicine_management.html HTTP/1.1" 200 OK
