@@ -310,7 +310,6 @@
         <button onclick="location.href='doctor.html'">👨‍⚕️ 醫生工作台</button>
         <button onclick="location.href='integrated_medicine_management.html'" class="active">🔧 整合管理</button>
         <button onclick="location.href='Prescription.html'">📋 處方籤管理</button>
-        <button onclick="location.href='Medicine.html'">💊 藥物管理</button>
     </div>
 
     <div class="main-content">
@@ -344,7 +343,7 @@
                 <button class="tab active" onclick="switchTab('add-medicine')">➕ 新增藥物</button>
                 <button class="tab" onclick="switchTab('manage-inventory')">📦 庫存管理</button>
                 <button class="tab" onclick="switchTab('medicine-list')">📋 藥物清單</button>
-                <button class="tab" onclick="switchTab('prescriptions')">📋 處方籤管理</button>
+                <button class="tab" onclick="location.href='Prescription.html'">📋 處方籤管理</button>
             </div>
 
             <!-- 新增藥物標籤 -->
@@ -371,29 +370,6 @@
                                     <label for="position">儲存位置 <span class="required">*</span></label>
                                     <input type="text" id="position" name="position" required placeholder="例：1-1, 2-1, A-3">
                                 </div>
-                                <div class="form-group">
-                                    <label for="manufacturer">製造商</label>
-                                    <input type="text" id="manufacturer" name="manufacturer" placeholder="製造商名稱">
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="dosage">劑量</label>
-                                    <input type="text" id="dosage" name="dosage" placeholder="例：500mg, 10ml">
-                                </div>
-                                <div class="form-group">
-                                    <label for="category">分類</label>
-                                    <select id="category" name="category">
-                                        <option value="">請選擇分類</option>
-                                        <option value="抗生素">抗生素</option>
-                                        <option value="止痛藥">止痛藥</option>
-                                        <option value="消炎藥">消炎藥</option>
-                                        <option value="心血管藥物">心血管藥物</option>
-                                        <option value="維生素">維生素</option>
-                                        <option value="其他">其他</option>
-                                    </select>
-                                </div>
                             </div>
                             
                             <div class="form-row">
@@ -411,38 +387,6 @@
                             <div class="form-group full-width">
                                 <label for="description">藥物描述</label>
                                 <textarea id="description" name="description" rows="3" placeholder="請詳細描述藥物的用途、功效、注意事項等..."></textarea>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="ingredient">主要成分</label>
-                                    <input type="text" id="ingredient" name="ingredient" placeholder="主要成分">
-                                </div>
-                                <div class="form-group">
-                                    <label for="usage_method">使用方法</label>
-                                    <input type="text" id="usage_method" name="usage_method" placeholder="例：口服，每日3次">
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="unit_dose">單次劑量</label>
-                                    <input type="text" id="unit_dose" name="unit_dose" placeholder="例：50mg">
-                                </div>
-                                <div class="form-group">
-                                    <label for="storage_conditions">儲存條件</label>
-                                    <input type="text" id="storage_conditions" name="storage_conditions" placeholder="例：常溫保存">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="side_effects">副作用</label>
-                                <textarea id="side_effects" name="side_effects" rows="2" placeholder="可能的副作用..."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="notes">備註</label>
-                                <textarea id="notes" name="notes" rows="2" placeholder="其他注意事項..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -500,26 +444,7 @@
                 <div id="medicineListStatus" class="status-message"></div>
             </div>
 
-            <!-- 病例管理標籤 -->
-            <div id="prescriptions" class="tab-content">
-                <div class="search-bar">
-                    <input type="text" class="search-input" id="prescriptionSearch" placeholder="🔍 搜尋病人姓名或醫生...">
-                    <select class="filter-select" id="prescriptionStatusFilter">
-                        <option value="">所有狀態</option>
-                        <option value="pending">待處理</option>
-                        <option value="processing">處理中</option>
-                        <option value="completed">已完成</option>
-                        <option value="cancelled">已取消</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="refreshPrescriptions()">🔄 重新整理</button>
-                </div>
-                
-                <div class="medicine-list" id="prescriptionList">
-                    <!-- 處方籤項目將在此動態生成 -->
-                </div>
-                
-                <div id="prescriptionStatus" class="status-message"></div>
-            </div>
+
         </div>
     </div>
 

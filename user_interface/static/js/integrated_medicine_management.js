@@ -37,12 +37,10 @@ function setupEventListeners() {
     // 搜尋功能
     document.getElementById('inventorySearch').addEventListener('input', filterInventory);
     document.getElementById('medicineSearch').addEventListener('input', filterMedicineList);
-    document.getElementById('prescriptionSearch').addEventListener('input', filterPrescriptions);
     
     // 篩選功能
     document.getElementById('stockFilter').addEventListener('change', filterInventory);
     document.getElementById('categoryFilter').addEventListener('change', filterMedicineList);
-    document.getElementById('prescriptionStatusFilter').addEventListener('change', filterPrescriptions);
 }
 
 /**
@@ -65,9 +63,6 @@ function switchTab(tabName) {
         case 'medicine-list':
             refreshMedicineList();
             break;
-        case 'prescriptions':
-            refreshPrescriptions();
-            break;
     }
 }
 
@@ -78,8 +73,7 @@ async function loadAllData() {
     try {
         await Promise.all([
             loadBasicMedicines(),
-            loadDetailedMedicines(),
-            loadPrescriptions()
+            loadDetailedMedicines()
         ]);
         updateStatistics();
     } catch (error) {
@@ -118,20 +112,7 @@ async function loadDetailedMedicines() {
     }
 }
 
-/**
- * 載入處方籤數據
- */
-async function loadPrescriptions() {
-    try {
-        const response = await fetch(`${API_BASE}/prescription/`);
-        const data = await response.json();
-        prescriptions = data.prescriptions || [];
-        return prescriptions;
-    } catch (error) {
-        console.error('載入處方籤失敗:', error);
-        throw error;
-    }
-}
+
 
 /**
  * 處理藥物表單提交
@@ -154,18 +135,9 @@ async function handleMedicineSubmit(event) {
                 name: formData.get('name'),
                 amount: parseInt(formData.get('amount')),
                 position: formData.get('position'),
-                manufacturer: formData.get('manufacturer') || "",
-                dosage: formData.get('dosage') || "",
                 prompt: formData.get('prompt') || "",
                 // 詳細資料
-                description: formData.get('description') || "",
-                ingredient: formData.get('ingredient') || "",
-                category: formData.get('category') || "",
-                usage_method: formData.get('usage_method') || "",
-                unit_dose: formData.get('unit_dose') || "",
-                side_effects: formData.get('side_effects') || "",
-                storage_conditions: formData.get('storage_conditions') || "",
-                notes: formData.get('notes') || ""
+                description: formData.get('description') || ""
             })
         });
         
@@ -225,7 +197,7 @@ function renderInventoryList(filteredMedicines = null) {
             <div class="medicine-info">
                 <div class="medicine-name">${medicine.name}</div>
                 <div class="medicine-details">
-                    位置: ${medicine.position} | 製造商: ${medicine.manufacturer || '未指定'} | 劑量: ${medicine.dosage || '未指定'}
+                    位置: ${medicine.position}
                 </div>
             </div>
             <div class="medicine-stock">
@@ -443,44 +415,9 @@ function viewMedicineDetails(medicineName) {
     showModal(detailsHTML);
 }
 
-/**
- * 刷新處方籤列表
- */
-async function refreshPrescriptions() {
-    await loadPrescriptions();
-    renderPrescriptionList();
-}
 
-/**
- * 渲染處方籤列表
- */
-function renderPrescriptionList(filteredPrescriptions = null) {
-    const container = document.getElementById('prescriptionList');
-    const prescriptionList = filteredPrescriptions || prescriptions;
-    
-    if (prescriptionList.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 50px; color: #7f8c8d;">📭 暫無處方籤資料</div>';
-        return;
-    }
-    
-    container.innerHTML = prescriptionList.map((prescription, index) => `
-        <div class="medicine-item">
-            <div class="medicine-info">
-                <div class="medicine-name">病人: ${prescription.patient_name || '未指定'}</div>
-                <div class="medicine-details">
-                    醫生: ${prescription.doctor_name || '未指定'} | 
-                    開立時間: ${prescription.created_at || '未記錄'}<br>
-                    藥物數量: ${prescription.medicines?.length || 0} 種
-                </div>
-            </div>
-            <div class="medicine-actions">
-                <button class="btn btn-primary btn-sm" onclick="viewPrescriptionDetails(${index})">👁️ 查看</button>
-                <button class="btn btn-warning btn-sm" onclick="editPrescription(${index})">✏️ 編輯</button>
-                <button class="btn btn-danger btn-sm" onclick="deletePrescription(${index})">🗑️ 刪除</button>
-            </div>
-        </div>
-    `).join('');
-}
+
+
 
 /**
  * 查看處方籤詳細資訊

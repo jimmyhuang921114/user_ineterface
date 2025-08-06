@@ -369,10 +369,7 @@ async def favicon():
     """網站圖標"""
     return FileResponse("static/favicon.ico", media_type="image/x-icon")
 
-@app.get("/Medicine.html")
-async def medicine_page():
-    """藥物管理頁面"""
-    return FileResponse("static/Medicine.html")
+
 
 @app.get("/Prescription.html")
 async def prescription_page():
