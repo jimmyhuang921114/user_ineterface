@@ -89,13 +89,22 @@ class MockHospitalROS2Node:
             # 添加時間戳和狀態
             order_data.update({
                 "timestamp": time.time(),
-                "status": "pending",
-                "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
+                "status": "queued",
+                "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "priority": order_data.get("priority", "normal")
             })
+            
+            # 根據優先級決定插入位置
+            if order_data.get("priority") == "high":
+                # 高優先級訂單插入到隊列前面（但這需要特殊處理，因為Queue不支持插入）
+                logger.warning("⚠️ 高優先級訂單需要特殊處理")
             
             self.order_queue.put(order_data)
             logger.info(f"📦 訂單已加入佇列: {order_data.get('order_id', 'Unknown')}")
             logger.debug(f"📦 訂單詳情: {json.dumps(order_data, ensure_ascii=False, indent=2)}")
+            
+            # 將訂單資訊傳送給您的 ROS2 媽（模擬）
+            self._send_to_ros2_master(order_data)
             
             return {
                 "success": True,
@@ -108,6 +117,34 @@ class MockHospitalROS2Node:
                 "success": False,
                 "message": f"添加訂單失敗: {str(e)}"
             }
+    
+    def _send_to_ros2_master(self, order_data: Dict):
+        """將訂單資訊傳送給 ROS2 主控制器（您的 ROS2 媽）"""
+        try:
+            # 在真實環境中，這裡會透過 ROS2 topic 或 service 傳送
+            master_message = {
+                "message_type": "new_prescription_order",
+                "order_id": order_data.get("order_id"),
+                "prescription_id": order_data.get("prescription_id"),
+                "patient_info": {
+                    "name": order_data.get("patient_name"),
+                    "id": order_data.get("patient_id")
+                },
+                "medicines": order_data.get("medicines", []),
+                "priority": order_data.get("priority", "normal"),
+                "timestamp": order_data.get("timestamp"),
+                "estimated_completion_time": time.time() + 300  # 預估5分鐘完成
+            }
+            
+            logger.info(f"📡 向 ROS2 主控制器傳送訂單: {order_data.get('order_id')}")
+            logger.debug(f"📡 傳送的訊息: {json.dumps(master_message, ensure_ascii=False, indent=2)}")
+            
+            # 模擬傳送成功
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ 向 ROS2 主控制器傳送失敗: {e}")
+            return False
     
     def get_queue_status(self) -> Dict:
         """獲取佇列狀態"""

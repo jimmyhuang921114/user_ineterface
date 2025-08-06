@@ -487,6 +487,183 @@ async def get_prescription_detail(prescription_id: int, db: Session = Depends(ge
     logger.info(f"✅ 返回處方籤 {prescription_id} 詳細資訊，包含 {len(medicine_details)} 種藥物")
     return result
 
+@app.put("/api/prescription/{prescription_id}/status")
+async def update_prescription_status(prescription_id: int, status_data: dict, db: Session = Depends(get_db)):
+    """更新處方籤狀態"""
+    logger.info(f"🔄 更新處方籤 {prescription_id} 狀態")
+    
+    prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
+    if not prescription:
+        raise HTTPException(status_code=404, detail="處方籤不存在")
+    
+    new_status = status_data.get('status')
+    updated_by = status_data.get('updated_by', '系統')
+    notes = status_data.get('notes', '')
+    
+    # 驗證狀態值
+    valid_statuses = ['pending', 'processing', 'completed', 'cancelled']
+    if new_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"無效的狀態值，必須是: {', '.join(valid_statuses)}")
+    
+    old_status = prescription.status
+    prescription.status = new_status
+    
+    try:
+        db.commit()
+        logger.info(f"✅ 處方籤 {prescription_id} 狀態已更新: {old_status} → {new_status}")
+        
+        # 如果狀態變為 processing，且 ROS2 可用，可以觸發處理
+        if new_status == 'processing' and ROS2_AVAILABLE and ros2_node:
+            logger.info(f"📡 觸發 ROS2 處理處方籤 {prescription_id}")
+        
+        return {
+            "message": "狀態更新成功",
+            "prescription_id": prescription_id,
+            "old_status": old_status,
+            "new_status": new_status,
+            "updated_by": updated_by
+        }
+    except Exception as e:
+        db.rollback()
+        logger.error(f"❌ 更新處方籤狀態失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"更新失敗: {str(e)}")
+
+@app.get("/api/prescription/pending/next")
+async def get_next_pending_prescription(db: Session = Depends(get_db)):
+    """獲取下一個待處理的處方籤（最舊的 pending 狀態）"""
+    logger.info("🔍 查找下一個待處理的處方籤")
+    
+    # 查找最舊的 pending 狀態處方籤
+    prescription = db.query(Prescription)\
+        .filter(Prescription.status == 'pending')\
+        .order_by(Prescription.created_at.asc())\
+        .first()
+    
+    if not prescription:
+        return {"message": "沒有待處理的處方籤", "prescription": None}
+    
+    # 獲取藥物詳細資訊
+    medicines = db.query(PrescriptionMedicine)\
+        .filter(PrescriptionMedicine.prescription_id == prescription.id)\
+        .all()
+    
+    medicine_details = []
+    for pm in medicines:
+        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine_details.append({
+            "medicine_id": pm.medicine_id,
+            "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "quantity": pm.quantity,
+            "position": basic_medicine.position if basic_medicine else "未知位置"
+        })
+    
+    result = {
+        "message": "找到待處理的處方籤",
+        "prescription": {
+            "id": prescription.id,
+            "patient_name": prescription.patient_name,
+            "patient_id": prescription.patient_id,
+            "doctor_name": prescription.doctor_name,
+            "diagnosis": prescription.diagnosis,
+            "status": prescription.status,
+            "created_at": prescription.created_at.isoformat(),
+            "medicines": medicine_details
+        }
+    }
+    
+    logger.info(f"✅ 找到待處理處方籤 {prescription.id}，包含 {len(medicine_details)} 種藥物")
+    
+    # 如果 ROS2 可用，自動加入處理佇列
+    if ROS2_AVAILABLE and ros2_node:
+        order_data = {
+            "order_id": f"ORDER_{prescription.id:04d}",
+            "prescription_id": prescription.id,
+            "patient_name": prescription.patient_name,
+            "patient_id": prescription.patient_id,
+            "doctor_name": prescription.doctor_name,
+            "diagnosis": prescription.diagnosis,
+            "medicines": medicine_details,
+            "status": "queued",
+            "priority": "normal"
+        }
+        ros2_node.add_order(order_data)
+        logger.info(f"📡 處方籤 {prescription.id} 已自動加入 ROS2 處理佇列")
+    
+    return result
+
+@app.post("/api/ros2/request-next-order")
+async def request_next_order(request_data: dict, db: Session = Depends(get_db)):
+    """ROS2 主控制器請求下一個最舊的待處理訂單"""
+    logger.info("🤖 ROS2 主控制器請求下一個訂單")
+    
+    requester_id = request_data.get("requester_id", "unknown")
+    requested_priority = request_data.get("priority", "any")  # "high", "normal", "any"
+    
+    # 查找最舊的 pending 狀態處方籤
+    query = db.query(Prescription).filter(Prescription.status == 'pending')
+    
+    # 按創建時間排序，優先處理最舊的
+    prescription = query.order_by(Prescription.created_at.asc()).first()
+    
+    if not prescription:
+        logger.info("📦 沒有待處理的處方籤")
+        return {
+            "success": False,
+            "message": "沒有待處理的處方籤",
+            "order": None
+        }
+    
+    # 獲取藥物詳細資訊
+    medicines = db.query(PrescriptionMedicine)\
+        .filter(PrescriptionMedicine.prescription_id == prescription.id)\
+        .all()
+    
+    medicine_details = []
+    for pm in medicines:
+        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine_details.append({
+            "medicine_id": pm.medicine_id,
+            "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "quantity": pm.quantity,
+            "position": basic_medicine.position if basic_medicine else "未知位置",
+            "manufacturer": basic_medicine.manufacturer if basic_medicine else "未知廠商"
+        })
+    
+    # 將狀態更新為 processing
+    prescription.status = 'processing'
+    db.commit()
+    
+    order_data = {
+        "order_id": f"ORDER_{prescription.id:04d}",
+        "prescription_id": prescription.id,
+        "patient_info": {
+            "name": prescription.patient_name,
+            "id": prescription.patient_id
+        },
+        "doctor_name": prescription.doctor_name,
+        "diagnosis": prescription.diagnosis,
+        "medicines": medicine_details,
+        "created_at": prescription.created_at.isoformat(),
+        "assigned_to": requester_id,
+        "priority": "normal",
+        "estimated_duration": len(medicine_details) * 60  # 每種藥物估計1分鐘
+    }
+    
+    logger.info(f"📦 分配訂單給 ROS2 主控制器: {order_data['order_id']} (處方籤 {prescription.id})")
+    logger.info(f"📦 包含 {len(medicine_details)} 種藥物")
+    
+    return {
+        "success": True,
+        "message": f"分配訂單 {order_data['order_id']}",
+        "order": order_data
+    }
+
 # ROS2相關API
 @app.get("/api/ros2/status")
 async def get_ros2_status():
