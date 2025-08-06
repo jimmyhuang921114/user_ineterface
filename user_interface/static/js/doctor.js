@@ -121,10 +121,15 @@ async function handlePrescriptionSubmit(event) {
         const medicineItems = document.querySelectorAll('.medicine-item');
         
         medicineItems.forEach(item => {
-            const medicineName = item.querySelector('.medicine-select select').value;
-            const quantity = item.querySelector('input[placeholder*="個數"]').value.trim();
-            const duration = item.querySelector('input[placeholder*="天數"]').value.trim();
-            const notes = item.querySelector('input[placeholder*="備註"]').value.trim();
+            const medicineSelect = item.querySelector('.medicine-select select');
+            const quantityInput = item.querySelector('input[placeholder*="個數"]') || item.querySelector('input[type="number"]');
+            const durationInput = item.querySelector('input[placeholder*="天數"]') || item.querySelectorAll('input[type="number"]')[1];
+            const notesInput = item.querySelector('input[placeholder*="備註"]') || item.querySelector('input[type="text"]:not([placeholder*="個數"]):not([placeholder*="天數"])');
+            
+            const medicineName = medicineSelect ? medicineSelect.value : '';
+            const quantity = quantityInput ? quantityInput.value.trim() : '';
+            const duration = durationInput ? durationInput.value.trim() : '';
+            const notes = notesInput ? notesInput.value.trim() : '';
             
             if (medicineName && quantity && duration) {
                 medicines.push([

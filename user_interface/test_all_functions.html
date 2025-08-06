@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 系統功能測試 - 醫院管理系統</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .test-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .test-btn.success {
+            background: #27ae60;
+        }
+        
+        .test-btn.error {
+            background: #e74c3c;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .result.success {
+            background: #d5f4e6;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .result.error {
+            background: #ffeaa7;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .result.info {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+        }
+        
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .nav-link {
+            display: block;
+            background: #34495e;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 系統功能全面測試</h1>
+            <p>測試所有修復的功能，確保系統正常運作</p>
+            <div id="generalStatus"></div>
+        </div>
+
+        <!-- 基本API測試 -->
+        <div class="test-section">
+            <h3>🔌 基本API連線測試</h3>
+            <button class="test-btn" onclick="testBasicAPI()">測試基本藥物API</button>
+            <button class="test-btn" onclick="testDetailedAPI()">測試詳細藥物API</button>
+            <button class="test-btn" onclick="testPrescriptionAPI()">測試處方籤API</button>
+            <div id="basicAPIResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 庫存調整測試 -->
+        <div class="test-section">
+            <h3>📦 庫存調整功能測試</h3>
+            <button class="test-btn" onclick="testStockAdd()">測試增加庫存</button>
+            <button class="test-btn" onclick="testStockSubtract()">測試減少庫存</button>
+            <button class="test-btn" onclick="testInvalidStock()">測試無效操作</button>
+            <div id="stockResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 處方籤創建測試 -->
+        <div class="test-section">
+            <h3>🏥 處方籤創建測試</h3>
+            <button class="test-btn" onclick="testPrescriptionCreate()">創建測試處方籤</button>
+            <button class="test-btn" onclick="testPrescriptionValidation()">測試數據驗證</button>
+            <div id="prescriptionResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- ROS2狀態測試 -->
+        <div class="test-section">
+            <h3>🤖 ROS2狀態更新測試</h3>
+            <button class="test-btn" onclick="testROS2StatusUpdate()">測試狀態更新</button>
+            <button class="test-btn" onclick="testROS2StatusQuery()">查詢狀態記錄</button>
+            <div id="ros2Result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- AI提示詞測試 -->
+        <div class="test-section">
+            <h3>🤖 AI提示詞功能測試</h3>
+            <button class="test-btn" onclick="testPromptFeature()">測試提示詞保存</button>
+            <button class="test-btn" onclick="testPromptQuery()">查詢提示詞</button>
+            <div id="promptResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 導航鏈接 -->
+        <div class="nav-links">
+            <a href="/html/doctor.html" class="nav-link">👨‍⚕️ 醫生工作台</a>
+            <a href="/html/integrated_medicine_management.html" class="nav-link">🏥 藥物管理</a>
+            <a href="/html/Prescription.html" class="nav-link">📋 處方查詢</a>
+            <a href="/html/Medicine.html" class="nav-link">💊 藥物查詢</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // 顯示結果
+        function showResult(elementId, content, type) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.textContent = content;
+        }
+
+        // 基本API測試
+        async function testBasicAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/basic`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('basicAPIResult', 
+                        `✅ 基本藥物API正常\n共有 ${data.medicines.length} 種藥物\n第一種藥物: ${data.medicines[0]?.name || '無'}`, 
+                        'success');
+                } else {
+                    throw new Error(`API錯誤: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('basicAPIResult', `❌ 基本藥物API錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDetailedAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/detailed`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('basicAPIResult', 
+                        `✅ 詳細藥物API正常\n共有 ${data.medicines.length} 種詳細藥物資料`, 
+                        'success');
+                } else {
+                    throw new Error(`API錯誤: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('basicAPIResult', `❌ 詳細藥物API錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPrescriptionAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('basicAPIResult', 
+                        `✅ 處方籤API正常\n共有 ${data.prescriptions.length} 張處方籤`, 
+                        'success');
+                } else {
+                    throw new Error(`API錯誤: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('basicAPIResult', `❌ 處方籤API錯誤: ${error.message}`, 'error');
+            }
+        }
+
+        // 庫存調整測試
+        async function testStockAdd() {
+            try {
+                // 先獲取第一個藥物
+                const medicinesResponse = await fetch(`${API_BASE}/medicine/basic`);
+                const medicinesData = await medicinesResponse.json();
+                
+                if (!medicinesData.medicines.length) {
+                    throw new Error('沒有可用的藥物進行測試');
+                }
+                
+                const testMedicine = medicinesData.medicines[0];
+                const originalAmount = testMedicine.amount;
+                
+                const response = await fetch(`${API_BASE}/medicine/adjust-stock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        medicine_name: testMedicine.name,
+                        action: 'add',
+                        amount: 5
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('stockResult', 
+                        `✅ 庫存增加測試成功\n藥物: ${testMedicine.name}\n原數量: ${originalAmount}\n新數量: ${result.new_amount}\n增加: 5`, 
+                        'success');
+                } else {
+                    throw new Error(result.detail || '庫存調整失敗');
+                }
+            } catch (error) {
+                showResult('stockResult', `❌ 庫存增加測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStockSubtract() {
+            try {
+                const medicinesResponse = await fetch(`${API_BASE}/medicine/basic`);
+                const medicinesData = await medicinesResponse.json();
+                
+                if (!medicinesData.medicines.length) {
+                    throw new Error('沒有可用的藥物進行測試');
+                }
+                
+                const testMedicine = medicinesData.medicines[0];
+                const originalAmount = testMedicine.amount;
+                
+                const response = await fetch(`${API_BASE}/medicine/adjust-stock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        medicine_name: testMedicine.name,
+                        action: 'subtract',
+                        amount: 2
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('stockResult', 
+                        `✅ 庫存減少測試成功\n藥物: ${testMedicine.name}\n原數量: ${originalAmount}\n新數量: ${result.new_amount}\n減少: 2`, 
+                        'success');
+                } else {
+                    throw new Error(result.detail || '庫存調整失敗');
+                }
+            } catch (error) {
+                showResult('stockResult', `❌ 庫存減少測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        async function testInvalidStock() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/adjust-stock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        medicine_name: '不存在的藥物',
+                        action: 'add',
+                        amount: 5
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.status === 404) {
+                    showResult('stockResult', 
+                        `✅ 無效操作測試成功\n正確識別不存在的藥物\n錯誤訊息: ${result.detail}`, 
+                        'success');
+                } else {
+                    throw new Error('應該返回404錯誤');
+                }
+            } catch (error) {
+                showResult('stockResult', `❌ 無效操作測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 處方籤測試
+        async function testPrescriptionCreate() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_name: '測試病人_' + Date.now(),
+                        patient_id: 'P' + Date.now(),
+                        doctor_name: '測試醫生',
+                        medicines: [['測試藥物2', '10', '5', '測試用藥']]
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('prescriptionResult', 
+                        `✅ 處方籤創建成功\n病人: ${result.prescription.patient_name}\n藥物數量: ${result.prescription.medicines.length}`, 
+                        'success');
+                } else {
+                    throw new Error(result.detail || '處方籤創建失敗');
+                }
+            } catch (error) {
+                showResult('prescriptionResult', `❌ 處方籤創建失敗: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPrescriptionValidation() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_name: '',
+                        patient_id: '',
+                        doctor_name: '',
+                        medicines: []
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.status === 422) {
+                    showResult('prescriptionResult', 
+                        `✅ 數據驗證測試成功\n正確識別無效數據\n錯誤訊息: ${result.detail}`, 
+                        'success');
+                } else {
+                    throw new Error('應該返回驗證錯誤');
+                }
+            } catch (error) {
+                showResult('prescriptionResult', `❌ 數據驗證測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // ROS2狀態測試
+        async function testROS2StatusUpdate() {
+            try {
+                const response = await fetch(`${API_BASE}/prescription/status-update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: 'TEST_' + Date.now(),
+                        status: 'completed',
+                        message: '測試狀態更新',
+                        patient_name: '測試病人',
+                        patient_id: 'P123456',
+                        medicine_count: 1,
+                        medicines: [{ name: '測試藥物', quantity: 10, status: 'completed' }]
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('ros2Result', 
+                        `✅ ROS2狀態更新成功\n訂單ID: ${result.order_id}\n狀態: ${result.status}`, 
+                        'success');
+                } else {
+                    throw new Error(result.detail || 'ROS2狀態更新失敗');
+                }
+            } catch (error) {
+                showResult('ros2Result', `❌ ROS2狀態更新失敗: ${error.message}`, 'error');
+            }
+        }
+
+        async function testROS2StatusQuery() {
+            try {
+                // 這裡可以查詢狀態記錄，但目前API沒有提供查詢端點
+                showResult('ros2Result', 
+                    `ℹ️ ROS2狀態查詢功能\n目前系統支援狀態更新\n如需查詢功能，可以擴展API端點`, 
+                    'info');
+            } catch (error) {
+                showResult('ros2Result', `❌ ROS2狀態查詢失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // AI提示詞測試
+        async function testPromptFeature() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/basic`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const medicinesWithPrompt = data.medicines.filter(m => m.prompt && m.prompt.trim());
+                    showResult('promptResult', 
+                        `✅ AI提示詞功能正常\n有提示詞的藥物: ${medicinesWithPrompt.length} 種\n範例: ${medicinesWithPrompt[0]?.prompt || '無'}`, 
+                        'success');
+                } else {
+                    throw new Error(`API錯誤: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('promptResult', `❌ AI提示詞測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPromptQuery() {
+            try {
+                const response = await fetch(`${API_BASE}/medicine/basic`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const promptStats = data.medicines.reduce((acc, medicine) => {
+                        if (medicine.prompt && medicine.prompt.trim()) {
+                            acc.withPrompt++;
+                        } else {
+                            acc.withoutPrompt++;
+                        }
+                        return acc;
+                    }, { withPrompt: 0, withoutPrompt: 0 });
+                    
+                    showResult('promptResult', 
+                        `✅ 提示詞統計查詢成功\n有提示詞: ${promptStats.withPrompt} 種\n無提示詞: ${promptStats.withoutPrompt} 種\n總藥物: ${data.medicines.length} 種`, 
+                        'success');
+                } else {
+                    throw new Error(`API錯誤: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('promptResult', `❌ 提示詞查詢失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 自動運行基本測試
+        window.addEventListener('load', function() {
+            setTimeout(testBasicAPI, 1000);
+        });
+    </script>
+</body>
+</html>

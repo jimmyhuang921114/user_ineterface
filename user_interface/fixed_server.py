@@ -639,13 +639,19 @@ async def get_detailed_medicines_yaml():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取YAML資料失敗: {str(e)}")
 
+# 庫存調整請求模型
+class StockAdjustmentRequest(BaseModel):
+    medicine_name: str
+    action: str  # "add" or "subtract" 
+    amount: int = 1
+
 # 庫存調整API
 @app.post("/api/medicine/adjust-stock")
-async def adjust_medicine_stock(request: dict):
+async def adjust_medicine_stock(request: StockAdjustmentRequest):
     try:
-        medicine_name = request.get("medicine_name")
-        action = request.get("action")  # "add" or "subtract"
-        amount = request.get("amount", 1)
+        medicine_name = request.medicine_name
+        action = request.action  # "add" or "subtract"
+        amount = request.amount
         
         if not medicine_name or not action:
             raise HTTPException(status_code=400, detail="藥物名稱和操作類型不能為空")
