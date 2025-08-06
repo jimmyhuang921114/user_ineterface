@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>處方籤顯示 - 醫院藥物管理系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .prescription-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .prescription-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .prescription-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .prescription-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .prescription-header h3 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .prescription-header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .prescription-body {
+            padding: 20px;
+        }
+
+        .patient-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .patient-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .info-value {
+            color: #7f8c8d;
+        }
+
+        .medicines-section {
+            margin-top: 20px;
+        }
+
+        .medicines-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .medicines-section h4::before {
+            content: '💊';
+            margin-right: 8px;
+        }
+
+        .medicine-item {
+            background: #e8f4fd;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .medicine-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .medicine-detail {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .medicine-detail span {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .no-prescriptions {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-prescriptions h3 {
+            color: #7f8c8d;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .no-prescriptions p {
+            color: #bdc3c7;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .prescription-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 處方籤資料庫</h1>
+            <p>查看所有已開立的處方籤</p>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="搜尋病患姓名、編號或醫師...">
+            <button class="btn" onclick="loadPrescriptions()">🔄 重新載入</button>
+            <button class="btn" onclick="exportPrescriptions()">📤 匯出資料</button>
+            <button class="btn" onclick="goToDoctor()">👨‍⚕️ 回到醫生工作站</button>
+        </div>
+
+        <div id="prescriptionsContainer">
+            <div class="loading">載入處方籤資料中...</div>
+        </div>
+    </div>
+
+    <script>
+        let allPrescriptions = [];
+
+        // 載入處方籤資料
+        async function loadPrescriptions() {
+            try {
+                const container = document.getElementById('prescriptionsContainer');
+                container.innerHTML = '<div class="loading">載入處方籤資料中...</div>';
+
+                const response = await fetch('/api/prescription/');
+                const data = await response.json();
+
+                if (response.ok) {
+                    allPrescriptions = data.prescriptions || [];
+                    displayPrescriptions(allPrescriptions);
+                } else {
+                    throw new Error(data.detail || '載入失敗');
+                }
+            } catch (error) {
+                document.getElementById('prescriptionsContainer').innerHTML = 
+                    `<div class="error">❌ 載入處方籤失敗: ${error.message}</div>`;
+            }
+        }
+
+        // 顯示處方籤
+        function displayPrescriptions(prescriptions) {
+            const container = document.getElementById('prescriptionsContainer');
+
+            if (prescriptions.length === 0) {
+                container.innerHTML = `
+                    <div class="no-prescriptions">
+                        <h3>📋 暫無處方籤資料</h3>
+                        <p>還沒有開立任何處方籤</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = prescriptions.map((prescription, index) => {
+                const medicines = prescription.medicines || [];
+                const status = prescription.status || 'pending';
+                const statusClass = `status-${status}`;
+                const statusText = {
+                    pending: '待處理',
+                    processing: '處理中',
+                    completed: '已完成'
+                };
+
+                return `
+                    <div class="prescription-card">
+                        <div class="prescription-header">
+                            <h3>處方籤 #${index + 1}</h3>
+                            <p>${prescription.created_at || '未知時間'}</p>
+                        </div>
+                        <div class="prescription-body">
+                            <div class="patient-info">
+                                <h4>👤 病患資訊</h4>
+                                <div class="info-row">
+                                    <span class="info-label">姓名:</span>
+                                    <span class="info-value">${prescription.patient_name || '未知'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">病患編號:</span>
+                                    <span class="info-value">${prescription.patient_id || '未知'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">主治醫師:</span>
+                                    <span class="info-value">${prescription.doctor_name || '未知'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">狀態:</span>
+                                    <span class="status-badge ${statusClass}">${statusText[status] || status}</span>
+                                </div>
+                            </div>
+
+                            <div class="medicines-section">
+                                <h4>處方藥物 (${medicines.length} 種)</h4>
+                                ${medicines.map(medicine => {
+                                    const [name, quantity, duration, notes] = medicine;
+                                    return `
+                                        <div class="medicine-item">
+                                            <div class="medicine-name">${name || '未知藥物'}</div>
+                                            <div class="medicine-details">
+                                                <div class="medicine-detail">
+                                                    <span>數量:</span> ${quantity || '未知'}
+                                                </div>
+                                                <div class="medicine-detail">
+                                                    <span>天數:</span> ${duration || '未知'}
+                                                </div>
+                                                <div class="medicine-detail">
+                                                    <span>說明:</span> ${notes || '無'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="prescription-grid">${html}</div>`;
+        }
+
+        // 搜尋功能
+        function searchPrescriptions() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = allPrescriptions.filter(prescription => {
+                return (
+                    (prescription.patient_name || '').toLowerCase().includes(searchTerm) ||
+                    (prescription.patient_id || '').toLowerCase().includes(searchTerm) ||
+                    (prescription.doctor_name || '').toLowerCase().includes(searchTerm)
+                );
+            });
+            displayPrescriptions(filtered);
+        }
+
+        // 匯出資料
+        function exportPrescriptions() {
+            const dataStr = JSON.stringify(allPrescriptions, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `prescriptions_${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+        }
+
+        // 返回醫生工作站
+        function goToDoctor() {
+            window.location.href = '/doctor.html';
+        }
+
+        // 事件監聽
+        document.getElementById('searchBox').addEventListener('input', searchPrescriptions);
+
+        // 頁面載入時執行
+        window.onload = function() {
+            loadPrescriptions();
+            
+            // 每30秒自動更新
+            setInterval(loadPrescriptions, 30000);
+        };
+    </script>
+</body>
+</html>

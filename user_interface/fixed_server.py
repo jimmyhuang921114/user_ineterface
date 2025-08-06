@@ -138,6 +138,12 @@ async def health_check():
         }
     }
 
+# === Favicon ===
+@app.get("/favicon.ico")
+async def favicon():
+    """Favicon"""
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
 # JSON文件操作函數
 def load_basic_medicines():
     try:
@@ -216,7 +222,7 @@ async def create_basic_medicine(medicine: MedicineBasic):
     
     # 添加時間戳
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    medicine_dict = medicine.dict()
+    medicine_dict = medicine.model_dump()
     
     # 檢查是否已存在
     existing_index = None
@@ -279,7 +285,7 @@ async def create_detailed_medicine(medicine: MedicineDetailed):
     
     # 添加時間戳
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    medicine_dict = medicine.dict()
+    medicine_dict = medicine.model_dump()
     
     # 檢查是否已存在
     existing_index = None
@@ -358,7 +364,7 @@ async def create_order(order: MedicineOrder):
     orders = load_orders()
     
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    order_dict = order.dict()
+    order_dict = order.model_dump()
     order_dict["timestamp"] = current_time
     order_dict["status"] = "pending"
     
@@ -424,7 +430,7 @@ async def ros2_create_order(order: MedicineOrder):
     orders = load_orders()
     
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    order_dict = order.dict()
+    order_dict = order.model_dump()
     order_dict["timestamp"] = current_time
     order_dict["status"] = "received_from_ros2"
     
@@ -459,7 +465,7 @@ async def get_prescriptions():
 async def create_prescription(prescription: Prescription):
     prescriptions = load_prescriptions()
     
-    prescription_dict = prescription.dict()
+    prescription_dict = prescription.model_dump()
     prescription_dict["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     prescription_dict["status"] = "pending"  # 新增狀態欄位
     prescription_dict["processing_history"] = []  # 處理歷史記錄
@@ -778,7 +784,7 @@ async def update_medicine(medicine_name: str, basic_data: MedicineBasic, detaile
                 original_created_time = medicine.get("created_time")
                 
                 # 更新資料
-                updated_basic = basic_data.dict()
+                updated_basic = basic_data.model_dump()
                 updated_basic["created_time"] = original_created_time
                 updated_basic["updated_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 
@@ -801,7 +807,7 @@ async def update_medicine(medicine_name: str, basic_data: MedicineBasic, detaile
                     detailed_found = True
                     original_created_time = detailed.get("created_time")
                     
-                    updated_detailed = detailed_data.dict()
+                    updated_detailed = detailed_data.model_dump()
                     updated_detailed["medicine_name"] = basic_data.name
                     updated_detailed["created_time"] = original_created_time
                     updated_detailed["updated_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -811,7 +817,7 @@ async def update_medicine(medicine_name: str, basic_data: MedicineBasic, detaile
             
             if not detailed_found:
                 # 新增詳細資料
-                updated_detailed = detailed_data.dict()
+                updated_detailed = detailed_data.model_dump()
                 updated_detailed["medicine_name"] = basic_data.name
                 updated_detailed["created_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 updated_detailed["updated_time"] = updated_detailed["created_time"]
@@ -992,6 +998,23 @@ async def ros2_get_prescriptions():
         "count": len(prescriptions),
         "data": prescriptions,
         "ros2_compatible": True
+    }
+
+# === 缺少的API端點 ===
+@app.get("/api/ros2/")
+async def ros2_info():
+    """ROS2整合資訊"""
+    return {
+        "status": "available",
+        "version": "4.0.0",
+        "endpoints": {
+            "orders": "/api/ros2/orders",
+            "order_detail": "/api/ros2/orders/{order_id}",
+            "status_update": "/api/ros2/status",
+            "prescriptions": "/api/ros2/prescription"
+        },
+        "description": "ROS2整合API端點",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
 if __name__ == "__main__":
