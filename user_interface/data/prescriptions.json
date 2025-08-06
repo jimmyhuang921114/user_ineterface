@@ -1,5 +1,18 @@
-{
-  "prescriptions": [],
-  "next_id": 1,
-  "last_updated": "2025-07-30T20:36:21.371135"
-}
+[
+  {
+    "patient_name": "測試病患",
+    "patient_id": "P123456",
+    "doctor_name": "測試醫師",
+    "medicines": [
+      [
+        "普拿疼",
+        "2",
+        "7",
+        "飯後服用"
+      ]
+    ],
+    "created_at": "2025-08-06 07:21:59",
+    "status": "pending",
+    "processing_history": []
+  }
+]
