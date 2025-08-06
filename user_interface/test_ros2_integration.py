@@ -10,7 +10,7 @@ import time
 from typing import Dict, List
 
 # API基礎URL
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:8001"
 
 def test_health_check():
     """測試健康檢查"""
