@@ -121,6 +121,23 @@ manager = ConnectionManager()
 # YAML儲存實例
 yaml_storage = YAMLMedicineStorage()
 
+# === 健康檢查 API ===
+@app.get("/api/health")
+async def health_check():
+    """系統健康檢查"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "version": "4.0.0",
+        "description": "醫院藥物管理系統運行正常",
+        "features": {
+            "prescription_management": True,
+            "medicine_management": True,
+            "ros2_integration": True,
+            "websocket_support": True
+        }
+    }
+
 # JSON文件操作函數
 def load_basic_medicines():
     try:
@@ -853,6 +870,117 @@ async def delete_prescription(prescription_id: int):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"刪除處方籤失敗: {str(e)}")
+
+# === ROS2 訂單 API ===
+@app.get("/api/ros2/orders")
+async def get_ros2_orders():
+    """獲取所有處方籤並轉換為ROS2訂單格式"""
+    prescriptions = load_prescriptions()
+    orders = []
+    
+    for i, prescription in enumerate(prescriptions):
+        # 將處方籤轉換為ROS2訂單格式
+        medicines = []
+        for medicine_item in prescription.get("medicines", []):
+            if len(medicine_item) >= 3:
+                medicine = {
+                    "medicine_name": medicine_item[0],
+                    "quantity": int(medicine_item[1]) if medicine_item[1].isdigit() else 1,
+                    "duration_days": int(medicine_item[2]) if medicine_item[2].isdigit() else 1,
+                    "notes": medicine_item[3] if len(medicine_item) > 3 else ""
+                }
+                medicines.append(medicine)
+        
+        order = {
+            "order_id": f"ORDER_{str(i+1).zfill(4)}",
+            "prescription_id": i + 1,
+            "patient_name": prescription.get("patient_name", ""),
+            "patient_id": prescription.get("patient_id", ""),
+            "doctor_name": prescription.get("doctor_name", ""),
+            "created_at": prescription.get("created_at", ""),
+            "status": prescription.get("status", "pending"),
+            "medicines": medicines,
+            "total_medicines": len(medicines)
+        }
+        orders.append(order)
+    
+    return {
+        "total_orders": len(orders),
+        "orders": orders,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+@app.get("/api/ros2/orders/{order_id}")
+async def get_ros2_order(order_id: str):
+    """獲取特定的ROS2訂單"""
+    prescriptions = load_prescriptions()
+    
+    # 從訂單ID提取索引 (ORDER_0001 -> 0)
+    try:
+        order_index = int(order_id.replace("ORDER_", "")) - 1
+        if order_index < 0 or order_index >= len(prescriptions):
+            raise HTTPException(status_code=404, detail="訂單未找到")
+        
+        prescription = prescriptions[order_index]
+        
+        # 轉換藥物格式
+        medicines = []
+        for medicine_item in prescription.get("medicines", []):
+            if len(medicine_item) >= 3:
+                medicine = {
+                    "medicine_name": medicine_item[0],
+                    "quantity": int(medicine_item[1]) if medicine_item[1].isdigit() else 1,
+                    "duration_days": int(medicine_item[2]) if medicine_item[2].isdigit() else 1,
+                    "notes": medicine_item[3] if len(medicine_item) > 3 else ""
+                }
+                medicines.append(medicine)
+        
+        order = {
+            "order_id": order_id,
+            "prescription_id": order_index + 1,
+            "patient_name": prescription.get("patient_name", ""),
+            "patient_id": prescription.get("patient_id", ""),
+            "doctor_name": prescription.get("doctor_name", ""),
+            "created_at": prescription.get("created_at", ""),
+            "status": prescription.get("status", "pending"),
+            "medicines": medicines,
+            "total_medicines": len(medicines)
+        }
+        
+        return order
+        
+    except ValueError:
+        raise HTTPException(status_code=400, detail="無效的訂單ID格式")
+
+@app.post("/api/ros2/status")
+async def update_ros2_status(status_update: OrderStatus):
+    """更新ROS2訂單狀態"""
+    try:
+        # 從訂單ID提取索引
+        order_index = int(status_update.order_id.replace("ORDER_", "")) - 1
+        
+        prescriptions = load_prescriptions()
+        if order_index < 0 or order_index >= len(prescriptions):
+            raise HTTPException(status_code=404, detail="訂單未找到")
+        
+        # 更新處方籤狀態
+        prescriptions[order_index]["ros2_status"] = status_update.status
+        prescriptions[order_index]["ros2_message"] = status_update.message
+        prescriptions[order_index]["last_ros2_update"] = status_update.timestamp or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        save_prescriptions(prescriptions)
+        
+        return {
+            "message": "狀態更新成功",
+            "order_id": status_update.order_id,
+            "new_status": status_update.status,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+    except ValueError:
+        raise HTTPException(status_code=400, detail="無效的訂單ID格式")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"狀態更新失敗: {str(e)}")
 
 @app.get("/api/ros2/prescription")
 async def ros2_get_prescriptions():

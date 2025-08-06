@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS2 整合測試 - 醫院藥物管理系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .test-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+
+        .test-section h2::before {
+            content: '🤖';
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .test-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-container h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item.error {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .result-item .timestamp {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .result-item .content {
+            font-family: 'Courier New', monospace;
+            background: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-healthy {
+            background-color: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .status-error {
+            background-color: #e74c3c;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 ROS2 整合測試中心</h1>
+            <p>測試醫院藥物管理系統與ROS2的完整整合功能</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalOrders">-</h3>
+                    <p>總訂單數</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalPrescriptions">-</h3>
+                    <p>處方籤數</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="systemStatus">-</h3>
+                    <p>系統狀態</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROS2 訂單測試 -->
+        <div class="test-section">
+            <h2>ROS2 訂單管理測試</h2>
+            <div class="button-group">
+                <button class="test-button" onclick="getROS2Orders()">📋 獲取所有ROS2訂單</button>
+                <button class="test-button" onclick="getROS2Order()">🔍 查詢單一訂單</button>
+                <button class="test-button" onclick="updateROS2Status()">🔄 更新訂單狀態</button>
+                <button class="test-button" onclick="getROS2Prescriptions()">💊 獲取ROS2處方格式</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="orderIdInput">訂單ID (用於單一查詢和狀態更新):</label>
+                <input type="text" id="orderIdInput" placeholder="例如: ORDER_0001" value="ORDER_0001">
+            </div>
+            
+            <div class="form-group">
+                <label for="statusSelect">新狀態:</label>
+                <select id="statusSelect">
+                    <option value="pending">待處理 (pending)</option>
+                    <option value="processing">處理中 (processing)</option>
+                    <option value="completed">已完成 (completed)</option>
+                    <option value="failed">失敗 (failed)</option>
+                    <option value="cancelled">已取消 (cancelled)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="statusMessage">狀態訊息:</label>
+                <input type="text" id="statusMessage" placeholder="例如: ROS2機器人正在處理訂單" value="ROS2機器人正在處理訂單">
+            </div>
+
+            <div class="result-container">
+                <h3>🤖 ROS2 測試結果</h3>
+                <div id="ros2Results"></div>
+            </div>
+        </div>
+
+        <!-- 處方籤創建測試 -->
+        <div class="test-section">
+            <h2>處方籤創建測試</h2>
+            <div class="button-group">
+                <button class="test-button" onclick="createTestPrescription()">➕ 創建測試處方籤</button>
+                <button class="test-button" onclick="getAllPrescriptions()">📋 獲取所有處方籤</button>
+                <button class="test-button" onclick="checkSystemHealth()">❤️ 系統健康檢查</button>
+            </div>
+
+            <div class="result-container">
+                <h3>📋 處方籤測試結果</h3>
+                <div id="prescriptionResults"></div>
+            </div>
+        </div>
+
+        <!-- 實時監控 -->
+        <div class="test-section">
+            <h2>實時狀態監控</h2>
+            <div class="button-group">
+                <button class="test-button" onclick="startMonitoring()">▶️ 開始監控</button>
+                <button class="test-button" onclick="stopMonitoring()">⏹️ 停止監控</button>
+                <button class="test-button" onclick="clearResults()">🗑️ 清除結果</button>
+            </div>
+
+            <div class="result-container">
+                <h3>📊 實時監控結果</h3>
+                <div id="monitoringResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let monitoringInterval = null;
+
+        // 添加結果到容器
+        function addResult(containerId, message, isError = false) {
+            const container = document.getElementById(containerId);
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${isError ? 'error' : ''}`;
+            
+            const timestamp = new Date().toLocaleString('zh-TW');
+            resultItem.innerHTML = `
+                <div class="timestamp">${timestamp}</div>
+                <div class="content">${message}</div>
+            `;
+            
+            container.insertBefore(resultItem, container.firstChild);
+            
+            // 限制顯示的結果數量
+            while (container.children.length > 10) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        // 格式化JSON顯示
+        function formatJSON(obj) {
+            return JSON.stringify(obj, null, 2);
+        }
+
+        // ROS2 訂單相關函數
+        async function getROS2Orders() {
+            try {
+                const response = await fetch('/api/ros2/orders');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('ros2Results', `✅ 成功獲取 ${data.total_orders} 個ROS2訂單:\n${formatJSON(data)}`);
+                    document.getElementById('totalOrders').textContent = data.total_orders;
+                } else {
+                    addResult('ros2Results', `❌ 獲取ROS2訂單失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('ros2Results', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function getROS2Order() {
+            const orderId = document.getElementById('orderIdInput').value;
+            if (!orderId) {
+                addResult('ros2Results', '❌ 請輸入訂單ID', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ros2/orders/${orderId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('ros2Results', `✅ 成功獲取訂單 ${orderId}:\n${formatJSON(data)}`);
+                } else {
+                    addResult('ros2Results', `❌ 獲取訂單失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('ros2Results', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function updateROS2Status() {
+            const orderId = document.getElementById('orderIdInput').value;
+            const status = document.getElementById('statusSelect').value;
+            const message = document.getElementById('statusMessage').value;
+
+            if (!orderId) {
+                addResult('ros2Results', '❌ 請輸入訂單ID', true);
+                return;
+            }
+
+            const statusData = {
+                order_id: orderId,
+                status: status,
+                message: message,
+                timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19)
+            };
+
+            try {
+                const response = await fetch('/api/ros2/status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(statusData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('ros2Results', `✅ 成功更新訂單狀態:\n${formatJSON(data)}`);
+                } else {
+                    addResult('ros2Results', `❌ 更新狀態失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('ros2Results', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function getROS2Prescriptions() {
+            try {
+                const response = await fetch('/api/ros2/prescription');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('ros2Results', `✅ 成功獲取ROS2格式處方籤:\n${formatJSON(data)}`);
+                } else {
+                    addResult('ros2Results', `❌ 獲取處方籤失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('ros2Results', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 處方籤相關函數
+        async function createTestPrescription() {
+            const testPrescription = {
+                patient_name: `測試病患_${Date.now()}`,
+                patient_id: `P${Date.now()}`,
+                doctor_name: "ROS2測試醫師",
+                medicines: [
+                    ["測試藥物ROS2_A", "2", "7", "ROS2測試用藥A"],
+                    ["測試藥物ROS2_B", "1", "14", "ROS2測試用藥B"]
+                ]
+            };
+
+            try {
+                const response = await fetch('/api/prescription/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testPrescription)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('prescriptionResults', `✅ 成功創建測試處方籤:\n${formatJSON(data)}`);
+                    // 自動更新統計
+                    setTimeout(getAllPrescriptions, 500);
+                } else {
+                    addResult('prescriptionResults', `❌ 創建處方籤失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('prescriptionResults', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function getAllPrescriptions() {
+            try {
+                const response = await fetch('/api/prescription/');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('prescriptionResults', `✅ 成功獲取 ${data.prescriptions.length} 個處方籤:\n${formatJSON(data)}`);
+                    document.getElementById('totalPrescriptions').textContent = data.prescriptions.length;
+                } else {
+                    addResult('prescriptionResults', `❌ 獲取處方籤失敗: ${formatJSON(data)}`, true);
+                }
+            } catch (error) {
+                addResult('prescriptionResults', `❌ 網路錯誤: ${error.message}`, true);
+            }
+        }
+
+        async function checkSystemHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult('prescriptionResults', `✅ 系統健康檢查通過:\n${formatJSON(data)}`);
+                    document.getElementById('systemStatus').innerHTML = 
+                        `<span class="status-indicator status-healthy"></span>健康`;
+                } else {
+                    addResult('prescriptionResults', `❌ 系統健康檢查失敗: ${formatJSON(data)}`, true);
+                    document.getElementById('systemStatus').innerHTML = 
+                        `<span class="status-indicator status-error"></span>異常`;
+                }
+            } catch (error) {
+                addResult('prescriptionResults', `❌ 網路錯誤: ${error.message}`, true);
+                document.getElementById('systemStatus').innerHTML = 
+                    `<span class="status-indicator status-error"></span>錯誤`;
+            }
+        }
+
+        // 監控相關函數
+        function startMonitoring() {
+            if (monitoringInterval) {
+                stopMonitoring();
+            }
+
+            addResult('monitoringResults', '🔄 開始實時監控...');
+            
+            monitoringInterval = setInterval(async () => {
+                try {
+                    // 檢查系統狀態
+                    const healthResponse = await fetch('/api/health');
+                    const healthData = await healthResponse.json();
+                    
+                    // 檢查訂單數量
+                    const ordersResponse = await fetch('/api/ros2/orders');
+                    const ordersData = await ordersResponse.json();
+                    
+                    // 檢查處方籤數量
+                    const prescriptionsResponse = await fetch('/api/prescription/');
+                    const prescriptionsData = await prescriptionsResponse.json();
+                    
+                    const monitorData = {
+                        timestamp: new Date().toLocaleString('zh-TW'),
+                        system_status: healthData.status,
+                        total_orders: ordersData.total_orders,
+                        total_prescriptions: prescriptionsData.prescriptions.length,
+                        features: healthData.features
+                    };
+                    
+                    addResult('monitoringResults', `📊 監控數據:\n${formatJSON(monitorData)}`);
+                    
+                    // 更新統計卡片
+                    document.getElementById('totalOrders').textContent = ordersData.total_orders;
+                    document.getElementById('totalPrescriptions').textContent = prescriptionsData.prescriptions.length;
+                    
+                } catch (error) {
+                    addResult('monitoringResults', `❌ 監控錯誤: ${error.message}`, true);
+                }
+            }, 5000); // 每5秒檢查一次
+        }
+
+        function stopMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+                addResult('monitoringResults', '⏹️ 停止實時監控');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('ros2Results').innerHTML = '';
+            document.getElementById('prescriptionResults').innerHTML = '';
+            document.getElementById('monitoringResults').innerHTML = '';
+        }
+
+        // 頁面載入時執行初始檢查
+        window.onload = function() {
+            checkSystemHealth();
+            getROS2Orders();
+            getAllPrescriptions();
+        };
+
+        // 頁面卸載時停止監控
+        window.onbeforeunload = function() {
+            stopMonitoring();
+        };
+    </script>
+</body>
+</html>
