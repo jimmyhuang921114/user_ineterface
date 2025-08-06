@@ -13,7 +13,19 @@ import json
 import os
 import threading
 import time
+import logging
 from datetime import datetime
+
+# 設置詳細的日誌配置
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('debug.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("hospital_system")
 
 from database import get_db, MedicineBasic, MedicineDetailed, Prescription, PrescriptionMedicine, init_database
 
@@ -38,6 +50,71 @@ app.mount("/js", StaticFiles(directory="static/js"), name="js")
 # 初始化資料庫
 init_database()
 
+# 添加樣本藥物資料（如果資料庫為空）
+def add_sample_medicines():
+    """添加樣本藥物資料"""
+    from sqlalchemy.orm import sessionmaker
+    from database import engine, MedicineBasic, MedicineDetailed
+    
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionLocal()
+    
+    try:
+        # 檢查是否已有藥物資料
+        existing_count = db.query(MedicineBasic).count()
+        if existing_count > 0:
+            logger.info(f"📊 資料庫已有 {existing_count} 種藥物，跳過樣本資料初始化")
+            return
+        
+        logger.info("📦 正在添加樣本藥物資料...")
+        
+        # 樣本基本藥物資料
+        sample_medicines = [
+            {"name": "阿斯匹靈", "amount": 100, "position": "A01", "manufacturer": "台灣製藥", "dosage": "100mg"},
+            {"name": "維他命C", "amount": 200, "position": "A02", "manufacturer": "健康製藥", "dosage": "500mg"},
+            {"name": "普拿疼", "amount": 150, "position": "A03", "manufacturer": "止痛製藥", "dosage": "500mg"},
+            {"name": "感冒糖漿", "amount": 50, "position": "B01", "manufacturer": "感冒製藥", "dosage": "10ml"},
+            {"name": "胃藥", "amount": 80, "position": "B02", "manufacturer": "腸胃製藥", "dosage": "200mg"}
+        ]
+        
+        for med_data in sample_medicines:
+            medicine = MedicineBasic(**med_data, is_active=True)
+            db.add(medicine)
+        
+        db.commit()
+        logger.info(f"✅ 已添加 {len(sample_medicines)} 種樣本藥物")
+        
+        # 為前3種藥物添加詳細資料
+        medicines = db.query(MedicineBasic).limit(3).all()
+        detailed_data = [
+            {"description": "解熱鎮痛劑", "ingredient": "乙醯水楊酸", "category": "鎮痛劑", "usage_method": "口服"},
+            {"description": "維生素補充劑", "ingredient": "維生素C", "category": "維生素", "usage_method": "口服"},
+            {"description": "解熱鎮痛劑", "ingredient": "乙醯胺酚", "category": "鎮痛劑", "usage_method": "口服"}
+        ]
+        
+        for i, med in enumerate(medicines):
+            if i < len(detailed_data):
+                detailed = MedicineDetailed(
+                    medicine_id=med.id,
+                    **detailed_data[i],
+                    unit_dose=med.dosage,
+                    side_effects="請依醫師指示使用",
+                    storage_conditions="陰涼乾燥處保存",
+                    appearance_type="錠劑"
+                )
+                db.add(detailed)
+        
+        db.commit()
+        logger.info("✅ 樣本詳細資料添加完成")
+        
+    except Exception as e:
+        logger.error(f"❌ 添加樣本資料失敗: {str(e)}")
+        db.rollback()
+    finally:
+        db.close()
+
+add_sample_medicines()
+
 # 初始化ROS2節點（如果可用）
 ros2_node = None
 if ROS2_AVAILABLE:
@@ -51,12 +128,15 @@ async def root():
 @app.get("/api/health")
 async def health_check():
     """健康檢查"""
+    logger.info("💓 系統健康檢查請求")
     ros2_status = "available" if ROS2_AVAILABLE and ros2_node else "unavailable"
-    return {
+    result = {
         "status": "healthy", 
         "message": "系統運行正常",
         "ros2_status": ros2_status
     }
+    logger.info(f"💓 健康檢查結果: {result}")
+    return result
 
 # 藥物管理API
 @app.post("/api/medicine/")
@@ -90,25 +170,38 @@ async def create_medicine(medicine_data: dict, db: Session = Depends(get_db)):
 @app.get("/api/medicine/basic")
 async def get_basic_medicines(db: Session = Depends(get_db)):
     """獲取基本藥物列表"""
-    medicines = db.query(MedicineBasic).filter(MedicineBasic.is_active == True).all()
-    result = [
-        {
-            "id": med.id,
-            "name": med.name,
-            "amount": med.amount,
-            "position": med.position,
-            "manufacturer": med.manufacturer,
-            "dosage": med.dosage
-        }
-        for med in medicines
-    ]
-    
-    # 如果ROS2可用，發布藥物資料
-    if ROS2_AVAILABLE and ros2_node:
-        for medicine in result:
-            ros2_node.publish_medicine_data(medicine)
-    
-    return result
+    logger.info("🔍 開始獲取基本藥物列表")
+    try:
+        medicines = db.query(MedicineBasic).filter(MedicineBasic.is_active == True).all()
+        logger.debug(f"📊 資料庫查詢結果: 找到 {len(medicines)} 種藥物")
+        
+        result = [
+            {
+                "id": med.id,
+                "name": med.name,
+                "amount": med.amount,
+                "position": med.position,
+                "manufacturer": med.manufacturer,
+                "dosage": med.dosage
+            }
+            for med in medicines
+        ]
+        
+        logger.info(f"✅ 基本藥物列表構建完成，共 {len(result)} 種藥物")
+        
+        # 如果ROS2可用，發布藥物資料
+        if ROS2_AVAILABLE and ros2_node:
+            logger.debug("📡 ROS2可用，準備發布藥物資料")
+            for medicine in result:
+                ros2_node.publish_medicine_data(medicine)
+            logger.info("📡 藥物資料已發布到ROS2")
+        else:
+            logger.debug("❌ ROS2不可用，跳過資料發布")
+        
+        return result
+    except Exception as e:
+        logger.error(f"❌ 獲取基本藥物列表失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"獲取藥物列表失敗: {str(e)}")
 
 @app.get("/api/medicine/detailed")
 async def get_detailed_medicines(db: Session = Depends(get_db)):
@@ -256,18 +349,26 @@ async def get_prescriptions(db: Session = Depends(get_db)):
 @app.post("/api/prescription/")
 async def create_prescription(prescription_data: dict, db: Session = Depends(get_db)):
     """創建新處方籤"""
+    logger.info("📋 開始創建新處方籤")
+    logger.debug(f"📋 接收到的處方數據: {prescription_data}")
+    
     try:
         # 提取藥物列表
         medicines_list = prescription_data.pop('medicines', [])
+        logger.info(f"💊 處方包含 {len(medicines_list)} 種藥物")
         
         # 創建處方籤
         prescription = Prescription(**prescription_data)
         db.add(prescription)
         db.commit()
         db.refresh(prescription)
+        logger.info(f"✅ 處方籤基本資料已創建，ID: {prescription.id}")
         
         # 處理藥物列表
-        for medicine_info in medicines_list:
+        added_medicines = 0
+        for i, medicine_info in enumerate(medicines_list):
+            logger.debug(f"💊 處理第 {i+1} 個藥物: {medicine_info}")
+            
             if isinstance(medicine_info, list) and len(medicine_info) >= 4:
                 # 格式: [藥物名稱, 劑量, 數量, 頻率]
                 medicine_name = medicine_info[0]
@@ -275,6 +376,8 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
                 quantity_str = str(medicine_info[2])
                 quantity = int(quantity_str) if quantity_str.isdigit() else 1
                 frequency = medicine_info[3]
+                
+                logger.debug(f"💊 藥物詳情 - 名稱: {medicine_name}, 劑量: {dosage}, 數量: {quantity}, 頻率: {frequency}")
                 
                 # 查找藥物ID
                 medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
@@ -289,13 +392,21 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
                         instructions=""
                     )
                     db.add(prescription_medicine)
+                    added_medicines += 1
+                    logger.debug(f"✅ 藥物 {medicine_name} 已加入處方籤")
+                else:
+                    logger.warning(f"⚠️ 找不到藥物: {medicine_name}")
+            else:
+                logger.warning(f"⚠️ 藥物資料格式錯誤: {medicine_info}")
         
         db.commit()
+        logger.info(f"✅ 處方籤創建完成，共添加 {added_medicines} 種藥物")
         
         result = {"message": "處方籤創建成功", "id": prescription.id}
         
         # 如果ROS2可用，將處方籤加入訂單佇列
         if ROS2_AVAILABLE and ros2_node:
+            logger.info("📡 ROS2可用，準備創建訂單")
             order_data = {
                 "order_id": f"ORDER_{prescription.id:04d}",
                 "prescription_id": prescription.id,
@@ -307,9 +418,13 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
                 "created_at": prescription.created_at.isoformat()
             }
             ros2_node.add_order(order_data)
+            logger.info(f"📡 ROS2訂單已創建: {order_data['order_id']}")
+        else:
+            logger.debug("❌ ROS2不可用，跳過訂單創建")
         
         return result
     except Exception as e:
+        logger.error(f"❌ 創建處方籤失敗: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=400, detail=f"創建失敗: {str(e)}")
 
@@ -425,7 +540,7 @@ if __name__ == "__main__":
     import uvicorn
     print("🏥 簡化醫院藥物管理系統")
     print("=" * 50)
-    print("🌐 網頁界面: http://localhost:8001/Medicine.html")
+    print("🌐 整合管理: http://localhost:8001/integrated_medicine_management.html")
     print("📋 處方籤管理: http://localhost:8001/Prescription.html")
     print("👨‍⚕️ 醫生界面: http://localhost:8001/doctor.html")
     print("📖 API文檔: http://localhost:8001/docs")

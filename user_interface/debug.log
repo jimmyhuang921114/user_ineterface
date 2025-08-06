@@ -1,29 +1,15 @@
-nohup: ignoring input
+2025-08-06 15:47:50,931 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 15:47:50,953 - asyncio - DEBUG - Using selector: EpollSelector
+2025-08-06 16:02:59,907 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
+2025-08-06 16:02:59,929 - asyncio - DEBUG - Using selector: EpollSelector
 2025-08-06 16:03:22,926 - hospital_system - INFO - 📊 資料庫已有 16 種藥物，跳過樣本資料初始化
 2025-08-06 16:03:22,949 - asyncio - DEBUG - Using selector: EpollSelector
-INFO:     Started server process [5827]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
 2025-08-06 16:03:26,600 - hospital_system - INFO - 💓 系統健康檢查請求
 2025-08-06 16:03:26,600 - hospital_system - INFO - 💓 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'unavailable'}
-⚠️ ROS2模組不可用，將使用模擬模式
-✅ 資料庫表格創建完成
-🏥 簡化醫院藥物管理系統
-==================================================
-🌐 整合管理: http://localhost:8001/integrated_medicine_management.html
-📋 處方籤管理: http://localhost:8001/Prescription.html
-👨‍⚕️ 醫生界面: http://localhost:8001/doctor.html
-📖 API文檔: http://localhost:8001/docs
-🤖 ROS2狀態: 不可用
-==================================================
-INFO:     127.0.0.1:40848 - "GET /api/health HTTP/1.1" 200 OK
 2025-08-06 16:03:31,053 - hospital_system - INFO - 🔍 開始獲取基本藥物列表
 2025-08-06 16:03:31,056 - hospital_system - DEBUG - 📊 資料庫查詢結果: 找到 16 種藥物
 2025-08-06 16:03:31,056 - hospital_system - INFO - ✅ 基本藥物列表構建完成，共 16 種藥物
 2025-08-06 16:03:31,056 - hospital_system - DEBUG - ❌ ROS2不可用，跳過資料發布
-INFO:     127.0.0.1:40858 - "GET /api/medicine/basic HTTP/1.1" 200 OK
-INFO:     127.0.0.1:40864 - "GET /api/medicine/detailed HTTP/1.1" 200 OK
 2025-08-06 16:03:41,605 - hospital_system - INFO - 📋 開始創建新處方籤
 2025-08-06 16:03:41,605 - hospital_system - DEBUG - 📋 接收到的處方數據: {'patient_name': '測試病患', 'patient_id': 'P123456789', 'doctor_name': '測試醫生', 'diagnosis': '測試診斷', 'medicines': [['普拿疼', '500mg', '30', '每日三次'], ['阿斯匹靈', '100mg', '20', '每日兩次']]}
 2025-08-06 16:03:41,605 - hospital_system - INFO - 💊 處方包含 2 種藥物
@@ -36,12 +22,7 @@ INFO:     127.0.0.1:40864 - "GET /api/medicine/detailed HTTP/1.1" 200 OK
 2025-08-06 16:03:41,623 - hospital_system - DEBUG - ✅ 藥物 阿斯匹靈 已加入處方籤
 2025-08-06 16:03:41,625 - hospital_system - INFO - ✅ 處方籤創建完成，共添加 2 種藥物
 2025-08-06 16:03:41,626 - hospital_system - DEBUG - ❌ ROS2不可用，跳過訂單創建
-INFO:     127.0.0.1:39908 - "POST /api/prescription/ HTTP/1.1" 200 OK
-INFO:     127.0.0.1:34168 - "GET /api/prescription/ HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50762 - "GET /doctor.html HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50772 - "GET /test_all_functions.html HTTP/1.1" 200 OK
 2025-08-06 16:04:09,035 - hospital_system - INFO - 🔍 開始獲取基本藥物列表
 2025-08-06 16:04:09,039 - hospital_system - DEBUG - 📊 資料庫查詢結果: 找到 16 種藥物
 2025-08-06 16:04:09,039 - hospital_system - INFO - ✅ 基本藥物列表構建完成，共 16 種藥物
 2025-08-06 16:04:09,039 - hospital_system - DEBUG - ❌ ROS2不可用，跳過資料發布
-INFO:     127.0.0.1:51616 - "GET /api/medicine/basic HTTP/1.1" 200 OK

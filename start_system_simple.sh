@@ -27,7 +27,7 @@ python3 database.py
 # 啟動系統
 echo "🚀 啟動系統..."
 echo "📖 API文檔: http://localhost:8001/docs"
-echo "🌐 藥物管理: http://localhost:8001/Medicine.html"
+echo "🌐 整合管理: http://localhost:8001/integrated_medicine_management.html"
 echo "📋 處方籤管理: http://localhost:8001/Prescription.html"
 echo "👨‍⚕️ 醫生工作站: http://localhost:8001/doctor.html"
 echo "🤖 ROS2整合: 模擬模式（如需真實ROS2請安裝rclpy）"

@@ -49,16 +49,23 @@ function setupEventListeners() {
  */
 async function loadAvailableMedicines() {
     try {
+        console.log('🔄 正在載入藥物清單...');
         const response = await fetch(`${API_BASE}/medicine/basic`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
-        availableMedicines = data.medicines || [];
+        // API直接返回藥物陣列，不是包裝在medicines屬性中
+        availableMedicines = Array.isArray(data) ? data : (data.medicines || []);
         
         // 更新所有藥物下拉選單
         updateMedicineSelects();
         
         console.log('✅ 已載入', availableMedicines.length, '種可用藥物');
     } catch (error) {
-        console.error('載入藥物清單失敗:', error);
+        console.error('❌ 載入藥物清單失敗:', error);
         availableMedicines = [];
     }
 }
