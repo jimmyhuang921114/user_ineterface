@@ -16,6 +16,7 @@ import asyncio
 import uvicorn
 import yaml
 from yaml_storage import YAMLMedicineStorage
+from multi_format_storage import get_storage
 
 # Pydantic Models
 class MedicineBasic(BaseModel):
@@ -121,6 +122,9 @@ manager = ConnectionManager()
 # YAML儲存實例
 yaml_storage = YAMLMedicineStorage()
 
+# 多格式存儲實例
+multi_storage = get_storage()
+
 # === 健康檢查 API ===
 @app.get("/api/health")
 async def health_check():
@@ -153,8 +157,12 @@ def load_basic_medicines():
         return []
 
 def save_basic_medicines(data):
+    # 保存到JSON（向後兼容）
     with open("medicine_basic_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    # 同步到所有格式（JSON、YAML、SQL）
+    multi_storage.save_basic_medicines(data)
 
 def load_detailed_medicines():
     try:
@@ -164,8 +172,12 @@ def load_detailed_medicines():
         return []
 
 def save_detailed_medicines(data):
+    # 保存到JSON（向後兼容）
     with open("medicine_detailed_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    # 同步到所有格式（JSON、YAML、SQL）
+    multi_storage.save_detailed_medicines(data)
 
 def load_orders():
     try:
@@ -186,8 +198,12 @@ def load_prescriptions():
         return []
 
 def save_prescriptions(data):
+    # 保存到JSON（向後兼容）
     with open("prescription_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    # 同步到所有格式（JSON、YAML、SQL）
+    multi_storage.save_prescriptions(data)
 
 # 狀態更新記錄管理
 def load_status_updates():
