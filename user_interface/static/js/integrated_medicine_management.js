@@ -143,22 +143,6 @@ async function handleMedicineSubmit(event) {
     const statusDiv = document.getElementById('addMedicineStatus');
     
     try {
-        // 收集基本資料
-        const basicData = {
-            name: formData.get('name'),
-            amount: parseInt(formData.get('amount')),
-            position: formData.get('position'),
-            prompt: formData.get('prompt') || ""
-        };
-        
-        // 收集詳細資料 (只保留描述)
-        const detailedData = {
-            description: formData.get('description') || ''
-        };
-        
-        // 檢查是否有詳細資料
-        const hasDetailedData = Object.values(detailedData).some(value => value !== '');
-        
         // 發送請求
         const response = await fetch(`${API_BASE}/medicine/unified`, {
             method: 'POST',
@@ -166,8 +150,22 @@ async function handleMedicineSubmit(event) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                basic_data: basicData,
-                detailed_data: hasDetailedData ? detailedData : null
+                // 基本資料
+                name: formData.get('name'),
+                amount: parseInt(formData.get('amount')),
+                position: formData.get('position'),
+                manufacturer: formData.get('manufacturer') || "",
+                dosage: formData.get('dosage') || "",
+                prompt: formData.get('prompt') || "",
+                // 詳細資料
+                description: formData.get('description') || "",
+                ingredient: formData.get('ingredient') || "",
+                category: formData.get('category') || "",
+                usage_method: formData.get('usage_method') || "",
+                unit_dose: formData.get('unit_dose') || "",
+                side_effects: formData.get('side_effects') || "",
+                storage_conditions: formData.get('storage_conditions') || "",
+                notes: formData.get('notes') || ""
             })
         });
         
