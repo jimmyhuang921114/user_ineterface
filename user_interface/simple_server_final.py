@@ -566,6 +566,101 @@ def get_ros2_service_status():
             "error": str(e)
         }
 
+@app.put("/api/prescription/{prescription_id}/status")
+def update_prescription_status(prescription_id: int, status_update: PrescriptionStatusUpdate, db: Session = Depends(get_db)):
+    """更新處方籤狀態"""
+    try:
+        prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
+        if not prescription:
+            raise HTTPException(status_code=404, detail="找不到處方籤")
+        
+        prescription.status = status_update.status
+        db.commit()
+        
+        logger.info(f"處方籤 {prescription_id} 狀態已更新為: {status_update.status}")
+        return {"success": True, "message": f"處方籤狀態已更新為: {status_update.status}"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"更新處方籤狀態失敗: {e}")
+        raise HTTPException(status_code=400, detail=f"更新失敗: {str(e)}")
+
+@app.get("/api/prescription/{prescription_id}")
+def get_prescription_detail(prescription_id: int, db: Session = Depends(get_db)):
+    """獲取處方籤詳細資訊"""
+    prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
+    if not prescription:
+        raise HTTPException(status_code=404, detail="找不到處方籤")
+    
+    # 獲取處方籤藥物
+    prescription_medicines = db.query(PrescriptionMedicine).filter(
+        PrescriptionMedicine.prescription_id == prescription_id
+    ).join(Medicine).all()
+    
+    medicines = []
+    for pm in prescription_medicines:
+        medicines.append({
+            "medicine_name": pm.medicine.name,
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "quantity": pm.quantity,
+            "instructions": pm.instructions
+        })
+    
+    return {
+        "id": prescription.id,
+        "patient_name": prescription.patient_name,
+        "patient_id": prescription.patient_id,
+        "doctor_name": prescription.doctor_name,
+        "diagnosis": prescription.diagnosis,
+        "status": prescription.status,
+        "created_at": prescription.created_at.isoformat(),
+        "prescription_date": prescription.prescription_date.isoformat(),
+        "medicines": medicines
+    }
+
+@app.get("/api/prescription/pending/next")
+def get_next_pending_prescription(db: Session = Depends(get_db)):
+    """獲取下一個待處理的處方籤"""
+    prescription = db.query(Prescription).filter(
+        Prescription.status == "pending"
+    ).order_by(Prescription.created_at.asc()).first()
+    
+    if not prescription:
+        return {"prescription": None, "message": "沒有待處理的處方籤"}
+    
+    # 獲取處方籤藥物
+    prescription_medicines = db.query(PrescriptionMedicine).filter(
+        PrescriptionMedicine.prescription_id == prescription.id
+    ).join(Medicine).all()
+    
+    medicines = []
+    for pm in prescription_medicines:
+        medicines.append({
+            "medicine_name": pm.medicine.name,
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "quantity": pm.quantity,
+            "instructions": pm.instructions
+        })
+    
+    return {
+        "prescription": {
+            "id": prescription.id,
+            "patient_name": prescription.patient_name,
+            "patient_id": prescription.patient_id,
+            "doctor_name": prescription.doctor_name,
+            "diagnosis": prescription.diagnosis,
+            "status": prescription.status,
+            "created_at": prescription.created_at.isoformat(),
+            "prescription_date": prescription.prescription_date.isoformat(),
+            "medicines": medicines
+        }
+    }
+
 @app.post("/api/ros2/complete-order")
 def complete_ros2_order(order_data: dict, db: Session = Depends(get_db)):
     """ROS2 訂單完成回調"""
