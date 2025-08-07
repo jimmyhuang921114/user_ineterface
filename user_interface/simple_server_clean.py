@@ -29,6 +29,98 @@ logger = logging.getLogger("hospital_system")
 
 from database_clean import get_db, MedicineBasic, MedicineDetailed, Prescription, PrescriptionMedicine, init_database
 
+# 庫存管理函數
+def handle_prescription_stock_change(prescription_id: int, old_status: str, new_status: str, db: Session):
+    """處理處方籤狀態變化時的庫存變動"""
+    logger.info(f"處理處方籤 {prescription_id} 庫存變化: {old_status} → {new_status}")
+    
+    # 獲取處方籤藥物
+    prescription_medicines = db.query(PrescriptionMedicine).filter(
+        PrescriptionMedicine.prescription_id == prescription_id
+    ).all()
+    
+    stock_changes = []
+    
+    for pm in prescription_medicines:
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        if not medicine:
+            continue
+            
+        # 根據狀態變化決定庫存操作
+        if old_status in ['active', 'pending'] and new_status == 'processing':
+            # 開始處理：實際扣減庫存
+            if medicine.amount >= pm.quantity:
+                medicine.amount -= pm.quantity
+                stock_changes.append({
+                    "medicine_name": medicine.name,
+                    "action": "deducted",
+                    "quantity": pm.quantity,
+                    "remaining": medicine.amount
+                })
+                logger.info(f"扣減庫存: {medicine.name} 減少 {pm.quantity}，剩餘 {medicine.amount}")
+            else:
+                stock_changes.append({
+                    "medicine_name": medicine.name,
+                    "action": "insufficient",
+                    "requested": pm.quantity,
+                    "available": medicine.amount
+                })
+                logger.warning(f"庫存不足: {medicine.name} 需要 {pm.quantity}，只有 {medicine.amount}")
+                
+        elif old_status == 'processing' and new_status in ['cancelled', 'pending']:
+            # 取消或退回：恢復庫存
+            medicine.amount += pm.quantity
+            stock_changes.append({
+                "medicine_name": medicine.name,
+                "action": "restored",
+                "quantity": pm.quantity,
+                "current": medicine.amount
+            })
+            logger.info(f"恢復庫存: {medicine.name} 增加 {pm.quantity}，現有 {medicine.amount}")
+            
+        elif old_status in ['active', 'pending'] and new_status == 'cancelled':
+            # 直接取消：無需庫存操作（因為還沒扣減）
+            stock_changes.append({
+                "medicine_name": medicine.name,
+                "action": "no_change",
+                "reason": "cancelled_before_processing"
+            })
+            logger.info(f"處方籤取消（未開始處理）: {medicine.name} 庫存無變化")
+    
+    if stock_changes:
+        db.commit()
+        logger.info(f"處方籤 {prescription_id} 庫存變化完成，共 {len(stock_changes)} 項藥物")
+    
+    return stock_changes
+
+def check_stock_availability(prescription_id: int, db: Session):
+    """檢查處方籤的庫存可用性"""
+    prescription_medicines = db.query(PrescriptionMedicine).filter(
+        PrescriptionMedicine.prescription_id == prescription_id
+    ).all()
+    
+    availability = []
+    all_available = True
+    
+    for pm in prescription_medicines:
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        if medicine:
+            is_available = medicine.amount >= pm.quantity
+            availability.append({
+                "medicine_id": medicine.id,
+                "medicine_name": medicine.name,
+                "required": pm.quantity,
+                "available": medicine.amount,
+                "sufficient": is_available
+            })
+            if not is_available:
+                all_available = False
+    
+    return {
+        "all_available": all_available,
+        "medicines": availability
+    }
+
 # 嘗試導入ROS2模組（如果可用）
 try:
     from ros2_integration import init_ros2_node, get_ros2_node
@@ -485,7 +577,22 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         db.commit()
         logger.info(f"處方籤創建完成，共添加 {added_medicines} 種藥物")
         
-        result = {"message": "處方籤創建成功", "id": prescription.id}
+        # 檢查庫存並預留
+        stock_warnings = []
+        for pm in db.query(PrescriptionMedicine).filter(PrescriptionMedicine.prescription_id == prescription.id).all():
+            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+            if medicine:
+                if medicine.amount < pm.quantity:
+                    stock_warnings.append(f"{medicine.name}: 庫存不足 (需要:{pm.quantity}, 現有:{medicine.amount})")
+                else:
+                    # 預留庫存（狀態為 pending 時不真正扣減，而是標記為預留）
+                    logger.info(f"預留庫存: {medicine.name} 數量 {pm.quantity}")
+        
+        result = {
+            "message": "處方籤創建成功", 
+            "id": prescription.id,
+            "stock_warnings": stock_warnings if stock_warnings else None
+        }
         
         # 如果ROS2可用，將處方籤加入訂單佇列
         if ROS2_AVAILABLE and ros2_node:
@@ -575,6 +682,9 @@ async def update_prescription_status(prescription_id: int, status_data: dict, db
         db.commit()
         logger.info(f"處方籤 {prescription_id} 狀態已更新: {old_status} → {new_status}")
         
+        # 根據狀態變化處理庫存
+        stock_result = handle_prescription_stock_change(prescription_id, old_status, new_status, db)
+        
         # 如果狀態變為 processing，且 ROS2 可用，可以觸發處理
         if new_status == 'processing' and ROS2_AVAILABLE and ros2_node:
             logger.info(f"觸發 ROS2 處理處方籤 {prescription_id}")
@@ -584,7 +694,8 @@ async def update_prescription_status(prescription_id: int, status_data: dict, db
             "prescription_id": prescription_id,
             "old_status": old_status,
             "new_status": new_status,
-            "updated_by": updated_by
+            "updated_by": updated_by,
+            "stock_changes": stock_result
         }
     except Exception as e:
         db.rollback()
@@ -656,6 +767,89 @@ async def get_next_pending_prescription(db: Session = Depends(get_db)):
         logger.info(f"處方籤 {prescription.id} 已自動加入 ROS2 處理佇列")
     
     return result
+
+@app.get("/api/prescription/{prescription_id}/stock-check")
+async def check_prescription_stock(prescription_id: int, db: Session = Depends(get_db)):
+    """檢查處方籤庫存可用性"""
+    logger.info(f"檢查處方籤 {prescription_id} 庫存可用性")
+    
+    prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
+    if not prescription:
+        raise HTTPException(status_code=404, detail="處方籤不存在")
+    
+    availability = check_stock_availability(prescription_id, db)
+    
+    result = {
+        "prescription_id": prescription_id,
+        "patient_name": prescription.patient_name,
+        "status": prescription.status,
+        "stock_check": availability,
+        "can_process": availability["all_available"]
+    }
+    
+    logger.info(f"處方籤 {prescription_id} 庫存檢查完成，可處理: {availability['all_available']}")
+    return result
+
+@app.post("/api/medicine/{medicine_id}/adjust-stock")
+async def adjust_medicine_stock(medicine_id: int, adjustment_data: dict, db: Session = Depends(get_db)):
+    """調整藥物庫存"""
+    logger.info(f"調整藥物 {medicine_id} 庫存")
+    
+    medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    if not medicine:
+        raise HTTPException(status_code=404, detail="藥物不存在")
+    
+    try:
+        adjustment_type = adjustment_data.get("type")  # "add", "subtract", "set"
+        quantity = adjustment_data.get("quantity", 0)
+        reason = adjustment_data.get("reason", "手動調整")
+        operator = adjustment_data.get("operator", "系統")
+        
+        old_amount = medicine.amount
+        
+        if adjustment_type == "add":
+            medicine.amount += quantity
+        elif adjustment_type == "subtract":
+            if medicine.amount >= quantity:
+                medicine.amount -= quantity
+            else:
+                raise HTTPException(status_code=400, detail=f"庫存不足，現有: {medicine.amount}，嘗試減少: {quantity}")
+        elif adjustment_type == "set":
+            medicine.amount = quantity
+        else:
+            raise HTTPException(status_code=400, detail="無效的調整類型，請使用: add, subtract, set")
+        
+        medicine.updated_at = datetime.now()
+        db.commit()
+        
+        logger.info(f"藥物 {medicine.name} 庫存調整: {old_amount} → {medicine.amount} (原因: {reason})")
+        
+        # 如果ROS2可用，發布庫存更新
+        if ROS2_AVAILABLE and ros2_node:
+            ros2_node.publish_medicine_data({
+                "id": medicine_id,
+                "name": medicine.name,
+                "amount": medicine.amount,
+                "old_amount": old_amount,
+                "action": "stock_adjusted"
+            })
+        
+        return {
+            "message": "庫存調整成功",
+            "medicine_id": medicine_id,
+            "medicine_name": medicine.name,
+            "old_amount": old_amount,
+            "new_amount": medicine.amount,
+            "adjustment": quantity,
+            "type": adjustment_type,
+            "reason": reason,
+            "operator": operator
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"調整庫存失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"調整失敗: {str(e)}")
 
 @app.post("/api/ros2/request-next-order")
 async def request_next_order(request_data: dict, db: Session = Depends(get_db)):

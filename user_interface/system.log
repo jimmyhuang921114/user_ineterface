@@ -51,3 +51,37 @@
 2025-08-07 03:50:05,619 - hospital_system - INFO - 開始獲取基本藥物列表
 2025-08-07 03:50:05,620 - hospital_system - INFO - 基本藥物列表構建完成，共 1 種藥物
 2025-08-07 03:50:05,620 - hospital_system - INFO - 藥物資料已發布到ROS2
+2025-08-07 04:05:37,437 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 04:05:37,437 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 04:05:37,437 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 04:05:37,438 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 04:05:46,717 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 04:05:46,718 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
+2025-08-07 04:05:46,718 - hospital_system - INFO - 藥物資料已發布到ROS2
+2025-08-07 04:05:54,824 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 04:05:54,824 - hospital_system - INFO - 處方包含 2 種藥物
+2025-08-07 04:05:54,830 - hospital_system - INFO - 處方籤基本資料已創建，ID: 1
+2025-08-07 04:05:54,835 - hospital_system - INFO - 處方籤創建完成，共添加 2 種藥物
+2025-08-07 04:05:54,838 - hospital_system - INFO - 預留庫存: 普拿疼 數量 30
+2025-08-07 04:05:54,838 - hospital_system - INFO - 預留庫存: 阿斯匹靈 數量 20
+2025-08-07 04:05:54,838 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 04:05:54,838 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0001
+2025-08-07 04:05:54,838 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0001
+2025-08-07 04:05:54,838 - hospital_system - INFO - ROS2訂單已創建: ORDER_0001
+2025-08-07 04:05:55,439 - ros2_mock - INFO - 開始處理訂單: ORDER_0001
+2025-08-07 04:05:55,439 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 04:05:57,439 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 04:06:00,440 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 04:06:02,587 - hospital_system - INFO - 檢查處方籤 1 庫存可用性
+2025-08-07 04:06:02,590 - hospital_system - INFO - 處方籤 1 庫存檢查完成，可處理: True
+2025-08-07 04:06:04,440 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 04:06:09,440 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 04:06:11,598 - hospital_system - INFO - 更新處方籤 1 狀態
+2025-08-07 04:06:11,602 - hospital_system - INFO - 處方籤 1 狀態已更新: active → processing
+2025-08-07 04:06:11,603 - hospital_system - INFO - 處理處方籤 1 庫存變化: active → processing
+2025-08-07 04:06:11,603 - hospital_system - INFO - 扣減庫存: 普拿疼 減少 30，剩餘 70
+2025-08-07 04:06:11,604 - hospital_system - INFO - 扣減庫存: 阿斯匹靈 減少 20，剩餘 30
+2025-08-07 04:06:11,606 - hospital_system - INFO - 處方籤 1 庫存變化完成，共 2 項藥物
+2025-08-07 04:06:11,606 - hospital_system - INFO - 觸發 ROS2 處理處方籤 1
+2025-08-07 04:06:12,440 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 04:06:14,441 - ros2_mock - INFO - 訂單處理完成
