@@ -88,7 +88,7 @@ class MedicineClientExample(Node):
                 # 同時獲取詳細資訊
                 await self.get_detailed_medicine_by_name(medicine_name)
             else:
-                self.get_logger().warning(f'⚠️  未找到藥物: {medicine_name}')
+                self.get_logger().warning(f'未找到藥物: {medicine_name}')
                 
         except Exception as e:
             self.get_logger().error(f'查詢失敗: {str(e)}')
@@ -124,7 +124,7 @@ class MedicineClientExample(Node):
                     self.get_logger().info(f'   當前庫存: {basic.amount}')
                     self.get_logger().info(f'   儲存位置: {basic.position}')
             else:
-                self.get_logger().warning(f'⚠️  未找到詳細資訊: {medicine_name}')
+                self.get_logger().warning(f'未找到詳細資訊: {medicine_name}')
                 
         except Exception as e:
             self.get_logger().error(f'查詢詳細資訊失敗: {str(e)}')

@@ -125,7 +125,7 @@ class SystemRunner:
             print(result.stdout)
             
             if result.stderr:
-                print("⚠️ 測試過程中的警告:")
+                print("測試過程中的警告:")
                 print(result.stderr)
             
             if result.returncode == 0:

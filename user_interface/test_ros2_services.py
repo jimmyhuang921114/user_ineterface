@@ -327,7 +327,7 @@ class ROS2ServiceTester:
             print("✅ 系統已準備好接入真實 ROS2 節點")
             return True
         else:
-            print(f"\n⚠️ {total - passed} 個測試項目失敗")
+            print(f"\n{total - passed} 個測試項目失敗")
             print("❌ 請檢查系統配置")
             return False
 
