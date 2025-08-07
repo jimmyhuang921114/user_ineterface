@@ -132,13 +132,26 @@ async function handleMedicineSubmit(event) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                // 基本資料
-                name: formData.get('name'),
-                amount: parseInt(formData.get('amount')),
-                position: formData.get('position'),
-                prompt: formData.get('prompt') || "",
-                // 詳細資料
-                description: formData.get('description') || ""
+                basic: {
+                    name: formData.get('name'),
+                    amount: parseInt(formData.get('amount')),
+                    position: formData.get('position'),
+                    manufacturer: formData.get('manufacturer') || "",
+                    dosage: formData.get('dosage') || ""
+                },
+                detailed: {
+                    description: formData.get('description') || "",
+                    ingredient: formData.get('ingredient') || "",
+                    category: formData.get('category') || "",
+                    usage_method: formData.get('usage_method') || "",
+                    unit_dose: parseFloat(formData.get('unit_dose')) || 0,
+                    side_effects: formData.get('side_effects') || "",
+                    storage_conditions: formData.get('storage_conditions') || "",
+                    expiry_date: formData.get('expiry_date') || "",
+                    barcode: formData.get('barcode') || "",
+                    appearance_type: formData.get('appearance_type') || "",
+                    notes: formData.get('notes') || ""
+                }
             })
         });
         
@@ -156,11 +169,16 @@ async function handleMedicineSubmit(event) {
                 await refreshMedicineList();
             }
         } else {
-            throw new Error(result.detail || '保存失敗');
+            const errorMessage = typeof result.detail === 'string' ? result.detail : 
+                               typeof result.detail === 'object' ? JSON.stringify(result.detail) :
+                               '保存失敗';
+            throw new Error(errorMessage);
         }
         
     } catch (error) {
-        showStatus('❌ 錯誤: ' + error.message, 'error', 'addMedicineStatus');
+        const errorMessage = error.message || error.toString() || '未知錯誤';
+        showStatus('❌ 錯誤: ' + errorMessage, 'error', 'addMedicineStatus');
+        console.error('藥物提交錯誤:', error);
     }
 }
 
@@ -239,8 +257,8 @@ async function adjustStock(medicineName, action) {
             },
             body: JSON.stringify({
                 medicine_name: medicineName,
-                action: action,
-                amount: parseInt(amount)
+                adjustment: action === 'add' ? parseInt(amount) : -parseInt(amount),
+                reason: `${action === 'add' ? '增加' : '減少'}庫存`
             })
         });
         
@@ -250,11 +268,16 @@ async function adjustStock(medicineName, action) {
             showStatus(`✅ ${medicineName} 庫存已${action === 'add' ? '增加' : '減少'} ${amount}`, 'success', 'inventoryStatus');
             await refreshInventory();
         } else {
-            throw new Error(result.detail || '庫存調整失敗');
+            const errorMessage = typeof result.detail === 'string' ? result.detail : 
+                               typeof result.detail === 'object' ? JSON.stringify(result.detail) :
+                               '庫存調整失敗';
+            throw new Error(errorMessage);
         }
         
     } catch (error) {
-        showStatus('❌ 庫存調整失敗: ' + error.message, 'error', 'inventoryStatus');
+        const errorMessage = error.message || error.toString() || '庫存調整失敗';
+        showStatus('❌ 庫存調整失敗: ' + errorMessage, 'error', 'inventoryStatus');
+        console.error('庫存調整錯誤:', error);
     }
 }
 
@@ -279,11 +302,16 @@ async function deleteMedicine(medicineName) {
             renderInventoryList();
             renderMedicineList();
         } else {
-            throw new Error(result.detail || '刪除失敗');
+            const errorMessage = typeof result.detail === 'string' ? result.detail : 
+                               typeof result.detail === 'object' ? JSON.stringify(result.detail) :
+                               '刪除失敗';
+            throw new Error(errorMessage);
         }
         
     } catch (error) {
-        showStatus('❌ 刪除失敗: ' + error.message, 'error', 'inventoryStatus');
+        const errorMessage = error.message || error.toString() || '刪除失敗';
+        showStatus('❌ 刪除失敗: ' + errorMessage, 'error', 'inventoryStatus');
+        console.error('刪除藥物錯誤:', error);
     }
 }
 

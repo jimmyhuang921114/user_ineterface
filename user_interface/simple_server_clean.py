@@ -440,15 +440,31 @@ async def create_detailed_medicine(medicine_data: dict, db: Session = Depends(ge
 async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get_db)):
     """創建統一藥物（基本+詳細）"""
     try:
+        # 檢查是否為嵌套格式 {basic: {...}, detailed: {...}}
+        if "basic" in medicine_data and "detailed" in medicine_data:
+            # 嵌套格式
+            basic_info = medicine_data.get("basic", {})
+            detailed_info = medicine_data.get("detailed", {})
+            
+            # 合併為平坦格式
+            combined_data = {**basic_info, **detailed_info}
+        else:
+            # 平坦格式，直接使用
+            combined_data = medicine_data
+        
         # 分離基本和詳細資料
         basic_data = {
-            "name": medicine_data.get("name"),
-            "amount": medicine_data.get("amount", 0),
-            "position": medicine_data.get("position"),
-            "manufacturer": medicine_data.get("manufacturer"),
-            "dosage": medicine_data.get("dosage"),
-            "is_active": medicine_data.get("is_active", True)
+            "name": combined_data.get("name"),
+            "amount": combined_data.get("amount", 0),
+            "position": combined_data.get("position"),
+            "manufacturer": combined_data.get("manufacturer"),
+            "dosage": combined_data.get("dosage"),
+            "is_active": combined_data.get("is_active", True)
         }
+        
+        # 驗證必需字段
+        if not basic_data["name"]:
+            raise HTTPException(status_code=400, detail="藥物名稱不能為空")
         
         # 創建基本藥物
         basic_medicine = Medicine(**basic_data)
@@ -457,20 +473,20 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
         
         # 創建詳細藥物（如果有詳細資料）
         detailed_id = None
-        if any(key in medicine_data for key in ["description", "ingredient", "category"]):
+        if any(key in combined_data for key in ["description", "ingredient", "category"]):
             detailed_data = {
                 "medicine_id": basic_medicine.id,
-                "description": medicine_data.get("description"),
-                "ingredient": medicine_data.get("ingredient"),
-                "category": medicine_data.get("category"),
-                "usage_method": medicine_data.get("usage_method"),
-                "unit_dose": medicine_data.get("unit_dose"),
-                "side_effects": medicine_data.get("side_effects"),
-                "storage_conditions": medicine_data.get("storage_conditions"),
-                "expiry_date": medicine_data.get("expiry_date"),
-                "barcode": medicine_data.get("barcode"),
-                "appearance_type": medicine_data.get("appearance_type"),
-                "notes": medicine_data.get("notes")
+                "description": combined_data.get("description", ""),
+                "ingredient": combined_data.get("ingredient", ""),
+                "category": combined_data.get("category", ""),
+                "usage_method": combined_data.get("usage_method", ""),
+                "unit_dose": float(combined_data.get("unit_dose", 0)),
+                "side_effects": combined_data.get("side_effects", ""),
+                "storage_conditions": combined_data.get("storage_conditions", ""),
+                "expiry_date": combined_data.get("expiry_date", ""),
+                "barcode": combined_data.get("barcode", ""),
+                "appearance_type": combined_data.get("appearance_type", ""),
+                "notes": combined_data.get("notes", "")
             }
             
             detailed_medicine = MedicineDetail(**detailed_data)
@@ -488,7 +504,7 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
         
         # 如果ROS2可用，發布新藥物資料
         if ROS2_AVAILABLE and ros2_node:
-            ros2_node.publish_medicine_data({
+            ros2_node._send_to_ros2_master({
                 "id": basic_medicine.id,
                 "name": basic_medicine.name,
                 "amount": basic_medicine.amount,
@@ -499,6 +515,9 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
             })
         
         return result
+        
+    except HTTPException:
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=f"創建失敗: {str(e)}")

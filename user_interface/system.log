@@ -81,3 +81,24 @@
 2025-08-07 06:53:47,911 - ros2_mock - INFO - 定位藥物中...
 2025-08-07 06:53:50,911 - ros2_mock - INFO - 移動機器人中...
 2025-08-07 06:53:54,912 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 06:53:59,912 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 06:54:02,912 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 06:54:04,917 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 06:54:04,920 - ros2_mock - INFO - 處方籤 1 狀態已自動更新為 completed
+2025-08-07 06:54:04,921 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 06:54:21,874 - hospital_system - ERROR - HTTP錯誤: 400 - 創建失敗: (sqlite3.IntegrityError) NOT NULL constraint failed: medicine_basic.name
+[SQL: INSERT INTO medicine_basic (name, amount, position, manufacturer, dosage, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (None, 0, None, None, None, 1, '2025-08-07 06:54:21.873191', '2025-08-07 06:54:21.873195')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-08-07 06:55:05,980 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 06:55:05,982 - hospital_system - INFO - 基本藥物列表構建完成，共 5 種藥物
+2025-08-07 06:55:05,982 - hospital_system - INFO - 藥物資料已發布到ROS2
+2025-08-07 06:55:16,037 - hospital_system - ERROR - HTTP錯誤: 400 - 創建失敗: (sqlite3.IntegrityError) NOT NULL constraint failed: medicine_basic.name
+[SQL: INSERT INTO medicine_basic (name, amount, position, manufacturer, dosage, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: (None, 0, None, None, None, 1, '2025-08-07 06:55:16.037281', '2025-08-07 06:55:16.037285')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-08-07 06:55:58,487 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 06:55:58,487 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 06:55:58,488 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 06:55:58,488 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 06:56:01,132 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
