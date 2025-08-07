@@ -27,7 +27,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("hospital_system")
 
-from database_clean import get_db, MedicineBasic, MedicineDetailed, Prescription, PrescriptionMedicine, init_database
+from database_clean import get_db, Medicine, MedicineDetail, Prescription, PrescriptionMedicine, init_database
 
 # 庫存管理函數
 def handle_prescription_stock_change(prescription_id: int, old_status: str, new_status: str, db: Session):
@@ -42,7 +42,7 @@ def handle_prescription_stock_change(prescription_id: int, old_status: str, new_
     stock_changes = []
     
     for pm in prescription_medicines:
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         if not medicine:
             continue
             
@@ -102,7 +102,7 @@ def check_stock_availability(prescription_id: int, db: Session):
     all_available = True
     
     for pm in prescription_medicines:
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         if medicine:
             is_available = medicine.amount >= pm.quantity
             availability.append({
@@ -179,7 +179,7 @@ async def health_check():
 async def create_medicine(medicine_data: dict, db: Session = Depends(get_db)):
     """創建新藥物"""
     try:
-        medicine = MedicineBasic(**medicine_data)
+        medicine = Medicine(**medicine_data)
         db.add(medicine)
         db.commit()
         db.refresh(medicine)
@@ -207,7 +207,7 @@ async def create_medicine(medicine_data: dict, db: Session = Depends(get_db)):
 async def create_detailed_medicine(medicine_data: dict, db: Session = Depends(get_db)):
     """創建詳細藥物"""
     try:
-        detailed_medicine = MedicineDetailed(**medicine_data)
+        detailed_medicine = MedicineDetail(**medicine_data)
         db.add(detailed_medicine)
         db.commit()
         db.refresh(detailed_medicine)
@@ -231,7 +231,7 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
         }
         
         # 創建基本藥物
-        basic_medicine = MedicineBasic(**basic_data)
+        basic_medicine = Medicine(**basic_data)
         db.add(basic_medicine)
         db.flush()  # 獲取ID但不提交
         
@@ -253,7 +253,7 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
                 "notes": medicine_data.get("notes")
             }
             
-            detailed_medicine = MedicineDetailed(**detailed_data)
+            detailed_medicine = MedicineDetail(**detailed_data)
             db.add(detailed_medicine)
             db.flush()  # 確保獲取ID
             detailed_id = detailed_medicine.id
@@ -292,10 +292,10 @@ async def delete_medicine(medicine_identifier: str, db: Session = Depends(get_db
         # 嘗試解析為 ID
         try:
             medicine_id = int(medicine_identifier)
-            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+            medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
         except ValueError:
             # 如果不是數字，則按名稱查找
-            medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_identifier).first()
+            medicine = db.query(Medicine).filter(Medicine.name == medicine_identifier).first()
         
         if not medicine:
             raise HTTPException(status_code=404, detail=f"找不到藥物: {medicine_identifier}")
@@ -322,7 +322,7 @@ async def delete_medicine(medicine_identifier: str, db: Session = Depends(get_db
             }
         else:
             # 刪除詳細資料
-            detailed = db.query(MedicineDetailed).filter(MedicineDetailed.medicine_id == medicine_id).first()
+            detailed = db.query(MedicineDetail).filter(MedicineDetail.medicine_id == medicine_id).first()
             if detailed:
                 db.delete(detailed)
                 logger.info(f"已刪除藥物詳細資料: {medicine_name}")
@@ -359,7 +359,7 @@ async def update_medicine(medicine_id: int, medicine_data: dict, db: Session = D
     """更新藥物資訊"""
     logger.info(f"更新藥物 ID: {medicine_id}")
     
-    medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     if not medicine:
         raise HTTPException(status_code=404, detail="藥物不存在")
     
@@ -402,7 +402,7 @@ async def get_basic_medicines(db: Session = Depends(get_db)):
     """獲取基本藥物列表"""
     logger.info("開始獲取基本藥物列表")
     try:
-        medicines = db.query(MedicineBasic).filter(MedicineBasic.is_active == True).all()
+        medicines = db.query(Medicine).filter(Medicine.is_active == True).all()
         logger.debug(f"資料庫查詢結果: 找到 {len(medicines)} 種藥物")
         
         result = [
@@ -436,7 +436,7 @@ async def get_basic_medicines(db: Session = Depends(get_db)):
 @app.get("/api/medicine/detailed")
 async def get_detailed_medicines(db: Session = Depends(get_db)):
     """獲取詳細藥物列表"""
-    detailed_medicines = db.query(MedicineDetailed).all()
+    detailed_medicines = db.query(MedicineDetail).all()
     return [
         {
             "id": med.id,
@@ -459,11 +459,11 @@ async def get_detailed_medicines(db: Session = Depends(get_db)):
 @app.get("/api/medicine/{medicine_id}")
 async def get_medicine_detail(medicine_id: int, db: Session = Depends(get_db)):
     """獲取藥物詳細資訊"""
-    medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     if not medicine:
         raise HTTPException(status_code=404, detail="藥物不存在")
     
-    detailed = db.query(MedicineDetailed).filter(MedicineDetailed.medicine_id == medicine_id).first()
+    detailed = db.query(MedicineDetail).filter(MedicineDetail.medicine_id == medicine_id).first()
     
     result = {
         "id": medicine.id,
@@ -555,7 +555,7 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
                 logger.debug(f"藥物詳情 - 名稱: {medicine_name}, 劑量: {dosage}, 數量: {quantity}, 頻率: {frequency}")
                 
                 # 查找藥物ID
-                medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+                medicine = db.query(Medicine).filter(Medicine.name == medicine_name).first()
                 if medicine:
                     prescription_medicine = PrescriptionMedicine(
                         prescription_id=prescription.id,
@@ -581,7 +581,7 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         stock_warnings = []
         stock_changes = []
         for pm in db.query(PrescriptionMedicine).filter(PrescriptionMedicine.prescription_id == prescription.id).all():
-            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+            medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
             if medicine:
                 if medicine.amount < pm.quantity:
                     stock_warnings.append(f"{medicine.name}: 庫存不足 (需要:{pm.quantity}, 現有:{medicine.amount})")
@@ -653,7 +653,7 @@ async def get_prescription_detail(prescription_id: int, db: Session = Depends(ge
     # 獲取藥物詳細資訊
     medicine_details = []
     for pm in medicines:
-        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        basic_medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         medicine_details.append({
             "id": pm.id,
             "medicine_id": pm.medicine_id,
@@ -745,7 +745,7 @@ async def get_next_pending_prescription(db: Session = Depends(get_db)):
     
     medicine_details = []
     for pm in medicines:
-        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        basic_medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         medicine_details.append({
             "medicine_id": pm.medicine_id,
             "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
@@ -827,10 +827,10 @@ async def adjust_medicine_stock_by_name(adjustment_data: dict, db: Session = Dep
     # 嘗試按ID查找
     try:
         medicine_id = int(medicine_identifier)
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+        medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     except ValueError:
         # 按名稱查找
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_identifier).first()
+        medicine = db.query(Medicine).filter(Medicine.name == medicine_identifier).first()
         if medicine:
             medicine_id = medicine.id
         else:
@@ -845,7 +845,7 @@ async def _adjust_medicine_stock_impl(medicine_id: int, adjustment_data: dict, d
     """調整藥物庫存"""
     logger.info(f"調整藥物 {medicine_id} 庫存")
     
-    medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     if not medicine:
         raise HTTPException(status_code=404, detail="藥物不存在")
     
@@ -919,7 +919,7 @@ async def get_pending_orders(db: Session = Depends(get_db)):
         
         medicine_details = []
         for pm in medicines:
-            basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+            basic_medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
             medicine_details.append({
                 "medicine_id": pm.medicine_id,
                 "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
@@ -990,7 +990,7 @@ async def request_order_confirmation(request_data: dict, db: Session = Depends(g
     
     medicine_details = []
     for pm in medicines:
-        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        basic_medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         medicine_details.append({
             "medicine_id": pm.medicine_id,
             "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
@@ -1159,7 +1159,7 @@ async def request_next_order(request_data: dict, db: Session = Depends(get_db)):
     
     medicine_details = []
     for pm in medicines:
-        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        basic_medicine = db.query(Medicine).filter(Medicine.id == pm.medicine_id).first()
         medicine_details.append({
             "medicine_id": pm.medicine_id,
             "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
@@ -1206,9 +1206,9 @@ async def search_medicine_by_name(medicine_name: str, db: Session = Depends(get_
     logger.info(f"搜尋藥物: {medicine_name}")
     
     # 模糊搜尋藥物名稱
-    medicines = db.query(MedicineBasic).filter(
-        MedicineBasic.name.contains(medicine_name),
-        MedicineBasic.is_active == True
+    medicines = db.query(Medicine).filter(
+        Medicine.name.contains(medicine_name),
+        Medicine.is_active == True
     ).all()
     
     if not medicines:
@@ -1221,8 +1221,8 @@ async def search_medicine_by_name(medicine_name: str, db: Session = Depends(get_
     result_medicines = []
     for medicine in medicines:
         # 獲取詳細資訊
-        detailed = db.query(MedicineDetailed).filter(
-            MedicineDetailed.medicine_id == medicine.id
+        detailed = db.query(MedicineDetail).filter(
+            MedicineDetail.medicine_id == medicine.id
         ).first()
         
         medicine_info = {
@@ -1282,9 +1282,9 @@ async def ros2_query_medicine(query_data: dict, db: Session = Depends(get_db)):
     
     # 查找藥物
     if medicine_id:
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+        medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     else:
-        medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+        medicine = db.query(Medicine).filter(Medicine.name == medicine_name).first()
     
     if not medicine:
         return {
@@ -1315,8 +1315,8 @@ async def ros2_query_medicine(query_data: dict, db: Session = Depends(get_db)):
     
     # 包含詳細資訊
     if include_detailed:
-        detailed = db.query(MedicineDetailed).filter(
-            MedicineDetailed.medicine_id == medicine.id
+        detailed = db.query(MedicineDetail).filter(
+            MedicineDetail.medicine_id == medicine.id
         ).first()
         
         if detailed:
@@ -1360,9 +1360,9 @@ async def ros2_batch_query_medicines(query_data: dict, db: Session = Depends(get
         medicine_id = item.get("id")
         
         if medicine_id:
-            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+            medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
         elif medicine_name:
-            medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+            medicine = db.query(Medicine).filter(Medicine.name == medicine_name).first()
         else:
             results.append({
                 "query": item,
@@ -1393,8 +1393,8 @@ async def ros2_batch_query_medicines(query_data: dict, db: Session = Depends(get
             medicine_info["current_amount"] = medicine.amount
         
         if include_detailed:
-            detailed = db.query(MedicineDetailed).filter(
-                MedicineDetailed.medicine_id == medicine.id
+            detailed = db.query(MedicineDetail).filter(
+                MedicineDetail.medicine_id == medicine.id
             ).first()
             if detailed:
                 medicine_info.update({

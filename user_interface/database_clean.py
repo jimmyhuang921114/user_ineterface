@@ -93,7 +93,7 @@ class PrescriptionMedicine(Base):
     
     # 關聯
     prescription = relationship("Prescription", back_populates="medicines")
-    medicine = relationship("MedicineBasic", back_populates="prescriptions")
+    medicine = relationship("Medicine", back_populates="prescriptions")
 
 def get_db():
     """獲取資料庫會話"""
