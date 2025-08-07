@@ -49,6 +49,9 @@ def start_ros2_integration():
         callback_func=ros2_system.process_order
     )
     
+    # 將 pusher 引用傳遞給 ROS2 系統
+    ros2_system._order_pusher = pusher
+    
     # 開始監控
     pusher.start_monitoring()
     

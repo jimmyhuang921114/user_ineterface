@@ -206,25 +206,36 @@ class HospitalROS2Services(Node):
                 return None
                 
             prescriptions = response.json()
-            pending_prescriptions = [p for p in prescriptions if p.get('status') == 'pending']
             
-            if not pending_prescriptions:
-                return None
+            # 首先檢查是否已有 processing 狀態的處方籤
+            processing_prescriptions = [p for p in prescriptions if p.get('status') == 'processing']
+            
+            if processing_prescriptions:
+                # 如果有 processing 狀態的處方籤，返回最早的一個
+                earliest = min(processing_prescriptions, key=lambda p: p.get('id'))
+                prescription_id = earliest['id']
+                self.get_logger().info(f"✅ 發現正在處理的處方籤: {prescription_id}")
+            else:
+                # 如果沒有 processing 的，查找 pending 的
+                pending_prescriptions = [p for p in prescriptions if p.get('status') == 'pending']
                 
-            # 獲取最早的處方籤
-            earliest = min(pending_prescriptions, key=lambda p: p.get('id'))
-            prescription_id = earliest['id']
-            
-            # 更新處方籤狀態為處理中
-            update_response = requests.put(
-                f"{self.web_api_url}/api/prescription/{prescription_id}/status",
-                json={"status": "processing"},
-                timeout=5
-            )
-            
-            if update_response.status_code != 200:
-                self.get_logger().warn(f"⚠️ 無法更新處方籤 {prescription_id} 狀態")
-                return None
+                if not pending_prescriptions:
+                    return None
+                    
+                # 獲取最早的處方籤
+                earliest = min(pending_prescriptions, key=lambda p: p.get('id'))
+                prescription_id = earliest['id']
+                
+                # 更新處方籤狀態為處理中
+                update_response = requests.put(
+                    f"{self.web_api_url}/api/prescription/{prescription_id}/status",
+                    json={"status": "processing"},
+                    timeout=5
+                )
+                
+                if update_response.status_code != 200:
+                    self.get_logger().warn(f"⚠️ 無法更新處方籤 {prescription_id} 狀態")
+                    return None
             
             # 轉換為訂單格式
             order_data = {

@@ -84,19 +84,20 @@ class YourROS2System:
             
             # 重要：通知 Web 系統訂單已完成
             # 這會允許系統處理下一個訂單
-            global order_pusher
-            if order_pusher:
-                success = order_pusher.complete_order(order_id)
+            if hasattr(self, '_order_pusher') and self._order_pusher:
+                success = self._order_pusher.complete_order(order_id)
                 if success:
                     logger.info("✅ 已通知 Web 系統訂單完成")
                 else:
                     logger.error("❌ 通知 Web 系統失敗")
+            else:
+                logger.error("❌ 無法找到 order_pusher 實例")
                     
         except Exception as e:
             logger.error(f"❌ 處理訂單時發生錯誤: {e}")
             # 錯誤情況下也要重置狀態
-            if order_pusher:
-                order_pusher.complete_order(order_id)
+            if hasattr(self, '_order_pusher') and self._order_pusher:
+                self._order_pusher.complete_order(order_id)
                 
         finally:
             self.robot_busy = False
