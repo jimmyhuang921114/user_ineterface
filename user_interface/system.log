@@ -63,3 +63,21 @@
 [SQL: INSERT INTO prescriptions (patient_name, patient_id, doctor_name, diagnosis, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)]
 [parameters: ('測試患者', None, '測試醫生', None, 'pending', '2025-08-07 06:52:30.844385', '2025-08-07 06:52:30.844400')]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-08-07 06:53:42,910 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 06:53:42,910 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 06:53:42,911 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 06:53:42,911 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 06:53:45,483 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 06:53:45,483 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 06:53:45,496 - hospital_system - INFO - 處方籤基本資料已創建，ID: 1, 患者ID: P625483
+2025-08-07 06:53:45,501 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 06:53:45,503 - hospital_system - INFO - 扣減庫存: 阿司匹林 減少 2 (從 100 變為 98)
+2025-08-07 06:53:45,510 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 06:53:45,510 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0001
+2025-08-07 06:53:45,510 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0001
+2025-08-07 06:53:45,510 - hospital_system - INFO - ROS2訂單已創建: ORDER_0001
+2025-08-07 06:53:45,911 - ros2_mock - INFO - 開始處理訂單: ORDER_0001
+2025-08-07 06:53:45,911 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 06:53:47,911 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 06:53:50,911 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 06:53:54,912 - ros2_mock - INFO - 分配藥物中...
