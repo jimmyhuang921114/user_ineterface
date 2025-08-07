@@ -1,15 +1,12 @@
 nohup: ignoring input
-2025-08-06 19:02:11,529 - ros2_mock - INFO - 啟動模擬ROS2整合...
-2025-08-06 19:02:11,529 - ros2_mock - INFO - 初始化模擬ROS2節點...
-2025-08-06 19:02:11,529 - ros2_mock - INFO - 模擬ROS2節點初始化完成
-2025-08-06 19:02:11,529 - ros2_mock - INFO - 模擬ROS2整合啟動成功
-INFO:     Started server process [21605]
+2025-08-07 03:42:48,123 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 03:42:48,123 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 03:42:48,123 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 03:42:48,124 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+INFO:     Started server process [23854]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-2025-08-06 19:02:22,711 - hospital_system - INFO - 開始獲取基本藥物列表
-2025-08-06 19:02:22,719 - hospital_system - INFO - 基本藥物列表構建完成，共 0 種藥物
-2025-08-06 19:02:22,719 - hospital_system - INFO - 藥物資料已發布到ROS2
 使用模擬ROS2模式
 資料庫表格創建完成
 醫院藥物管理系統 - 乾淨版本
@@ -22,4 +19,9 @@ API文檔: http://localhost:8001/docs
 注意：此版本不包含測試資料
 請透過 API 或網頁界面添加藥物資料
 ==================================================
-INFO:     127.0.0.1:43596 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53862 - "POST /api/medicine/unified HTTP/1.1" 200 OK
+2025-08-07 03:43:02,969 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:43:02,970 - hospital_system - INFO - 基本藥物列表構建完成，共 2 種藥物
+2025-08-07 03:43:02,970 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:53076 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53082 - "GET /api/medicine/detailed HTTP/1.1" 200 OK
