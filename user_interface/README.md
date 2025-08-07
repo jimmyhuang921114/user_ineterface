@@ -30,6 +30,9 @@
     ├── Prescription.html
     ├── ros2_client.html
     └── css/, js/
+├── 🤖 ros2_services_interface.py     # ROS2 服務節點
+├── 🤖 ros2_client_example.py        # ROS2 客戶端示例
+├── 📖 ROS2_SERVICES_GUIDE.md        # ROS2 服務使用指南
 ```
 
 ## 🚀 快速啟動
@@ -88,7 +91,7 @@ medicine:
 
 ## 🔧 整合您的 ROS2 系統
 
-### 1. 替換示例代碼
+### 方法 1: Python 模組整合
 編輯 `integration_example.py` 中的 `YourROS2System` 類：
 
 ```python
@@ -115,10 +118,25 @@ class YourROS2System:
         order_pusher.complete_order(order_id)
 ```
 
-### 2. 關鍵函數
+### 方法 2: ROS2 服務接口
+使用 ROS2 標準服務和 Topic 與系統通信：
+
+```bash
+# 啟動 ROS2 服務節點
+python3 ros2_services_interface.py
+
+# 啟動您的 ROS2 客戶端
+python3 ros2_client_example.py
+```
+
+詳細說明請參考：[ROS2_SERVICES_GUIDE.md](ROS2_SERVICES_GUIDE.md)
+
+### 關鍵函數和服務
 - `pusher.complete_order(order_id)` - **必須**在 ROS2 完成後調用
 - `pusher.get_status()` - 獲取當前系統狀態
 - `pusher.is_ros2_busy()` - 檢查是否正在處理訂單
+- ROS2 服務: `/hospital/get_order`, `/hospital/complete_order`
+- ROS2 Topic: `/hospital/order_data`, `/hospital/medicine_request`
 
 ## 🧪 測試流程
 
