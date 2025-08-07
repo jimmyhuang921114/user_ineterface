@@ -136,21 +136,11 @@ async function handleMedicineSubmit(event) {
                     name: formData.get('name'),
                     amount: parseInt(formData.get('amount')),
                     position: formData.get('position'),
-                    manufacturer: formData.get('manufacturer') || "",
-                    dosage: formData.get('dosage') || ""
+                    manufacturer: "",
+                    dosage: ""
                 },
                 detailed: {
-                    description: formData.get('description') || "",
-                    ingredient: formData.get('ingredient') || "",
-                    category: formData.get('category') || "",
-                    usage_method: formData.get('usage_method') || "",
-                    unit_dose: parseFloat(formData.get('unit_dose')) || 0,
-                    side_effects: formData.get('side_effects') || "",
-                    storage_conditions: formData.get('storage_conditions') || "",
-                    expiry_date: formData.get('expiry_date') || "",
-                    barcode: formData.get('barcode') || "",
-                    appearance_type: formData.get('appearance_type') || "",
-                    notes: formData.get('notes') || ""
+                    description: formData.get('description') || ""
                 }
             })
         });
