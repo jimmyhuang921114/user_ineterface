@@ -779,12 +779,14 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         
         # 確保必需的字段存在
         patient_name = prescription_data.get('patient_name', '')
-        doctor_name = prescription_data.get('doctor_name', '')
+        doctor_name = prescription_data.get('doctor_name', '系統醫生')  # 預設醫生
         
         if not patient_name:
             raise HTTPException(status_code=400, detail="患者姓名不能為空")
+        
+        # 如果沒有提供醫生姓名，使用預設值
         if not doctor_name:
-            raise HTTPException(status_code=400, detail="醫生姓名不能為空")
+            doctor_name = '系統醫生'
         
         # 生成 patient_id（如果沒有提供）
         patient_id = prescription_data.get('patient_id', '')
@@ -798,7 +800,7 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
             patient_name=patient_name,
             patient_id=patient_id,
             doctor_name=doctor_name,
-            diagnosis=prescription_data.get('diagnosis', ''),
+            diagnosis=prescription_data.get('diagnosis', '一般診療'),
             status='pending'
         )
         db.add(prescription)

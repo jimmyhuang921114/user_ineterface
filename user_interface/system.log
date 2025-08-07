@@ -368,3 +368,43 @@
 2025-08-07 09:06:27,161 - hospital_system - INFO - ROS2標記訂單完成
 2025-08-07 09:06:27,163 - ros2_mock - INFO - 處方籤 10 狀態已自動更新為 completed
 2025-08-07 09:06:27,164 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 14:23:15,944 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 14:23:15,944 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 14:23:15,945 - hospital_system - ERROR - 創建處方籤失敗: 400: 醫生姓名不能為空
+2025-08-07 14:23:15,946 - hospital_system - ERROR - HTTP錯誤: 400 - 創建失敗: 400: 醫生姓名不能為空
+2025-08-07 14:24:23,994 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 14:24:23,994 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 14:24:23,994 - hospital_system - ERROR - 創建處方籤失敗: 400: 醫生姓名不能為空
+2025-08-07 14:24:23,994 - hospital_system - ERROR - HTTP錯誤: 400 - 創建失敗: 400: 醫生姓名不能為空
+2025-08-07 14:24:37,415 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 14:24:37,415 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 14:24:37,415 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 14:24:37,415 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 14:24:39,979 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 14:24:39,979 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 14:24:39,992 - hospital_system - INFO - 處方籤基本資料已創建，ID: 11, 患者ID: P679979
+2025-08-07 14:24:39,998 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 14:24:40,000 - hospital_system - INFO - 扣減庫存: 阿司匹林 減少 1 (從 83 變為 82)
+2025-08-07 14:24:40,007 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 14:24:40,007 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0011
+2025-08-07 14:24:40,008 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0011
+2025-08-07 14:24:40,008 - hospital_system - INFO - ROS2訂單已創建: ORDER_0011
+2025-08-07 14:24:40,416 - ros2_mock - INFO - 開始處理訂單: ORDER_0011
+2025-08-07 14:24:40,416 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 14:24:42,416 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 14:24:45,416 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 14:24:49,416 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 14:24:50,864 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 14:24:54,417 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 14:24:57,417 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 14:24:59,280 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 14:24:59,420 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 14:24:59,422 - ros2_mock - INFO - 處方籤 11 狀態已自動更新為 completed
+2025-08-07 14:24:59,422 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 14:25:06,553 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 14:25:11,203 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 14:25:11,205 - hospital_system - INFO - 基本藥物列表構建完成，共 11 種藥物
+2025-08-07 14:25:11,205 - hospital_system - INFO - 藥物資料已發布到ROS2
+2025-08-07 14:25:29,248 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 14:25:29,248 - hospital_system - INFO - 基本藥物列表構建完成，共 11 種藥物
+2025-08-07 14:25:29,248 - hospital_system - INFO - 藥物資料已發布到ROS2
