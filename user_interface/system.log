@@ -1,0 +1,55 @@
+2025-08-07 06:39:34,351 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 06:39:34,351 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 06:39:34,352 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 06:39:34,352 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 06:40:17,805 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 06:40:17,805 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 06:40:17,806 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 06:40:17,806 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 06:40:45,148 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name=None medicine_id=None include_detailed=False
+2025-08-07 06:40:45,156 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,156 - hospital_system - INFO - 基本藥物服務完成，返回 5 個藥物
+2025-08-07 06:40:45,158 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 06:40:45,159 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,159 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 06:40:45,162 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name=None medicine_id=4 include_detailed=False
+2025-08-07 06:40:45,163 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,163 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 06:40:45,165 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name=None medicine_id=None include_detailed=False
+2025-08-07 06:40:45,168 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,168 - hospital_system - INFO - 詳細藥物服務完成，返回 5 個詳細資訊
+2025-08-07 06:40:45,170 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 06:40:45,171 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,171 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:40:45,173 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='維他命C' medicine_id=None include_detailed=True
+2025-08-07 06:40:45,174 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,174 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:40:45,177 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='胃藥' medicine_id=None include_detailed=False
+2025-08-07 06:40:45,177 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,177 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 06:40:45,179 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='胃藥' medicine_id=None include_detailed=False
+2025-08-07 06:40:45,180 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:40:45,180 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:41:07,955 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name=None medicine_id=None include_detailed=False
+2025-08-07 06:41:07,956 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,956 - hospital_system - INFO - 基本藥物服務完成，返回 5 個藥物
+2025-08-07 06:41:07,958 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 06:41:07,959 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,959 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 06:41:07,961 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name=None medicine_id=None include_detailed=False
+2025-08-07 06:41:07,962 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,962 - hospital_system - INFO - 詳細藥物服務完成，返回 5 個詳細資訊
+2025-08-07 06:41:07,965 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 06:41:07,966 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,966 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:41:07,968 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='維他命C' medicine_id=None include_detailed=True
+2025-08-07 06:41:07,969 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,969 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:41:07,971 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='胃藥' medicine_id=None include_detailed=False
+2025-08-07 06:41:07,972 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,972 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 06:41:07,974 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='胃藥' medicine_id=None include_detailed=False
+2025-08-07 06:41:07,974 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 06:41:07,974 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 06:41:07,977 - hospital_system - INFO - ROS2請求查看所有待處理訂單
+2025-08-07 06:41:07,978 - hospital_system - INFO - 找到 0 個待處理訂單

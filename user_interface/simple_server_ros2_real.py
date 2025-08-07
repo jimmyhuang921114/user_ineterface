@@ -1183,6 +1183,157 @@ async def http_exception_handler(request, exc):
         content={"detail": exc.detail}
     )
 
+# 新增：分離的基本藥物 ROS2 服務
+@app.post("/api/ros2/service/basic-medicine")
+def ros2_basic_medicine_service(query: ROS2MedicineQuery, db: Session = Depends(get_db)):
+    """ROS2 服務 - 僅獲取基本藥物資訊"""
+    if not ROS2_AVAILABLE or not ros2_node:
+        raise HTTPException(status_code=503, detail="ROS2 不可用")
+    
+    logger.info(f"ROS2 基本藥物服務請求: {query}")
+    
+    if query.medicine_id:
+        medicines = [db.query(Medicine).filter(Medicine.id == query.medicine_id).first()]
+    elif query.medicine_name:
+        medicines = [db.query(Medicine).filter(Medicine.name == query.medicine_name).first()]
+    else:
+        # 獲取所有藥物
+        medicines = db.query(Medicine).filter(Medicine.is_active == True).all()
+    
+    # 過濾掉 None 值
+    medicines = [m for m in medicines if m is not None]
+    
+    if not medicines:
+        return {
+            "success": False,
+            "message": "未找到符合條件的藥物",
+            "medicines": []
+        }
+    
+    basic_medicines = []
+    for medicine in medicines:
+        basic_info = {
+            "id": medicine.id,
+            "name": medicine.name,
+            "amount": medicine.amount,
+            "position": medicine.position,
+            "manufacturer": medicine.manufacturer,
+            "dosage": medicine.dosage,
+            "is_active": medicine.is_active
+        }
+        basic_medicines.append(basic_info)
+    
+    # 發布到 ROS2
+    ros2_node.publish_medicine_info({
+        "type": "basic_medicine_response",
+        "medicines": basic_medicines,
+        "count": len(basic_medicines)
+    })
+    
+    logger.info(f"基本藥物服務完成，返回 {len(basic_medicines)} 個藥物")
+    return {
+        "success": True,
+        "message": f"基本藥物資訊獲取成功，共 {len(basic_medicines)} 個",
+        "medicines": basic_medicines
+    }
+
+# 新增：分離的詳細藥物 ROS2 服務  
+@app.post("/api/ros2/service/detailed-medicine")
+def ros2_detailed_medicine_service(query: ROS2MedicineQuery, db: Session = Depends(get_db)):
+    """ROS2 服務 - 僅獲取詳細藥物資訊"""
+    if not ROS2_AVAILABLE or not ros2_node:
+        raise HTTPException(status_code=503, detail="ROS2 不可用")
+    
+    logger.info(f"ROS2 詳細藥物服務請求: {query}")
+    
+    if query.medicine_id:
+        medicines = [db.query(Medicine).filter(Medicine.id == query.medicine_id).first()]
+    elif query.medicine_name:
+        medicines = [db.query(Medicine).filter(Medicine.name == query.medicine_name).first()]
+    else:
+        # 獲取所有藥物
+        medicines = db.query(Medicine).filter(Medicine.is_active == True).all()
+    
+    # 過濾掉 None 值
+    medicines = [m for m in medicines if m is not None]
+    
+    if not medicines:
+        return {
+            "success": False,
+            "message": "未找到符合條件的藥物",
+            "detailed_medicines": [],
+            "basic_medicines": []
+        }
+    
+    detailed_medicines = []
+    basic_medicines = []
+    
+    for medicine in medicines:
+        # 基本資訊
+        basic_info = {
+            "id": medicine.id,
+            "name": medicine.name,
+            "amount": medicine.amount,
+            "position": medicine.position,
+            "manufacturer": medicine.manufacturer,
+            "dosage": medicine.dosage,
+            "is_active": medicine.is_active
+        }
+        basic_medicines.append(basic_info)
+        
+        # 詳細資訊
+        detail = db.query(MedicineDetail).filter(
+            MedicineDetail.medicine_id == medicine.id
+        ).first()
+        
+        if detail:
+            detailed_info = {
+                "id": detail.id,
+                "medicine_id": detail.medicine_id,
+                "description": detail.description,
+                "ingredient": detail.ingredient,
+                "category": detail.category,
+                "usage_method": detail.usage_method,
+                "unit_dose": float(detail.unit_dose),
+                "side_effects": detail.side_effects,
+                "storage_conditions": detail.storage_conditions,
+                "expiry_date": detail.expiry_date,
+                "barcode": detail.barcode,
+                "appearance_type": detail.appearance_type,
+                "notes": detail.notes
+            }
+            detailed_medicines.append(detailed_info)
+    
+    # 發布到 ROS2
+    ros2_node.publish_medicine_info({
+        "type": "detailed_medicine_response",
+        "detailed_medicines": detailed_medicines,
+        "basic_medicines": basic_medicines,
+        "count": len(detailed_medicines)
+    })
+    
+    logger.info(f"詳細藥物服務完成，返回 {len(detailed_medicines)} 個詳細資訊")
+    return {
+        "success": True,
+        "message": f"詳細藥物資訊獲取成功，共 {len(detailed_medicines)} 個",
+        "detailed_medicines": detailed_medicines,
+        "basic_medicines": basic_medicines if query.include_detailed else None
+    }
+
+# 新增：ROS2 服務狀態檢查
+@app.get("/api/ros2/service/status")
+def ros2_service_status():
+    """檢查 ROS2 服務狀態"""
+    return {
+        "ros2_available": ROS2_AVAILABLE,
+        "node_active": ros2_node is not None,
+        "services": {
+            "basic_medicine": "/api/ros2/service/basic-medicine",
+            "detailed_medicine": "/api/ros2/service/detailed-medicine"
+        },
+        "message": "ROS2 服務已就緒" if ROS2_AVAILABLE and ros2_node else "ROS2 服務不可用"
+    }
+
 if __name__ == "__main__":
     print("醫院藥物管理系統 - 真實 ROS2 版本")
     print("==================================================")

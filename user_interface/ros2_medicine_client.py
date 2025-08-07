@@ -22,6 +22,7 @@ import json
 import logging
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+import time # Added for time.sleep
 
 # 嘗試導入 ROS2
 try:
@@ -71,6 +72,7 @@ class MedicineROS2Client:
         self.medicine_publisher = None
         self.order_publisher = None
         self.response_subscriber = None
+        self.status_publisher = None # Added for new services
         
         # 設置日誌
         logging.basicConfig(level=logging.INFO)
@@ -109,6 +111,9 @@ class MedicineROS2Client:
         )
         self.order_publisher = self.node.create_publisher(
             String, 'hospital/order_request', 10
+        )
+        self.status_publisher = self.node.create_publisher( # Initialize status publisher
+            String, 'hospital/status_request', 10
         )
         
         # 創建訂閱器接收響應
@@ -392,29 +397,127 @@ class MedicineROS2Client:
             http_data=http_data
         )
     
-    async def get_system_status(self) -> Dict:
-        """
-        獲取系統狀態
-        
-        Returns:
-            系統狀態資訊
-        """
-        return await self._make_request(
-            http_method="GET",
-            http_endpoint="/api/system/status"
-        )
-    
-    async def get_ros2_status(self) -> Dict:
-        """
-        獲取 ROS2 狀態
-        
-        Returns:
-            ROS2 狀態資訊
-        """
-        return await self._make_request(
-            http_method="GET",
-            http_endpoint="/api/ros2/status"
-        )
+    def get_system_status(self):
+        """獲取系統狀態"""
+        try:
+            response = requests.get(f"{self.base_url}/api/system/status", timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except Exception as e:
+            print(f"獲取系統狀態失敗: {e}")
+            return None
+
+    def get_pending_orders(self):
+        """獲取待處理訂單"""
+        try:
+            response = requests.get(f"{self.base_url}/api/ros2/pending-orders", timeout=5)
+            return response.json() if response.status_code == 200 else None
+        except Exception as e:
+            print(f"獲取待處理訂單失敗: {e}")
+            return None
+
+    # 新增：分離的基本藥物服務
+    def query_basic_medicine(self, medicine_name=None, medicine_id=None, get_all=False):
+        """查詢基本藥物資訊 (分離服務)"""
+        try:
+            query_data = {}
+            if medicine_name:
+                query_data["medicine_name"] = medicine_name
+            elif medicine_id:
+                query_data["medicine_id"] = medicine_id
+            elif get_all:
+                query_data = {}  # 空查詢獲取所有
+            
+            if self.use_ros2 and ROS2_AVAILABLE: # Changed from self.ros2_available to ROS2_AVAILABLE
+                # ROS2 方式 - 發布查詢請求
+                msg = String()
+                msg.data = json.dumps({
+                    "type": "basic_medicine_request",
+                    "query": query_data
+                })
+                self.medicine_publisher.publish(msg)
+                print(f"🤖 [ROS2] 基本藥物查詢請求已發送: {query_data}")
+                time.sleep(0.1)  # 等待響應
+                return {"status": "sent", "mode": "ROS2"}
+            else:
+                # HTTP 方式
+                response = requests.post(
+                    f"{self.base_url}/api/ros2/service/basic-medicine",
+                    json=query_data,
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    print(f"🌐 [HTTP] 基本藥物查詢成功: {result['message']}")
+                    return result
+                else:
+                    print(f"❌ [HTTP] 基本藥物查詢失敗: {response.status_code}")
+                    return None
+                    
+        except Exception as e:
+            print(f"基本藥物查詢失敗: {e}")
+            return None
+
+    # 新增：分離的詳細藥物服務
+    def query_detailed_medicine(self, medicine_name=None, medicine_id=None, get_all=False, include_basic=False):
+        """查詢詳細藥物資訊 (分離服務)"""
+        try:
+            query_data = {"include_detailed": include_basic}
+            if medicine_name:
+                query_data["medicine_name"] = medicine_name
+            elif medicine_id:
+                query_data["medicine_id"] = medicine_id
+            elif get_all:
+                pass  # 空查詢獲取所有
+            
+            if self.use_ros2 and ROS2_AVAILABLE: # Changed from self.ros2_available to ROS2_AVAILABLE
+                # ROS2 方式 - 發布查詢請求
+                msg = String()
+                msg.data = json.dumps({
+                    "type": "detailed_medicine_request",
+                    "query": query_data
+                })
+                self.medicine_publisher.publish(msg)
+                print(f"🤖 [ROS2] 詳細藥物查詢請求已發送: {query_data}")
+                time.sleep(0.1)  # 等待響應
+                return {"status": "sent", "mode": "ROS2"}
+            else:
+                # HTTP 方式
+                response = requests.post(
+                    f"{self.base_url}/api/ros2/service/detailed-medicine",
+                    json=query_data,
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    print(f"🌐 [HTTP] 詳細藥物查詢成功: {result['message']}")
+                    return result
+                else:
+                    print(f"❌ [HTTP] 詳細藥物查詢失敗: {response.status_code}")
+                    return None
+                    
+        except Exception as e:
+            print(f"詳細藥物查詢失敗: {e}")
+            return None
+
+    # 新增：ROS2 服務狀態檢查
+    def check_ros2_service_status(self):
+        """檢查 ROS2 服務狀態"""
+        try:
+            response = requests.get(f"{self.base_url}/api/ros2/service/status", timeout=5)
+            if response.status_code == 200:
+                result = response.json()
+                print(f"🔍 ROS2 服務狀態: {result['message']}")
+                print(f"   - ROS2 可用: {result['ros2_available']}")
+                print(f"   - 節點活躍: {result['node_active']}")
+                return result
+            else:
+                print(f"❌ 服務狀態檢查失敗: {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"服務狀態檢查錯誤: {e}")
+            return None
     
     # =============================================================================
     # 高級工作流程方法
@@ -512,50 +615,113 @@ class MedicineROS2Client:
 # 使用範例和測試
 # =============================================================================
 
-async def example_usage():
-    """使用範例"""
-    print("醫院藥物管理 ROS2 客戶端 - 使用範例")
-    print("=" * 50)
+def example_usage():
+    """示例使用方法"""
+    print("醫院藥物管理系統 - ROS2 客戶端示例")
+    print("=" * 60)
     
-    # 創建客戶端
-    client = MedicineROS2Client()
+    # 創建客戶端實例
+    client = MedicineROS2Client(use_ros2=False)  # 使用 HTTP 模式進行示例
     
-    try:
-        # 初始化
-        await client.initialize()
-        
-        # 查詢系統狀態
-        print("1. 查詢系統狀態...")
-        status = await client.get_system_status()
-        print(f"系統狀態: {status}")
-        
-        # 查詢藥物
-        print("\n2. 查詢藥物資訊...")
-        medicine_result = await client.query_medicine("阿司匹林", include_detailed=True)
-        print(f"藥物查詢結果: {medicine_result}")
-        
-        # 獲取待處理訂單
-        print("\n3. 獲取待處理訂單...")
-        orders = await client.get_pending_orders()
-        print(f"待處理訂單: {orders}")
-        
-        # 如果有訂單，處理第一個
-        if orders.get('orders'):
-            first_order = orders['orders'][0]
-            prescription_id = first_order['prescription_id']
-            
-            print(f"\n4. 處理訂單 {prescription_id}...")
-            workflow_result = await client.full_order_workflow(prescription_id)
-            print(f"工作流程結果: {workflow_result}")
-        
-    except Exception as e:
-        print(f"錯誤: {e}")
+    print("\n🔧 1. 檢查系統狀態")
+    system_status = client.get_system_status()
+    if system_status:
+        print(f"✅ 系統狀態: {system_status.get('message', 'Unknown')}")
     
-    finally:
-        # 關閉客戶端
-        await client.shutdown()
+    print("\n🔧 2. 檢查 ROS2 服務狀態")
+    ros2_status = client.check_ros2_service_status()
+    if ros2_status:
+        print(f"✅ ROS2 服務: {ros2_status.get('message', 'Unknown')}")
+    
+    print("\n🧪 3. 測試分離的基本藥物服務")
+    
+    # 3.1 獲取所有基本藥物
+    print("   3.1 獲取所有基本藥物")
+    basic_all = client.query_basic_medicine(get_all=True)
+    if basic_all and basic_all.get('success'):
+        medicines = basic_all.get('medicines', [])
+        print(f"   ✅ 找到 {len(medicines)} 種基本藥物")
+        for med in medicines[:2]:  # 顯示前兩個
+            print(f"      • {med['name']} (庫存: {med['amount']}, 位置: {med['position']})")
+    
+    # 3.2 按名稱查詢基本藥物
+    print("   3.2 按名稱查詢基本藥物")
+    basic_aspirin = client.query_basic_medicine(medicine_name="阿司匹林")
+    if basic_aspirin and basic_aspirin.get('success'):
+        medicines = basic_aspirin.get('medicines', [])
+        if medicines:
+            med = medicines[0]
+            print(f"   ✅ 找到: {med['name']} (製造商: {med['manufacturer']}, 劑量: {med['dosage']})")
+    
+    print("\n🔬 4. 測試分離的詳細藥物服務")
+    
+    # 4.1 獲取所有詳細藥物
+    print("   4.1 獲取所有詳細藥物")
+    detailed_all = client.query_detailed_medicine(get_all=True)
+    if detailed_all and detailed_all.get('success'):
+        detailed_meds = detailed_all.get('detailed_medicines', [])
+        print(f"   ✅ 找到 {len(detailed_meds)} 種詳細藥物")
+        if detailed_meds:
+            detail = detailed_meds[0]
+            print(f"      • {detail['description']} (成分: {detail['ingredient']})")
+    
+    # 4.2 按名稱查詢詳細藥物
+    print("   4.2 按名稱查詢詳細藥物")
+    detailed_ibuprofen = client.query_detailed_medicine(medicine_name="布洛芬")
+    if detailed_ibuprofen and detailed_ibuprofen.get('success'):
+        detailed_meds = detailed_ibuprofen.get('detailed_medicines', [])
+        if detailed_meds:
+            detail = detailed_meds[0]
+            print(f"   ✅ 詳細資訊:")
+            print(f"      - 描述: {detail['description']}")
+            print(f"      - 用法: {detail['usage_method']}")
+            print(f"      - 劑量: {detail['unit_dose']} mg")
+            print(f"      - 副作用: {detail['side_effects']}")
+    
+    # 4.3 包含基本資訊的詳細查詢
+    print("   4.3 包含基本資訊的詳細查詢")
+    detailed_with_basic = client.query_detailed_medicine(medicine_name="維他命C", include_basic=True)
+    if detailed_with_basic and detailed_with_basic.get('success'):
+        detailed_count = len(detailed_with_basic.get('detailed_medicines', []))
+        basic_count = len(detailed_with_basic.get('basic_medicines', []))
+        print(f"   ✅ 查詢成功: {detailed_count} 詳細 + {basic_count} 基本")
+    
+    print("\n🚀 5. 比較服務差異")
+    medicine_name = "胃藥"
+    
+    # 基本服務
+    print(f"   5.1 查詢 '{medicine_name}' 基本資訊")
+    basic_result = client.query_basic_medicine(medicine_name=medicine_name)
+    if basic_result and basic_result.get('success') and basic_result.get('medicines'):
+        med = basic_result['medicines'][0]
+        print(f"   📋 基本: {med['name']} - {med['dosage']} (庫存: {med['amount']})")
+    
+    # 詳細服務
+    print(f"   5.2 查詢 '{medicine_name}' 詳細資訊")
+    detailed_result = client.query_detailed_medicine(medicine_name=medicine_name)
+    if detailed_result and detailed_result.get('success') and detailed_result.get('detailed_medicines'):
+        detail = detailed_result['detailed_medicines'][0]
+        print(f"   🔬 詳細: {detail['description']}")
+        print(f"       成分: {detail['ingredient']}")
+        print(f"       類別: {detail['category']}")
+    
+    print("\n💡 使用建議:")
+    print("   • query_basic_medicine(): 快速獲取庫存、位置等基本資訊")
+    print("   • query_detailed_medicine(): 獲取成分、用法、副作用等詳細資訊")
+    print("   • 根據使用場景選擇合適的服務，提高效率")
+    print("   • ROS2 節點可以分別訂閱這兩個服務的響應")
+    
+    print("\n🎯 6. 原有功能（訂單管理）依然可用")
+    
+    # 原有的訂單功能示例
+    pending_orders = client.get_pending_orders()
+    if pending_orders:
+        print(f"   📋 待處理訂單: {len(pending_orders.get('orders', []))} 個")
+    
+    print("\n✅ 示例完成！")
+    print("現在您可以使用分離的基本和詳細藥物 ROS2 服務了。")
 
 
 if __name__ == "__main__":
     """直接執行時運行範例"""
-    asyncio.run(example_usage())
+    example_usage()
