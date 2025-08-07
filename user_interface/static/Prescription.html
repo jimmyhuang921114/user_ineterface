@@ -85,8 +85,6 @@
                                 <tr style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
                                     <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">處方籤編號</th>
                                     <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">患者姓名</th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">醫生姓名</th>
-                                    <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">診斷</th>
                                     <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">藥物數量</th>
                                     <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">狀態</th>
                                     <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600;">建立時間</th>
@@ -95,7 +93,7 @@
                             </thead>
                             <tbody id="prescriptionTableBody">
                                 <tr>
-                                    <td colspan="8" style="padding: 40px; text-align: center; color: #7f8c8d;">
+                                    <td colspan="6" style="padding: 40px; text-align: center; color: #7f8c8d;">
                                                                 <div>目前沒有符合條件的處方籤</div>
                         <div style="margin-top: 10px; font-size: 14px;">請調整篩選條件或由醫生開立新處方籤</div>
                                     </td>
@@ -184,7 +182,7 @@
             if (filteredPrescriptions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="padding: 40px; text-align: center; color: #7f8c8d;">
+                        <td colspan="6" style="padding: 40px; text-align: center; color: #7f8c8d;">
                                                     <div>暫無處方籤資料</div>
                         <div style="margin-top: 10px; font-size: 14px;">請由醫生開立處方籤</div>
                         </td>
@@ -201,8 +199,6 @@
                     <tr style="cursor: pointer;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='white'">
                         <td style="padding: 12px; border: 1px solid #dee2e6; font-weight: 600; color: #3498db;">#${prescription.id}</td>
                         <td style="padding: 12px; border: 1px solid #dee2e6;">${prescription.patient_name}</td>
-                        <td style="padding: 12px; border: 1px solid #dee2e6;">${prescription.doctor_name}</td>
-                        <td style="padding: 12px; border: 1px solid #dee2e6; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${prescription.diagnosis || ''}">${prescription.diagnosis || ''}</td>
                         <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
                             <span style="background: rgba(52, 152, 219, 0.1); color: #3498db; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
                                 ${prescription.medicine_count || (prescription.medicines && prescription.medicines.length) || 0}
@@ -267,12 +263,7 @@
                             <div>
                                 <h4>患者資訊</h4>
                                 <p><strong>姓名:</strong> ${prescription.patient_name}</p>
-                                <p><strong>診斷:</strong> ${prescription.diagnosis || ''}</p>
-                            </div>
-                            <div>
-                                <h4>醫生資訊</h4>
-                                <p><strong>姓名:</strong> ${prescription.doctor_name}</p>
-                                <p><strong>開立日期:</strong> ${formatDate(prescription.created_at)}</p>
+                                <p><strong>患者ID:</strong> ${prescription.patient_id || ''}</p>
                             </div>
                             <div>
                                 <h4>處方籤狀態</h4>
@@ -374,7 +365,7 @@
 
         // CSV
         function generateCSV(prescriptions) {
-            const headers = ['編號', '患者', '醫生', '診斷', '狀態', '日期', '藥物'];
+            const headers = ['編號', '患者', '狀態', '日期', '藥物'];
             const csvRows = [headers.join(',')];
 
             prescriptions.forEach(prescription => {
@@ -385,8 +376,6 @@
                 const row = [
                     prescription.id,
                     `"${prescription.patient_name}"`,
-                    `"${prescription.doctor_name}"`,
-                    `"${prescription.diagnosis || ''}"`,
                     getStatusText(prescription.status),
                     prescription.prescription_date,
                     `"${medicines}"`

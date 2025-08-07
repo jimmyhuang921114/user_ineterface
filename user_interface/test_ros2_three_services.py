@@ -46,8 +46,8 @@ def test_order_service(manager):
     status = manager.get_service_status()
     order_status = status['order_service']
     print(f"   當前處理中: {order_status['current_order']['order_id'] if order_status['current_order'] else '無'}")
-    print(f"   排隊數量: {order_status['queue_length']}")
     print(f"   是否處理中: {order_status['processing']}")
+    print(f"   可接受新訂單: {order_status['ready_for_new_order']}")
 
 def test_basic_medicine_service(manager):
     """測試基本藥物服務（持續）"""
@@ -134,8 +134,8 @@ def monitor_service_status(manager, duration=10):
         order_status = status['order_service']
         if order_status['current_order']:
             print(f"    當前訂單: {order_status['current_order']['order_id']}")
-        print(f"    排隊: {order_status['queue_length']} 筆")
         print(f"    處理中: {order_status['processing']}")
+        print(f"    可接受新訂單: {order_status['ready_for_new_order']}")
         
         print(f"  基本藥物服務: {'運行中' if status['basic_service']['running'] else '停止'}")
         print(f"  詳細藥物服務: {'運行中' if status['detailed_service']['running'] else '停止'}")

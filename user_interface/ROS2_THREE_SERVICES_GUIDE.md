@@ -4,7 +4,7 @@
 
 本系統提供三個專門的 ROS2 服務接口，滿足您的需求：
 
-1. **訂單服務 (Order Service)** - 每筆訂單完成後再送下一筆
+1. **訂單服務 (Order Service)** - 一次只處理一個 client 請求
 2. **基本藥物服務 (Basic Medicine Service)** - 持續獲取基本藥物資訊
 3. **詳細藥物服務 (Detailed Medicine Service)** - 持續獲取詳細藥物資訊
 
@@ -44,8 +44,8 @@ manager.query_detailed_medicine("布洛芬")
 ## 📦 訂單服務 (Order Service)
 
 ### 特點
-- ✅ **佇列機制**：多筆訂單自動排隊
-- ✅ **序列處理**：每筆完成後再處理下一筆
+- ✅ **單一請求處理**：一次只處理一個 client 請求
+- ✅ **忙碌拒絕機制**：處理中時拒絕新請求
 - ✅ **狀態追蹤**：即時監控處理狀態
 
 ### 使用方法
@@ -67,7 +67,7 @@ manager.send_order(
 status = manager.get_service_status()
 order_status = status['order_service']
 print(f"當前處理: {order_status['current_order']}")
-print(f"排隊數量: {order_status['queue_length']}")
+print(f"可接受新訂單: {order_status['ready_for_new_order']}")
 ```
 
 ### ROS2 Topic
@@ -172,8 +172,8 @@ status = manager.get_service_status()
 
 print("訂單服務:")
 print(f"  當前訂單: {status['order_service']['current_order']}")
-print(f"  排隊數量: {status['order_service']['queue_length']}")
 print(f"  處理中: {status['order_service']['processing']}")
+print(f"  可接受新訂單: {status['order_service']['ready_for_new_order']}")
 
 print("基本藥物服務:")
 print(f"  運行狀態: {status['basic_service']['running']}")
@@ -241,8 +241,8 @@ manager.stop_continuous_services()
 ## 💡 最佳實踐
 
 1. **訂單服務**：
-   - 一次發送一筆訂單，等待完成再發送下一筆
-   - 監控佇列狀態避免積壓
+   - 一次只能處理一個請求，處理中時會拒絕新請求
+   - 等待當前訂單完成後再發送新訂單
 
 2. **基本藥物服務**：
    - 用於頻繁的快速查詢

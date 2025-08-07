@@ -25,12 +25,11 @@ except ImportError:
 
 
 class OrderServiceInterface:
-    """訂單服務接口 - 每筆訂單結束後再送下一筆"""
+    """訂單服務接口 - 一次只處理一個 client 請求"""
     
     def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.current_order = None
-        self.order_queue = []
         self.processing = False
         self.use_ros2 = ROS2_AVAILABLE
         
@@ -86,26 +85,29 @@ class OrderServiceInterface:
             order_id = data.get('order_id')
             print(f"📦 訂單完成通知: {order_id}")
             
-            # 標記當前訂單完成
+            # 標記當前訂單完成，準備接受新請求
             if self.current_order:
                 print(f"✅ 訂單 {self.current_order.get('order_id')} 已完成")
                 self.current_order = None
                 self.processing = False
-                
-                # 處理下一筆訂單
-                self._process_next_order()
+                print(f"🔄 服務已就緒，可接受新的訂單請求")
                 
         except Exception as e:
             print(f"❌ 處理訂單完成通知失敗: {e}")
     
     def send_order(self, medicines: List[Dict[str, Any]], patient_info: Dict[str, str] = None):
         """
-        發送訂單
+        發送訂單（一次處理一個請求）
         
         Args:
             medicines: 藥物列表 [{"name": "藥物名", "quantity": 數量}, ...]
             patient_info: 患者資訊 {"patient_name": "姓名", "doctor_name": "醫生"}
         """
+        # 如果正在處理訂單，拒絕新請求
+        if self.processing:
+            print(f"❌ 服務忙碌中，當前正在處理: {self.current_order.get('order_id') if self.current_order else 'Unknown'}")
+            return {"error": "服務忙碌中，請稍後再試"}
+        
         order_data = {
             "order_id": f"ORDER_{int(time.time() * 1000) % 1000000:06d}",
             "medicines": medicines,
@@ -114,33 +116,25 @@ class OrderServiceInterface:
             "status": "pending"
         }
         
-        # 加入訂單佇列
-        self.order_queue.append(order_data)
-        print(f"📦 訂單已加入佇列: {order_data['order_id']} ({len(medicines)} 種藥物)")
+        print(f"📦 開始處理新訂單: {order_data['order_id']} ({len(medicines)} 種藥物)")
         
-        # 如果沒有正在處理的訂單，立即處理
-        if not self.processing:
-            self._process_next_order()
+        # 直接處理訂單，不使用佇列
+        self.current_order = order_data
+        self.processing = True
+        
+        if self.use_ros2:
+            # ROS2 方式
+            msg = String()
+            msg.data = json.dumps(order_data)
+            self.order_publisher.publish(msg)
+            print(f"🤖 [ROS2] 訂單已發送: {order_data['order_id']}")
         else:
-            print(f"⏳ 訂單排隊中，當前正在處理: {self.current_order.get('order_id') if self.current_order else 'Unknown'}")
+            # HTTP 方式
+            self._send_order_http()
+        
+        return {"success": True, "order_id": order_data['order_id']}
     
-    def _process_next_order(self):
-        """處理下一筆訂單"""
-        if self.order_queue and not self.processing:
-            self.current_order = self.order_queue.pop(0)
-            self.processing = True
-            
-            print(f"🚀 開始處理訂單: {self.current_order['order_id']}")
-            
-            if self.use_ros2:
-                # ROS2 方式
-                msg = String()
-                msg.data = json.dumps(self.current_order)
-                self.order_publisher.publish(msg)
-                print(f"🤖 [ROS2] 訂單已發送: {self.current_order['order_id']}")
-            else:
-                # HTTP 方式
-                self._send_order_http()
+
     
     def _send_order_http(self):
         """HTTP 方式發送訂單"""
@@ -192,8 +186,8 @@ class OrderServiceInterface:
         """獲取訂單狀態"""
         return {
             "current_order": self.current_order,
-            "queue_length": len(self.order_queue),
-            "processing": self.processing
+            "processing": self.processing,
+            "ready_for_new_order": not self.processing
         }
 
 
