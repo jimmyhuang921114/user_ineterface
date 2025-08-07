@@ -152,11 +152,23 @@ async function handlePrescriptionSubmit(event) {
             throw new Error('請至少選擇一種處方用藥');
         }
         
+        // 獲取表單數據
+        const diagnosis = document.getElementById('diagnosis').value.trim();
+        const doctorName = document.getElementById('doctorName').value.trim();
+        
+        if (!diagnosis) {
+            throw new Error('請輸入診斷結果');
+        }
+        if (!doctorName) {
+            throw new Error('請輸入主治醫師姓名');
+        }
+        
         // 構建處方籤資料
         const prescriptionData = {
             patient_name: patientName,
             patient_id: patientNumber,
-            doctor_name: '系統醫生', // 預設醫生名稱
+            doctor_name: doctorName,
+            diagnosis: diagnosis,
             medicines: medicines
         };
         

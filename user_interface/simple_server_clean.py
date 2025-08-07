@@ -474,6 +474,13 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
         # 創建詳細藥物（如果有詳細資料）
         detailed_id = None
         if any(key in combined_data for key in ["description", "ingredient", "category"]):
+            # 生成唯一的 barcode（如果為空）
+            barcode = combined_data.get("barcode", "")
+            if not barcode:
+                # 生成基於時間戳的唯一條碼
+                import time
+                barcode = f"BC{int(time.time() * 1000) % 1000000:06d}"
+            
             detailed_data = {
                 "medicine_id": basic_medicine.id,
                 "description": combined_data.get("description", ""),
@@ -484,7 +491,7 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
                 "side_effects": combined_data.get("side_effects", ""),
                 "storage_conditions": combined_data.get("storage_conditions", ""),
                 "expiry_date": combined_data.get("expiry_date", ""),
-                "barcode": combined_data.get("barcode", ""),
+                "barcode": barcode,
                 "appearance_type": combined_data.get("appearance_type", ""),
                 "notes": combined_data.get("notes", "")
             }
