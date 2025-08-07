@@ -7,7 +7,7 @@ import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Empty
 from std_msgs.msg import String
-import json
+import yaml
 import time
 import threading
 
@@ -115,23 +115,32 @@ class HospitalClient(Node):
             return False
 
     def order_callback(self, msg):
-        """處理訂單數據"""
+        """處理訂單數據 (YAML 格式)"""
         try:
-            order_data = json.loads(msg.data)
+            # 解析 YAML 格式的訂單數據
+            order_data = yaml.safe_load(msg.data)
             self.current_order = order_data
             self.is_processing = True
             
             self.get_logger().info("📋 收到新訂單!")
             self.get_logger().info(f"   訂單ID: {order_data['order_id']}")
             self.get_logger().info(f"   病患: {order_data.get('patient_name', 'N/A')}")
-            self.get_logger().info(f"   藥物數量: {len(order_data['medicines'])}")
             
-            # 顯示訂單詳細資訊
+            medicines = order_data.get('medicine', [])
+            self.get_logger().info(f"   藥物數量: {len(medicines)}")
+            
+            # 顯示原始 YAML 格式
             print("\n" + "="*60)
+            print(f"📋 收到訂單 YAML 格式:")
+            print("="*60)
+            print(msg.data)
+            print("="*60)
+            
+            # 顯示解析後的訂單詳細資訊
             print(f"📋 訂單 {order_data['order_id']} 詳細資訊:")
             print("="*60)
             
-            for i, med in enumerate(order_data['medicines'], 1):
+            for i, med in enumerate(medicines, 1):
                 print(f"藥物 {i}:")
                 print(f"  名稱: {med['name']}")
                 print(f"  數量: {med['amount']}")
@@ -144,11 +153,13 @@ class HospitalClient(Node):
             
         except Exception as e:
             self.get_logger().error(f"❌ 處理訂單數據時發生錯誤: {e}")
+            self.get_logger().error(f"   原始數據: {msg.data}")
 
     def medicine_callback(self, msg):
-        """處理藥物詳細資訊"""
+        """處理藥物詳細資訊 (YAML 格式)"""
         try:
-            medicine_data = json.loads(msg.data)
+            # 解析 YAML 格式的藥物數據
+            medicine_data = yaml.safe_load(msg.data)
             
             if medicine_data.get('error'):
                 self.get_logger().warn(f"⚠️ {medicine_data['error']}")
@@ -156,18 +167,20 @@ class HospitalClient(Node):
                 self.get_logger().info(f"💊 收到藥物詳細資訊: {medicine_data['name']}")
                 
                 print("\n" + "="*40)
-                print(f"💊 藥物詳細資訊: {medicine_data['name']}")
+                print(f"💊 藥物詳細資訊 YAML 格式:")
                 print("="*40)
-                print(f"描述: {medicine_data.get('description', 'N/A')}")
+                print(msg.data)
                 print("="*40)
                 
         except Exception as e:
             self.get_logger().error(f"❌ 處理藥物數據時發生錯誤: {e}")
+            self.get_logger().error(f"   原始數據: {msg.data}")
 
     def status_callback(self, msg):
-        """處理系統狀態"""
+        """處理系統狀態 (YAML 格式)"""
         try:
-            status_data = json.loads(msg.data)
+            # 解析 YAML 格式的狀態數據
+            status_data = yaml.safe_load(msg.data)
             
             status = status_data.get('status', '')
             order_id = status_data.get('order_id', '')
@@ -181,11 +194,12 @@ class HospitalClient(Node):
                 
         except Exception as e:
             self.get_logger().error(f"❌ 處理狀態數據時發生錯誤: {e}")
+            self.get_logger().error(f"   原始數據: {msg.data}")
 
     def process_order(self, order_data):
         """處理訂單（您的機器人邏輯）"""
         order_id = order_data['order_id']
-        medicines = order_data['medicines']
+        medicines = order_data.get('medicine', [])  # YAML 格式中是 'medicine' 不是 'medicines'
         
         self.get_logger().info(f"🤖 開始處理訂單: {order_id}")
         
@@ -199,8 +213,8 @@ class HospitalClient(Node):
             time.sleep(1)  # 模擬移動時間
             
             # 2. 查詢藥物詳細資訊（如果需要）
-            # self.query_medicine_detail(medicine['name'])
-            # time.sleep(1)
+            self.query_medicine_detail(medicine['name'])
+            time.sleep(1)
             
             # 3. 抓取藥物
             prompt = medicine['prompt']

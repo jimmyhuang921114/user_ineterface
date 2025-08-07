@@ -54,36 +54,27 @@ python3 ros2_client_example.py
 
 ## 📄 數據格式
 
-### 訂單數據格式
-```json
-{
-  "order_id": "000001",
-  "prescription_id": 1,
-  "patient_name": "張三",
-  "medicines": [
-    {
-      "name": "阿斯匹靈",
-      "amount": 10,
-      "locate": [2, 3],
-      "prompt": "tablet"
-    },
-    {
-      "name": "維他命C",
-      "amount": 5,
-      "locate": [1, 5],
-      "prompt": "capsule"
-    }
-  ]
-}
+### 訂單數據格式 (YAML)
+```yaml
+order_id: "000001"
+prescription_id: 1
+patient_name: "張三"
+medicine:
+  - name: 阿斯匹靈
+    amount: 10
+    locate: [2, 3]
+    prompt: tablet
+  - name: 維他命C
+    amount: 5
+    locate: [1, 5]
+    prompt: capsule
 ```
 
-### 藥物詳細資訊格式
-```json
-{
-  "name": "阿斯匹靈",
-  "description": "解熱鎮痛藥，用於緩解頭痛、發燒等症狀",
-  "found": true
-}
+### 藥物詳細資訊格式 (YAML)
+```yaml
+name: 阿斯匹靈
+description: "解熱鎮痛藥，用於緩解頭痛、發燒等症狀"
+found: true
 ```
 
 ## 🤖 您的 ROS2 實作
@@ -95,7 +86,7 @@ import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Empty
 from std_msgs.msg import String
-import json
+import yaml
 
 class YourHospitalRobot(Node):
     def __init__(self):
@@ -136,9 +127,9 @@ def get_new_order(self):
         return False
 
 def order_callback(self, msg):
-    """處理接收到的訂單"""
+    """處理接收到的訂單 (YAML 格式)"""
     try:
-        order_data = json.loads(msg.data)
+        order_data = yaml.safe_load(msg.data)
         self.current_order = order_data
         
         # 開始處理訂單
@@ -157,9 +148,9 @@ def query_medicine_detail(self, medicine_name):
     self.medicine_request_pub.publish(msg)
 
 def medicine_callback(self, msg):
-    """處理藥物詳細資訊回應"""
+    """處理藥物詳細資訊回應 (YAML 格式)"""
     try:
-        medicine_data = json.loads(msg.data)
+        medicine_data = yaml.safe_load(msg.data)
         
         if medicine_data.get('found'):
             name = medicine_data['name']
@@ -199,7 +190,7 @@ def complete_order(self):
 def process_order(self, order_data):
     """處理訂單的主要邏輯"""
     order_id = order_data['order_id']
-    medicines = order_data['medicines']
+    medicines = order_data.get('medicine', [])  # YAML 格式中是 'medicine'
     
     self.get_logger().info(f"開始處理訂單: {order_id}")
     

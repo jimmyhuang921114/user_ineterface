@@ -8,7 +8,7 @@ import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Empty
 from std_msgs.msg import String
-import json
+import yaml
 import requests
 import threading
 import time
@@ -105,17 +105,18 @@ class HospitalROS2Services(Node):
                     self.current_order = order_data
                     self.get_logger().info(f"✅ 獲取到新訂單: {order_data['order_id']}")
                     
-                    # 發布訂單數據
+                    # 發布訂單數據 (YAML 格式)
+                    order_yaml = self._format_order_yaml(order_data)
                     order_msg = String()
-                    order_msg.data = json.dumps(order_data)
+                    order_msg.data = order_yaml
                     self.order_publisher.publish(order_msg)
                     
                     # 發布狀態
                     status_msg = String()
-                    status_msg.data = json.dumps({
+                    status_msg.data = yaml.dump({
                         "status": "order_received", 
                         "order_id": order_data['order_id']
-                    })
+                    }, default_flow_style=False, allow_unicode=True)
                     self.status_publisher.publish(status_msg)
                     
                 else:
@@ -141,19 +142,20 @@ class HospitalROS2Services(Node):
             medicine_detail = self._fetch_medicine_detail(medicine_name)
             
             if medicine_detail:
-                # 發布藥物詳細資訊
+                # 發布藥物詳細資訊 (YAML 格式)
+                medicine_yaml = self._format_medicine_yaml(medicine_detail)
                 detail_msg = String()
-                detail_msg.data = json.dumps(medicine_detail)
+                detail_msg.data = medicine_yaml
                 self.medicine_publisher.publish(detail_msg)
                 
                 self.get_logger().info(f"✅ 已發送 {medicine_name} 的詳細資訊")
             else:
                 # 發送錯誤訊息
                 error_msg = String()
-                error_msg.data = json.dumps({
+                error_msg.data = yaml.dump({
                     "error": f"未找到藥物: {medicine_name}",
                     "medicine_name": medicine_name
-                })
+                }, default_flow_style=False, allow_unicode=True)
                 self.medicine_publisher.publish(error_msg)
                 
                 self.get_logger().warn(f"⚠️ 未找到藥物: {medicine_name}")
@@ -181,10 +183,10 @@ class HospitalROS2Services(Node):
                     
                     # 發布完成狀態
                     status_msg = String()
-                    status_msg.data = json.dumps({
+                    status_msg.data = yaml.dump({
                         "status": "order_completed", 
                         "order_id": order_id
-                    })
+                    }, default_flow_style=False, allow_unicode=True)
                     self.status_publisher.publish(status_msg)
                     
                 else:
@@ -314,6 +316,44 @@ class HospitalROS2Services(Node):
             return 'white_circle_box'
         else:
             return 'tablet'  # 預設
+
+    def _format_order_yaml(self, order_data: Dict[str, Any]) -> str:
+        """將訂單數據格式化為 YAML"""
+        try:
+            yaml_content = f"""order_id: "{order_data['order_id']}"
+prescription_id: {order_data.get('prescription_id', '')}
+patient_name: "{order_data.get('patient_name', '')}"
+medicine:
+"""
+            
+            for med in order_data.get('medicines', []):
+                yaml_content += f"""  - name: {med.get('name', '')}
+    amount: {med.get('amount', 0)}
+    locate: {med.get('locate', [1, 1])}
+    prompt: {med.get('prompt', 'tablet')}
+"""
+            
+            return yaml_content.rstrip()
+            
+        except Exception as e:
+            self.get_logger().error(f"格式化訂單 YAML 失敗: {e}")
+            return yaml.dump(order_data, default_flow_style=False, allow_unicode=True)
+
+    def _format_medicine_yaml(self, medicine_data: Dict[str, Any]) -> str:
+        """將藥物詳細資訊格式化為 YAML"""
+        try:
+            if not medicine_data.get('found', False):
+                return yaml.dump(medicine_data, default_flow_style=False, allow_unicode=True)
+            
+            yaml_content = f"""name: {medicine_data.get('name', '')}
+description: "{medicine_data.get('description', '')}"
+found: true
+"""
+            return yaml_content.rstrip()
+            
+        except Exception as e:
+            self.get_logger().error(f"格式化藥物 YAML 失敗: {e}")
+            return yaml.dump(medicine_data, default_flow_style=False, allow_unicode=True)
 
 
 def main():

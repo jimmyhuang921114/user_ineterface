@@ -72,12 +72,14 @@ graph TD
     H --> I[可處理下一個訂單]
 ```
 
-## 📄 訂單格式
+## 📄 訂單格式 (YAML)
 
-您的 ROS2 系統會收到這樣的訂單：
+您的 ROS2 系統會收到這樣的 YAML 格式訂單：
 
 ```yaml
 order_id: "000001"
+prescription_id: 1
+patient_name: "張三"
 medicine:
   - name: Antipsychotics
     amount: 87
