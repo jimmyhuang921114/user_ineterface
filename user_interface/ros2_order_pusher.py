@@ -15,7 +15,7 @@ from datetime import datetime
 logger = logging.getLogger("ros2_order_pusher")
 
 class OrderPusher:
-    """訂單主動推送器"""
+    """訂單主動推送器 - 支持單一訂單處理"""
     
     def __init__(self, fastapi_base_url: str = "http://localhost:8001", 
                  callback_func: Optional[Callable] = None):
@@ -26,7 +26,12 @@ class OrderPusher:
         self.monitor_thread = None
         self.check_interval = 3  # 每3秒檢查一次
         
-        logger.info("訂單推送器已初始化")
+        # 單一訂單處理控制
+        self.current_order_id = None  # 當前正在處理的訂單ID
+        self.ros2_busy = False  # ROS2 是否忙碌中
+        self.processing_lock = threading.Lock()
+        
+        logger.info("訂單推送器已初始化 - 支持單一訂單處理")
     
     def start_monitoring(self):
         """開始監控新處方籤"""
@@ -59,12 +64,20 @@ class OrderPusher:
     def _check_for_new_prescriptions(self):
         """檢查新的待處理處方籤"""
         try:
+            # 如果 ROS2 正在忙碌，不處理新訂單
+            with self.processing_lock:
+                if self.ros2_busy or self.current_order_id is not None:
+                    logger.debug("ROS2 正忙，跳過新處方籤檢查")
+                    return
+            
             response = requests.get(f"{self.base_url}/api/prescription/", timeout=5)
             if response.status_code != 200:
                 return
             
             prescriptions = response.json()
             
+            # 按創建時間排序，優先處理最早的處方籤
+            pending_prescriptions = []
             for prescription in prescriptions:
                 prescription_id = prescription.get('id')
                 status = prescription.get('status')
@@ -72,8 +85,16 @@ class OrderPusher:
                 # 檢查是否為新的 pending 處方籤
                 if (status == 'pending' and 
                     prescription_id not in self.processed_prescriptions):
-                    
-                    self._process_new_prescription(prescription_id)
+                    pending_prescriptions.append(prescription)
+            
+            # 只處理最早的一個處方籤
+            if pending_prescriptions:
+                # 按 ID 排序（假設 ID 按時間遞增）
+                earliest_prescription = min(pending_prescriptions, key=lambda p: p.get('id'))
+                prescription_id = earliest_prescription.get('id')
+                
+                logger.info(f"發現新的處方籤 {prescription_id}，準備處理")
+                self._process_new_prescription(prescription_id)
                     
         except Exception as e:
             logger.error(f"檢查處方籤時發生錯誤: {e}")
@@ -81,10 +102,21 @@ class OrderPusher:
     def _process_new_prescription(self, prescription_id: int):
         """處理新的處方籤，轉換為訂單"""
         try:
+            # 雙重檢查，確保沒有其他訂單在處理
+            with self.processing_lock:
+                if self.ros2_busy or self.current_order_id is not None:
+                    logger.warning(f"ROS2 正忙，無法處理處方籤 {prescription_id}")
+                    return
+                
+                # 設置當前處理狀態
+                self.ros2_busy = True
+                self.current_order_id = f"{prescription_id:06d}"
+            
             # 獲取處方籤詳細資訊
             response = requests.get(f"{self.base_url}/api/prescription/{prescription_id}", timeout=5)
             if response.status_code != 200:
                 logger.error(f"無法獲取處方籤 {prescription_id} 詳細資訊")
+                self._reset_processing_state()
                 return
             
             prescription_detail = response.json()
@@ -101,10 +133,12 @@ class OrderPusher:
             # 推送訂單
             self._push_order_to_ros2(order, prescription_id)
             
-            logger.info(f"處方籤 {prescription_id} 已轉換為訂單並推送")
+            logger.info(f"處方籤 {prescription_id} 已轉換為訂單 {self.current_order_id} 並推送")
+            logger.info("⏳ 等待 ROS2 完成處理...")
             
         except Exception as e:
             logger.error(f"處理處方籤 {prescription_id} 時發生錯誤: {e}")
+            self._reset_processing_state()
     
     def _convert_prescription_to_order(self, prescription: Dict) -> Dict:
         """將處方籤轉換為訂單格式"""
@@ -223,29 +257,60 @@ class OrderPusher:
         return yaml_content.rstrip()
     
     def complete_order(self, order_id: str) -> bool:
-        """標記訂單完成"""
+        """標記訂單完成 - 您的 ROS2 系統完成處理後調用此函數"""
         try:
-            # 從訂單ID推算處方籤ID
-            prescription_id = int(order_id)
-            
-            # 更新處方籤狀態為已完成
-            self._update_prescription_status(prescription_id, "completed")
-            
-            logger.info(f"訂單 {order_id} 已標記為完成")
-            return True
+            with self.processing_lock:
+                # 檢查是否為當前處理的訂單
+                if self.current_order_id != order_id:
+                    logger.warning(f"訂單 {order_id} 不是當前處理的訂單 {self.current_order_id}")
+                    return False
+                
+                # 從訂單ID推算處方籤ID
+                prescription_id = int(order_id)
+                
+                # 更新處方籤狀態為已完成
+                self._update_prescription_status(prescription_id, "completed")
+                
+                # 重置處理狀態，允許處理下一個訂單
+                self._reset_processing_state()
+                
+                logger.info(f"✅ 訂單 {order_id} 已完成，ROS2 可以處理下一個訂單")
+                return True
             
         except Exception as e:
             logger.error(f"完成訂單 {order_id} 時發生錯誤: {e}")
+            self._reset_processing_state()
             return False
+    
+    def _reset_processing_state(self):
+        """重置處理狀態"""
+        with self.processing_lock:
+            self.current_order_id = None
+            self.ros2_busy = False
+            logger.debug("處理狀態已重置")
+    
+    def is_ros2_busy(self) -> bool:
+        """檢查 ROS2 是否正在處理訂單"""
+        with self.processing_lock:
+            return self.ros2_busy
+    
+    def get_current_order(self) -> Optional[str]:
+        """獲取當前正在處理的訂單ID"""
+        with self.processing_lock:
+            return self.current_order_id
     
     def get_status(self) -> Dict:
         """獲取推送器狀態"""
-        return {
-            "monitoring": self.is_running,
-            "processed_count": len(self.processed_prescriptions),
-            "check_interval": self.check_interval,
-            "base_url": self.base_url
-        }
+        with self.processing_lock:
+            return {
+                "monitoring": self.is_running,
+                "processed_count": len(self.processed_prescriptions),
+                "check_interval": self.check_interval,
+                "base_url": self.base_url,
+                "ros2_busy": self.ros2_busy,
+                "current_order_id": self.current_order_id,
+                "current_order": self.current_order_id
+            }
 
 # ==================== 使用範例 ====================
 
@@ -261,11 +326,33 @@ def example_ros2_callback(order_dict: Dict, yaml_order: str):
     print("=" * 50)
     print(yaml_order)
     print("=" * 50)
+    print("⏳ 開始 ROS2 處理...")
     
     # 在這裡添加您的 ROS2 處理邏輯
     # 例如：
     # ros2_node.send_order(yaml_order)
     # robot_controller.process_order(order_dict)
+    
+    # 模擬處理時間（在實際應用中，這將是您的 ROS2 處理邏輯）
+    import threading
+    def simulate_ros2_processing():
+        import time
+        order_id = order_dict.get('order_id')
+        print(f"🤖 模擬 ROS2 處理訂單 {order_id}...")
+        time.sleep(10)  # 模擬處理時間
+        
+        # 處理完成後，調用 complete_order
+        # 在實際應用中，這應該在您的 ROS2 完成處理後調用
+        global current_pusher
+        if 'current_pusher' in globals():
+            success = current_pusher.complete_order(order_id)
+            if success:
+                print(f"✅ 訂單 {order_id} 處理完成！")
+            else:
+                print(f"❌ 訂單 {order_id} 完成標記失敗")
+    
+    # 在後台模擬處理
+    threading.Thread(target=simulate_ros2_processing, daemon=True).start()
 
 def main():
     """主函數 - 示範如何使用"""
