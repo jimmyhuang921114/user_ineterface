@@ -879,6 +879,235 @@ async def _adjust_medicine_stock_impl(medicine_id: int, adjustment_data: dict, d
         logger.error(f"調整庫存失敗: {str(e)}")
         raise HTTPException(status_code=500, detail=f"調整失敗: {str(e)}")
 
+@app.get("/api/ros2/pending-orders")
+async def get_pending_orders(db: Session = Depends(get_db)):
+    """獲取所有待處理訂單（供ROS2詢問）"""
+    logger.info("ROS2請求查看所有待處理訂單")
+    
+    pending_prescriptions = db.query(Prescription)\
+        .filter(Prescription.status == 'pending')\
+        .order_by(Prescription.created_at.asc())\
+        .all()
+    
+    orders = []
+    for prescription in pending_prescriptions:
+        medicines = db.query(PrescriptionMedicine)\
+            .filter(PrescriptionMedicine.prescription_id == prescription.id)\
+            .all()
+        
+        medicine_details = []
+        for pm in medicines:
+            basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+            medicine_details.append({
+                "medicine_id": pm.medicine_id,
+                "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
+                "dosage": pm.dosage,
+                "frequency": pm.frequency,
+                "quantity": pm.quantity,
+                "position": basic_medicine.position if basic_medicine else "未知位置"
+            })
+        
+        orders.append({
+            "order_id": f"ORDER_{prescription.id:04d}",
+            "prescription_id": prescription.id,
+            "patient_name": prescription.patient_name,
+            "patient_id": prescription.patient_id,
+            "doctor_name": prescription.doctor_name,
+            "diagnosis": prescription.diagnosis,
+            "created_at": prescription.created_at.isoformat(),
+            "medicine_count": len(medicine_details),
+            "medicines": medicine_details,
+            "priority": "normal",
+            "estimated_duration": len(medicine_details) * 60
+        })
+    
+    logger.info(f"找到 {len(orders)} 個待處理訂單")
+    return {
+        "total_pending": len(orders),
+        "orders": orders
+    }
+
+@app.post("/api/ros2/request-order-confirmation")
+async def request_order_confirmation(request_data: dict, db: Session = Depends(get_db)):
+    """ROS2請求執行特定訂單的確認"""
+    logger.info("ROS2請求執行訂單確認")
+    
+    prescription_id = request_data.get("prescription_id")
+    requester_id = request_data.get("requester_id", "unknown")
+    
+    if not prescription_id:
+        raise HTTPException(status_code=400, detail="必須提供 prescription_id")
+    
+    prescription = db.query(Prescription).filter(
+        Prescription.id == prescription_id,
+        Prescription.status == 'pending'
+    ).first()
+    
+    if not prescription:
+        return {
+            "success": False,
+            "message": "處方籤不存在或已被處理",
+            "order": None
+        }
+    
+    # 檢查庫存可用性
+    availability = check_stock_availability(prescription_id, db)
+    
+    if not availability["all_available"]:
+        return {
+            "success": False,
+            "message": "庫存不足，無法執行訂單",
+            "order": None,
+            "stock_issues": availability["medicines"]
+        }
+    
+    # 準備訂單詳情
+    medicines = db.query(PrescriptionMedicine)\
+        .filter(PrescriptionMedicine.prescription_id == prescription_id)\
+        .all()
+    
+    medicine_details = []
+    for pm in medicines:
+        basic_medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
+        medicine_details.append({
+            "medicine_id": pm.medicine_id,
+            "medicine_name": basic_medicine.name if basic_medicine else "未知藥物",
+            "dosage": pm.dosage,
+            "frequency": pm.frequency,
+            "duration": pm.duration,
+            "quantity": pm.quantity,
+            "position": basic_medicine.position if basic_medicine else "未知位置",
+            "manufacturer": basic_medicine.manufacturer if basic_medicine else "未知廠商"
+        })
+    
+    order_data = {
+        "order_id": f"ORDER_{prescription.id:04d}",
+        "prescription_id": prescription.id,
+        "patient_info": {
+            "name": prescription.patient_name,
+            "id": prescription.patient_id
+        },
+        "doctor_name": prescription.doctor_name,
+        "diagnosis": prescription.diagnosis,
+        "medicines": medicine_details,
+        "created_at": prescription.created_at.isoformat(),
+        "assigned_to": requester_id,
+        "priority": "normal",
+        "estimated_duration": len(medicine_details) * 60,
+        "status": "awaiting_confirmation"
+    }
+    
+    logger.info(f"準備執行訂單確認: {order_data['order_id']} (處方籤 {prescription.id})")
+    
+    return {
+        "success": True,
+        "message": f"訂單 {order_data['order_id']} 準備就緒，等待確認",
+        "order": order_data,
+        "confirmation_required": True
+    }
+
+@app.post("/api/ros2/confirm-and-execute-order")
+async def confirm_and_execute_order(request_data: dict, db: Session = Depends(get_db)):
+    """確認並執行訂單"""
+    logger.info("ROS2確認並執行訂單")
+    
+    prescription_id = request_data.get("prescription_id")
+    confirmed = request_data.get("confirmed", False)
+    requester_id = request_data.get("requester_id", "unknown")
+    
+    if not prescription_id:
+        raise HTTPException(status_code=400, detail="必須提供 prescription_id")
+    
+    if not confirmed:
+        return {
+            "success": False,
+            "message": "訂單未被確認，執行中止"
+        }
+    
+    prescription = db.query(Prescription).filter(
+        Prescription.id == prescription_id,
+        Prescription.status == 'pending'
+    ).first()
+    
+    if not prescription:
+        return {
+            "success": False,
+            "message": "處方籤不存在或已被處理"
+        }
+    
+    try:
+        # 將狀態更新為 processing（這會觸發庫存扣減）
+        old_status = prescription.status
+        prescription.status = 'processing'
+        
+        # 處理庫存變化
+        stock_result = handle_prescription_stock_change(prescription_id, old_status, 'processing', db)
+        
+        db.commit()
+        
+        # 如果ROS2可用，加入處理佇列
+        if ROS2_AVAILABLE and ros2_node:
+            order_data = {
+                "order_id": f"ORDER_{prescription.id:04d}",
+                "prescription_id": prescription.id,
+                "patient_name": prescription.patient_name,
+                "status": "processing",
+                "assigned_to": requester_id
+            }
+            ros2_node.add_order(order_data)
+        
+        logger.info(f"訂單 ORDER_{prescription.id:04d} 已確認並開始執行")
+        
+        return {
+            "success": True,
+            "message": f"訂單 ORDER_{prescription.id:04d} 已開始執行",
+            "order_id": f"ORDER_{prescription.id:04d}",
+            "prescription_id": prescription.id,
+            "stock_changes": stock_result,
+            "status": "processing"
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"執行訂單失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"執行失敗: {str(e)}")
+
+@app.post("/api/ros2/complete-order")
+async def complete_order(request_data: dict, db: Session = Depends(get_db)):
+    """標記訂單為完成"""
+    logger.info("ROS2標記訂單完成")
+    
+    prescription_id = request_data.get("prescription_id")
+    completion_notes = request_data.get("notes", "")
+    
+    if not prescription_id:
+        raise HTTPException(status_code=400, detail="必須提供 prescription_id")
+    
+    prescription = db.query(Prescription).filter(
+        Prescription.id == prescription_id,
+        Prescription.status == 'processing'
+    ).first()
+    
+    if not prescription:
+        return {
+            "success": False,
+            "message": "處方籤不存在或狀態不正確"
+        }
+    
+    prescription.status = 'completed'
+    db.commit()
+    
+    logger.info(f"訂單 ORDER_{prescription.id:04d} 已完成")
+    
+    return {
+        "success": True,
+        "message": f"訂單 ORDER_{prescription.id:04d} 已完成",
+        "order_id": f"ORDER_{prescription.id:04d}",
+        "prescription_id": prescription.id,
+        "completion_time": datetime.now().isoformat(),
+        "notes": completion_notes
+    }
+
 @app.post("/api/ros2/request-next-order")
 async def request_next_order(request_data: dict, db: Session = Depends(get_db)):
     """ROS2 主控制器請求下一個最舊的待處理訂單"""
@@ -947,6 +1176,225 @@ async def request_next_order(request_data: dict, db: Session = Depends(get_db)):
         "success": True,
         "message": f"分配訂單 {order_data['order_id']}",
         "order": order_data
+    }
+
+@app.get("/api/medicine/search/{medicine_name}")
+async def search_medicine_by_name(medicine_name: str, db: Session = Depends(get_db)):
+    """根據藥物名稱搜尋完整資訊（基本+詳細）"""
+    logger.info(f"搜尋藥物: {medicine_name}")
+    
+    # 模糊搜尋藥物名稱
+    medicines = db.query(MedicineBasic).filter(
+        MedicineBasic.name.contains(medicine_name),
+        MedicineBasic.is_active == True
+    ).all()
+    
+    if not medicines:
+        return {
+            "found": False,
+            "message": f"找不到包含 '{medicine_name}' 的藥物",
+            "medicines": []
+        }
+    
+    result_medicines = []
+    for medicine in medicines:
+        # 獲取詳細資訊
+        detailed = db.query(MedicineDetailed).filter(
+            MedicineDetailed.medicine_id == medicine.id
+        ).first()
+        
+        medicine_info = {
+            "basic_info": {
+                "id": medicine.id,
+                "name": medicine.name,
+                "amount": medicine.amount,
+                "position": medicine.position,
+                "manufacturer": medicine.manufacturer,
+                "dosage": medicine.dosage,
+                "is_active": medicine.is_active,
+                "created_at": medicine.created_at.isoformat(),
+                "updated_at": medicine.updated_at.isoformat()
+            },
+            "detailed_info": None
+        }
+        
+        if detailed:
+            medicine_info["detailed_info"] = {
+                "id": detailed.id,
+                "description": detailed.description,
+                "ingredient": detailed.ingredient,
+                "category": detailed.category,
+                "usage_method": detailed.usage_method,
+                "unit_dose": detailed.unit_dose,
+                "side_effects": detailed.side_effects,
+                "storage_conditions": detailed.storage_conditions,
+                "expiry_date": detailed.expiry_date.isoformat() if detailed.expiry_date else None,
+                "barcode": detailed.barcode,
+                "appearance_type": detailed.appearance_type,
+                "notes": detailed.notes
+            }
+        
+        result_medicines.append(medicine_info)
+    
+    logger.info(f"找到 {len(result_medicines)} 種符合的藥物")
+    
+    return {
+        "found": True,
+        "total_found": len(result_medicines),
+        "search_term": medicine_name,
+        "medicines": result_medicines
+    }
+
+@app.post("/api/ros2/query-medicine")
+async def ros2_query_medicine(query_data: dict, db: Session = Depends(get_db)):
+    """ROS2查詢藥物詳細資訊"""
+    logger.info("ROS2查詢藥物資訊")
+    
+    medicine_name = query_data.get("medicine_name")
+    medicine_id = query_data.get("medicine_id")
+    include_stock = query_data.get("include_stock", True)
+    include_detailed = query_data.get("include_detailed", True)
+    
+    if not medicine_name and not medicine_id:
+        raise HTTPException(status_code=400, detail="必須提供 medicine_name 或 medicine_id")
+    
+    # 查找藥物
+    if medicine_id:
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    else:
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+    
+    if not medicine:
+        return {
+            "found": False,
+            "message": f"找不到藥物: {medicine_name or medicine_id}",
+            "medicine": None
+        }
+    
+    # 基本資訊
+    medicine_info = {
+        "basic_info": {
+            "id": medicine.id,
+            "name": medicine.name,
+            "position": medicine.position,
+            "manufacturer": medicine.manufacturer,
+            "dosage": medicine.dosage,
+            "is_active": medicine.is_active
+        }
+    }
+    
+    # 包含庫存資訊
+    if include_stock:
+        medicine_info["stock_info"] = {
+            "current_amount": medicine.amount,
+            "position": medicine.position,
+            "last_updated": medicine.updated_at.isoformat()
+        }
+    
+    # 包含詳細資訊
+    if include_detailed:
+        detailed = db.query(MedicineDetailed).filter(
+            MedicineDetailed.medicine_id == medicine.id
+        ).first()
+        
+        if detailed:
+            medicine_info["detailed_info"] = {
+                "description": detailed.description,
+                "ingredient": detailed.ingredient,
+                "category": detailed.category,
+                "usage_method": detailed.usage_method,
+                "unit_dose": detailed.unit_dose,
+                "side_effects": detailed.side_effects,
+                "storage_conditions": detailed.storage_conditions,
+                "expiry_date": detailed.expiry_date.isoformat() if detailed.expiry_date else None,
+                "appearance_type": detailed.appearance_type,
+                "notes": detailed.notes
+            }
+        else:
+            medicine_info["detailed_info"] = None
+    
+    logger.info(f"ROS2查詢藥物 {medicine.name} 完成")
+    
+    return {
+        "found": True,
+        "medicine": medicine_info
+    }
+
+@app.post("/api/ros2/batch-query-medicines")
+async def ros2_batch_query_medicines(query_data: dict, db: Session = Depends(get_db)):
+    """ROS2批量查詢多個藥物資訊"""
+    logger.info("ROS2批量查詢藥物資訊")
+    
+    medicine_list = query_data.get("medicines", [])  # [{"name": "xxx"}, {"id": 123}, ...]
+    include_stock = query_data.get("include_stock", True)
+    include_detailed = query_data.get("include_detailed", False)
+    
+    if not medicine_list:
+        raise HTTPException(status_code=400, detail="必須提供藥物列表")
+    
+    results = []
+    for item in medicine_list:
+        medicine_name = item.get("name")
+        medicine_id = item.get("id")
+        
+        if medicine_id:
+            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+        elif medicine_name:
+            medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_name).first()
+        else:
+            results.append({
+                "query": item,
+                "found": False,
+                "message": "無效的查詢參數"
+            })
+            continue
+        
+        if not medicine:
+            results.append({
+                "query": item,
+                "found": False,
+                "message": f"找不到藥物: {medicine_name or medicine_id}"
+            })
+            continue
+        
+        # 構建回應
+        medicine_info = {
+            "id": medicine.id,
+            "name": medicine.name,
+            "position": medicine.position,
+            "manufacturer": medicine.manufacturer,
+            "dosage": medicine.dosage,
+            "is_active": medicine.is_active
+        }
+        
+        if include_stock:
+            medicine_info["current_amount"] = medicine.amount
+        
+        if include_detailed:
+            detailed = db.query(MedicineDetailed).filter(
+                MedicineDetailed.medicine_id == medicine.id
+            ).first()
+            if detailed:
+                medicine_info.update({
+                    "description": detailed.description,
+                    "ingredient": detailed.ingredient,
+                    "category": detailed.category,
+                    "usage_method": detailed.usage_method,
+                    "side_effects": detailed.side_effects,
+                    "storage_conditions": detailed.storage_conditions
+                })
+        
+        results.append({
+            "query": item,
+            "found": True,
+            "medicine": medicine_info
+        })
+    
+    logger.info(f"批量查詢完成，處理 {len(medicine_list)} 個請求")
+    
+    return {
+        "total_queries": len(medicine_list),
+        "results": results
     }
 
 # ROS2相關API
