@@ -102,3 +102,126 @@
 2025-08-07 06:55:58,488 - ros2_mock - INFO - 模擬ROS2節點初始化完成
 2025-08-07 06:55:58,488 - ros2_mock - INFO - 模擬ROS2整合啟動成功
 2025-08-07 06:56:01,132 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:05,984 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 07:02:05,986 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:05,986 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:06,489 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 07:02:06,490 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:06,490 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:06,993 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='維他命C' medicine_id=None include_detailed=False
+2025-08-07 07:02:06,994 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:06,994 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:07,497 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='胃藥' medicine_id=None include_detailed=False
+2025-08-07 07:02:07,498 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:07,498 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:08,001 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='感冒糖漿' medicine_id=None include_detailed=False
+2025-08-07 07:02:08,001 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:08,001 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:08,504 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 07:02:08,506 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:08,506 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:09,009 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 07:02:09,010 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:09,010 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:09,513 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='維他命C' medicine_id=None include_detailed=False
+2025-08-07 07:02:09,514 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:09,514 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:10,017 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 07:02:10,017 - hospital_system - INFO - 處方包含 2 種藥物
+2025-08-07 07:02:10,026 - hospital_system - INFO - 處方籤基本資料已創建，ID: 2, 患者ID: P130017
+2025-08-07 07:02:10,030 - hospital_system - INFO - 處方籤創建完成，共添加 2 種藥物
+2025-08-07 07:02:10,032 - hospital_system - INFO - 扣減庫存: 阿司匹林 減少 3 (從 98 變為 95)
+2025-08-07 07:02:10,033 - hospital_system - INFO - 扣減庫存: 維他命C 減少 2 (從 150 變為 148)
+2025-08-07 07:02:10,036 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 07:02:10,036 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0002
+2025-08-07 07:02:10,036 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0002
+2025-08-07 07:02:10,036 - hospital_system - INFO - ROS2訂單已創建: ORDER_0002
+2025-08-07 07:02:10,531 - ros2_mock - INFO - 開始處理訂單: ORDER_0002
+2025-08-07 07:02:10,531 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 07:02:12,039 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 07:02:12,039 - hospital_system - INFO - 處方包含 2 種藥物
+2025-08-07 07:02:12,042 - hospital_system - INFO - 處方籤基本資料已創建，ID: 3, 患者ID: P132039
+2025-08-07 07:02:12,046 - hospital_system - INFO - 處方籤創建完成，共添加 2 種藥物
+2025-08-07 07:02:12,047 - hospital_system - INFO - 扣減庫存: 布洛芬 減少 1 (從 80 變為 79)
+2025-08-07 07:02:12,047 - hospital_system - INFO - 扣減庫存: 胃藥 減少 1 (從 120 變為 119)
+2025-08-07 07:02:12,050 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 07:02:12,050 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0003
+2025-08-07 07:02:12,050 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0003
+2025-08-07 07:02:12,050 - hospital_system - INFO - ROS2訂單已創建: ORDER_0003
+2025-08-07 07:02:12,531 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 07:02:14,053 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 07:02:14,053 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 07:02:14,056 - hospital_system - INFO - 處方籤基本資料已創建，ID: 4, 患者ID: P134053
+2025-08-07 07:02:14,059 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 07:02:14,059 - hospital_system - INFO - 扣減庫存: 感冒糖漿 減少 1 (從 50 變為 49)
+2025-08-07 07:02:14,062 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 07:02:14,062 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0004
+2025-08-07 07:02:14,062 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0004
+2025-08-07 07:02:14,062 - hospital_system - INFO - ROS2訂單已創建: ORDER_0004
+2025-08-07 07:02:15,531 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 07:02:16,065 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 07:02:16,065 - hospital_system - INFO - 處方包含 4 種藥物
+2025-08-07 07:02:16,067 - hospital_system - INFO - 處方籤基本資料已創建，ID: 5, 患者ID: P136065
+2025-08-07 07:02:16,071 - hospital_system - INFO - 處方籤創建完成，共添加 4 種藥物
+2025-08-07 07:02:16,072 - hospital_system - INFO - 扣減庫存: 阿司匹林 減少 5 (從 95 變為 90)
+2025-08-07 07:02:16,072 - hospital_system - INFO - 扣減庫存: 布洛芬 減少 3 (從 79 變為 76)
+2025-08-07 07:02:16,072 - hospital_system - INFO - 扣減庫存: 維他命C 減少 2 (從 148 變為 146)
+2025-08-07 07:02:16,073 - hospital_system - INFO - 扣減庫存: 胃藥 減少 1 (從 119 變為 118)
+2025-08-07 07:02:16,076 - hospital_system - INFO - ROS2可用，準備創建訂單
+2025-08-07 07:02:16,076 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0005
+2025-08-07 07:02:16,076 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0005
+2025-08-07 07:02:16,076 - hospital_system - INFO - ROS2訂單已創建: ORDER_0005
+2025-08-07 07:02:18,078 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 07:02:18,079 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:18,079 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:18,082 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 07:02:18,082 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:18,082 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:19,085 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 07:02:19,086 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:19,086 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:19,089 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 07:02:19,089 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:19,090 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:19,532 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 07:02:20,092 - hospital_system - INFO - ROS2 基本藥物服務請求: medicine_name='阿司匹林' medicine_id=None include_detailed=False
+2025-08-07 07:02:20,093 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:20,093 - hospital_system - INFO - 基本藥物服務完成，返回 1 個藥物
+2025-08-07 07:02:20,096 - hospital_system - INFO - ROS2 詳細藥物服務請求: medicine_name='布洛芬' medicine_id=None include_detailed=False
+2025-08-07 07:02:20,097 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: None
+2025-08-07 07:02:20,097 - hospital_system - INFO - 詳細藥物服務完成，返回 1 個詳細資訊
+2025-08-07 07:02:24,532 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 07:02:27,532 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 07:02:29,535 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 07:02:29,538 - ros2_mock - INFO - 處方籤 2 狀態已自動更新為 completed
+2025-08-07 07:02:29,538 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 07:02:30,539 - ros2_mock - INFO - 開始處理訂單: ORDER_0003
+2025-08-07 07:02:30,539 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 07:02:32,539 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 07:02:35,539 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 07:02:39,539 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 07:02:44,539 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 07:02:47,540 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 07:02:49,542 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 07:02:49,545 - ros2_mock - INFO - 處方籤 3 狀態已自動更新為 completed
+2025-08-07 07:02:49,545 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 07:02:50,545 - ros2_mock - INFO - 開始處理訂單: ORDER_0004
+2025-08-07 07:02:50,545 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 07:02:52,545 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 07:02:55,546 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 07:02:59,546 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 07:03:04,546 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 07:03:07,547 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 07:03:09,549 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 07:03:09,551 - ros2_mock - INFO - 處方籤 4 狀態已自動更新為 completed
+2025-08-07 07:03:09,551 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 07:03:10,551 - ros2_mock - INFO - 開始處理訂單: ORDER_0005
+2025-08-07 07:03:10,552 - ros2_mock - INFO - 驗證處方籤中...
+2025-08-07 07:03:12,552 - ros2_mock - INFO - 定位藥物中...
+2025-08-07 07:03:15,552 - ros2_mock - INFO - 移動機器人中...
+2025-08-07 07:03:19,552 - ros2_mock - INFO - 分配藥物中...
+2025-08-07 07:03:24,552 - ros2_mock - INFO - 包裝藥物中...
+2025-08-07 07:03:27,553 - ros2_mock - INFO - 品質檢查中...
+2025-08-07 07:03:29,555 - hospital_system - INFO - ROS2標記訂單完成
+2025-08-07 07:03:29,557 - ros2_mock - INFO - 處方籤 5 狀態已自動更新為 completed
+2025-08-07 07:03:29,557 - ros2_mock - INFO - 訂單處理完成
