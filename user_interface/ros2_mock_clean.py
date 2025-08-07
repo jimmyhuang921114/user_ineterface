@@ -20,7 +20,7 @@ class MockHospitalROS2Node:
     def __init__(self):
         logger.info("初始化模擬ROS2節點...")
         
-        # 訂單處理狀態
+        # 訂單處理狀態 - 一次處理一個訂單
         self.order_queue = Queue()
         self.current_order = None
         self.processing = False
@@ -116,6 +116,36 @@ class MockHospitalROS2Node:
         except Exception as e:
             logger.error(f"自動更新處方籤狀態時發生錯誤: {e}")
     
+    def has_pending_orders(self):
+        """檢查是否有正在處理的訂單 - 一次只處理一個"""
+        with self.order_lock:
+            return self.processing or not self.order_queue.empty()
+    
+    def add_order_to_queue(self, order_data: Dict):
+        """新增訂單到佇列 - 一次只處理一個"""
+        if isinstance(order_data, dict):
+            if self.processing:
+                logger.warning(f"ROS2正在處理其他訂單，拒絕新訂單: {order_data.get('order_id', 'Unknown')}")
+                return False
+            
+            # 添加時間戳和狀態
+            order_data.update({
+                "timestamp": time.time(),
+                "status": "queued",
+                "created_at": time.strftime("%Y-%m-%d %H:%M:%S")
+            })
+            
+            self.order_queue.put(order_data)
+            logger.info(f"訂單已加入佇列: {order_data.get('order_id', 'Unknown')}")
+            
+            # 傳送給 ROS2 主控制器（模擬）
+            self._send_to_ros2_master(order_data)
+            
+            return True
+        else:
+            logger.error("訂單資料格式錯誤")
+            return False
+    
     def add_order(self, order_data: Dict):
         """添加訂單到處理佇列"""
         try:
@@ -150,6 +180,15 @@ class MockHospitalROS2Node:
                 "success": False,
                 "message": f"添加訂單失敗: {str(e)}"
             }
+    
+    def publish_order_status(self, status_data):
+        """發布訂單狀態到ROS2主題"""
+        try:
+            logger.info(f"發布訂單狀態: {status_data.get('type', 'Unknown')}")
+            # 在真實環境中，這會發布到ROS2主題
+            # 這裡只是記錄日誌
+        except Exception as e:
+            logger.error(f"發布訂單狀態失敗: {e}")
     
     def _send_to_ros2_master(self, order_data: Dict):
         """將訂單資訊傳送給 ROS2 主控制器（您的 ROS2 媽）"""
@@ -238,3 +277,8 @@ def get_ros2_node() -> Optional[MockHospitalROS2Node]:
     # 在這個模擬版本中，我們返回None
     # 實際的ROS2實現會返回真實的節點
     return None
+
+# 為了向後兼容，提供 ROS2Mock 別名
+class ROS2Mock(MockHospitalROS2Node):
+    """ROS2Mock 別名類，向後兼容"""
+    pass
