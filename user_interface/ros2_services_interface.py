@@ -247,6 +247,10 @@ class HospitalROS2Services(Node):
             
             # 解析藥物列表
             medicines_data = earliest.get('medicines', [])
+            if not medicines_data:
+                # 如果沒有藥物數據，記錄警告但仍然返回訂單
+                self.get_logger().warn(f"⚠️ 處方籤 {prescription_id} 沒有藥物數據")
+                
             for med in medicines_data:
                 medicine_info = {
                     "name": med.get('name', ''),
@@ -334,11 +338,16 @@ class HospitalROS2Services(Node):
             yaml_content = f"""order_id: "{order_data['order_id']}"
 prescription_id: {order_data.get('prescription_id', '')}
 patient_name: "{order_data.get('patient_name', '')}"
-medicine:
-"""
+medicine:"""
             
-            for med in order_data.get('medicines', []):
-                yaml_content += f"""  - name: {med.get('name', '')}
+            medicines = order_data.get('medicines', [])
+            if not medicines:
+                # 如果沒有藥物，添加空列表
+                yaml_content += " []"
+            else:
+                yaml_content += "\n"
+                for med in medicines:
+                    yaml_content += f"""  - name: {med.get('name', '')}
     amount: {med.get('amount', 0)}
     locate: {med.get('locate', [1, 1])}
     prompt: {med.get('prompt', 'tablet')}
