@@ -751,13 +751,34 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         medicines_list = prescription_data.pop('medicines', [])
         logger.info(f"處方包含 {len(medicines_list)} 種藥物")
         
+        # 確保必需的字段存在
+        patient_name = prescription_data.get('patient_name', '')
+        doctor_name = prescription_data.get('doctor_name', '')
+        
+        if not patient_name:
+            raise HTTPException(status_code=400, detail="患者姓名不能為空")
+        if not doctor_name:
+            raise HTTPException(status_code=400, detail="醫生姓名不能為空")
+        
+        # 生成 patient_id（如果沒有提供）
+        patient_id = prescription_data.get('patient_id', '')
+        if not patient_id:
+            # 使用當前時間戳和患者名稱生成唯一 ID
+            import time
+            patient_id = f"P{int(time.time() * 1000) % 1000000:06d}"
+        
         # 創建處方籤，預設狀態為 pending
-        prescription_data.setdefault('status', 'pending')
-        prescription = Prescription(**prescription_data)
+        prescription = Prescription(
+            patient_name=patient_name,
+            patient_id=patient_id,
+            doctor_name=doctor_name,
+            diagnosis=prescription_data.get('diagnosis', ''),
+            status='pending'
+        )
         db.add(prescription)
         db.commit()
         db.refresh(prescription)
-        logger.info(f"處方籤基本資料已創建，ID: {prescription.id}")
+        logger.info(f"處方籤基本資料已創建，ID: {prescription.id}, 患者ID: {patient_id}")
         
         # 處理藥物列表
         added_medicines = 0
@@ -785,6 +806,34 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
                         duration="7天",
                         quantity=quantity,
                         instructions=""
+                    )
+                    db.add(prescription_medicine)
+                    added_medicines += 1
+                    logger.debug(f"藥物 {medicine_name} 已加入處方籤")
+                else:
+                    logger.warning(f"找不到藥物: {medicine_name}")
+            elif isinstance(medicine_info, dict):
+                # 字典格式支援
+                medicine_name = medicine_info.get('name', '')
+                dosage = medicine_info.get('dosage', '')
+                quantity = int(medicine_info.get('quantity', 1))
+                frequency = medicine_info.get('frequency', '')
+                duration = medicine_info.get('duration', '7天')
+                notes = medicine_info.get('notes', '')
+                
+                logger.debug(f"藥物詳情 (字典) - 名稱: {medicine_name}, 劑量: {dosage}, 數量: {quantity}")
+                
+                # 查找藥物ID
+                medicine = db.query(Medicine).filter(Medicine.name == medicine_name).first()
+                if medicine:
+                    prescription_medicine = PrescriptionMedicine(
+                        prescription_id=prescription.id,
+                        medicine_id=medicine.id,
+                        dosage=dosage,
+                        frequency=frequency,
+                        duration=duration,
+                        quantity=quantity,
+                        instructions=notes
                     )
                     db.add(prescription_medicine)
                     added_medicines += 1
