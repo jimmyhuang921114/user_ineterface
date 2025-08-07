@@ -1,12 +1,14 @@
 nohup: ignoring input
-2025-08-07 04:05:37,437 - ros2_mock - INFO - 啟動模擬ROS2整合...
-2025-08-07 04:05:37,437 - ros2_mock - INFO - 初始化模擬ROS2節點...
-2025-08-07 04:05:37,437 - ros2_mock - INFO - 模擬ROS2節點初始化完成
-2025-08-07 04:05:37,438 - ros2_mock - INFO - 模擬ROS2整合啟動成功
-INFO:     Started server process [28269]
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+INFO:     Started server process [32055]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+2025-08-07 04:23:08,730 - hospital_system - INFO - 調整藥物 3 庫存
+2025-08-07 04:23:08,735 - hospital_system - INFO - 藥物 普拿疼 庫存調整: 100 → 150 (原因: 新進貨)
 使用模擬ROS2模式
 資料庫表格創建完成
 醫院藥物管理系統 - 乾淨版本
@@ -19,106 +21,23 @@ API文檔: http://localhost:8001/docs
 注意：此版本不包含測試資料
 請透過 API 或網頁界面添加藥物資料
 ==================================================
-INFO:     127.0.0.1:38584 - "POST /api/medicine/unified HTTP/1.1" 200 OK
-INFO:     127.0.0.1:38588 - "POST /api/medicine/unified HTTP/1.1" 200 OK
-2025-08-07 04:05:46,717 - hospital_system - INFO - 開始獲取基本藥物列表
-2025-08-07 04:05:46,718 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
-2025-08-07 04:05:46,718 - hospital_system - INFO - 藥物資料已發布到ROS2
-INFO:     127.0.0.1:38592 - "GET /api/medicine/basic HTTP/1.1" 200 OK
-2025-08-07 04:05:54,824 - hospital_system - INFO - 開始創建新處方籤
-2025-08-07 04:05:54,824 - hospital_system - INFO - 處方包含 2 種藥物
-2025-08-07 04:05:54,830 - hospital_system - INFO - 處方籤基本資料已創建，ID: 1
-2025-08-07 04:05:54,835 - hospital_system - INFO - 處方籤創建完成，共添加 2 種藥物
-2025-08-07 04:05:54,838 - hospital_system - INFO - 預留庫存: 普拿疼 數量 30
-2025-08-07 04:05:54,838 - hospital_system - INFO - 預留庫存: 阿斯匹靈 數量 20
-2025-08-07 04:05:54,838 - hospital_system - INFO - ROS2可用，準備創建訂單
-2025-08-07 04:05:54,838 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0001
-2025-08-07 04:05:54,838 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0001
-2025-08-07 04:05:54,838 - hospital_system - INFO - ROS2訂單已創建: ORDER_0001
-INFO:     127.0.0.1:50938 - "POST /api/prescription/ HTTP/1.1" 200 OK
-2025-08-07 04:05:55,439 - ros2_mock - INFO - 開始處理訂單: ORDER_0001
-2025-08-07 04:05:55,439 - ros2_mock - INFO - 驗證處方籤中...
-2025-08-07 04:05:57,439 - ros2_mock - INFO - 定位藥物中...
-2025-08-07 04:06:00,440 - ros2_mock - INFO - 移動機器人中...
-2025-08-07 04:06:02,587 - hospital_system - INFO - 檢查處方籤 1 庫存可用性
-2025-08-07 04:06:02,590 - hospital_system - INFO - 處方籤 1 庫存檢查完成，可處理: True
-INFO:     127.0.0.1:39720 - "GET /api/prescription/1/stock-check HTTP/1.1" 200 OK
-2025-08-07 04:06:04,440 - ros2_mock - INFO - 分配藥物中...
-2025-08-07 04:06:09,440 - ros2_mock - INFO - 包裝藥物中...
-2025-08-07 04:06:11,598 - hospital_system - INFO - 更新處方籤 1 狀態
-2025-08-07 04:06:11,602 - hospital_system - INFO - 處方籤 1 狀態已更新: active → processing
-2025-08-07 04:06:11,603 - hospital_system - INFO - 處理處方籤 1 庫存變化: active → processing
-2025-08-07 04:06:11,603 - hospital_system - INFO - 扣減庫存: 普拿疼 減少 30，剩餘 70
-2025-08-07 04:06:11,604 - hospital_system - INFO - 扣減庫存: 阿斯匹靈 減少 20，剩餘 30
-2025-08-07 04:06:11,606 - hospital_system - INFO - 處方籤 1 庫存變化完成，共 2 項藥物
-2025-08-07 04:06:11,606 - hospital_system - INFO - 觸發 ROS2 處理處方籤 1
-INFO:     127.0.0.1:51580 - "PUT /api/prescription/1/status HTTP/1.1" 200 OK
-2025-08-07 04:06:12,440 - ros2_mock - INFO - 品質檢查中...
-2025-08-07 04:06:14,441 - ros2_mock - INFO - 訂單處理完成
-2025-08-07 04:19:51,144 - hospital_system - INFO - 開始獲取基本藥物列表
-2025-08-07 04:19:51,157 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
-2025-08-07 04:19:51,157 - hospital_system - INFO - 藥物資料已發布到ROS2
-INFO:     127.0.0.1:33512 - "GET /api/medicine/basic HTTP/1.1" 200 OK
-2025-08-07 04:19:59,728 - hospital_system - INFO - 獲取處方籤詳細資訊: 1
-2025-08-07 04:19:59,732 - hospital_system - INFO - 返回處方籤 1 詳細資訊，包含 2 種藥物
-INFO:     127.0.0.1:54204 - "GET /api/prescription/1 HTTP/1.1" 200 OK
-2025-08-07 04:20:10,609 - hospital_system - INFO - 更新處方籤 1 狀態
-2025-08-07 04:20:10,614 - hospital_system - INFO - 處方籤 1 狀態已更新: processing → cancelled
-2025-08-07 04:20:10,615 - hospital_system - INFO - 處理處方籤 1 庫存變化: processing → cancelled
-2025-08-07 04:20:10,615 - hospital_system - INFO - 恢復庫存: 普拿疼 增加 30，現有 100
-2025-08-07 04:20:10,616 - hospital_system - INFO - 恢復庫存: 阿斯匹靈 增加 20，現有 50
-2025-08-07 04:20:10,618 - hospital_system - INFO - 處方籤 1 庫存變化完成，共 2 項藥物
-INFO:     127.0.0.1:34748 - "PUT /api/prescription/1/status HTTP/1.1" 200 OK
-2025-08-07 04:20:16,897 - hospital_system - INFO - 開始獲取基本藥物列表
-2025-08-07 04:20:16,899 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
-2025-08-07 04:20:16,899 - hospital_system - INFO - 藥物資料已發布到ROS2
-INFO:     127.0.0.1:34754 - "GET /api/medicine/basic HTTP/1.1" 200 OK
-2025-08-07 04:20:28,276 - hospital_system - INFO - 開始創建新處方籤
-2025-08-07 04:20:28,276 - hospital_system - INFO - 處方包含 1 種藥物
-2025-08-07 04:20:28,281 - hospital_system - INFO - 處方籤基本資料已創建，ID: 2
-2025-08-07 04:20:28,286 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
-2025-08-07 04:20:28,288 - hospital_system - INFO - 預留庫存: 普拿疼 數量 10
-2025-08-07 04:20:28,288 - hospital_system - INFO - ROS2可用，準備創建訂單
-2025-08-07 04:20:28,288 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0002
-2025-08-07 04:20:28,288 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0002
-2025-08-07 04:20:28,288 - hospital_system - INFO - ROS2訂單已創建: ORDER_0002
-INFO:     127.0.0.1:60970 - "POST /api/prescription/ HTTP/1.1" 200 OK
-2025-08-07 04:20:28,296 - hospital_system - INFO - 更新處方籤 2 狀態
-2025-08-07 04:20:28,300 - hospital_system - INFO - 處方籤 2 狀態已更新: active → cancelled
-2025-08-07 04:20:28,301 - hospital_system - INFO - 處理處方籤 2 庫存變化: active → cancelled
-2025-08-07 04:20:28,301 - hospital_system - INFO - 處方籤取消（未開始處理）: 普拿疼 庫存無變化
-2025-08-07 04:20:28,301 - hospital_system - INFO - 處方籤 2 庫存變化完成，共 1 項藥物
-INFO:     127.0.0.1:60978 - "PUT /api/prescription/2/status HTTP/1.1" 200 OK
-2025-08-07 04:20:28,558 - ros2_mock - INFO - 開始處理訂單: ORDER_0002
-2025-08-07 04:20:28,558 - ros2_mock - INFO - 驗證處方籤中...
-2025-08-07 04:20:30,559 - ros2_mock - INFO - 定位藥物中...
-2025-08-07 04:20:33,559 - ros2_mock - INFO - 移動機器人中...
-2025-08-07 04:20:37,057 - hospital_system - INFO - 開始創建新處方籤
-2025-08-07 04:20:37,057 - hospital_system - INFO - 處方包含 2 種藥物
-2025-08-07 04:20:37,060 - hospital_system - INFO - 處方籤基本資料已創建，ID: 3
-2025-08-07 04:20:37,064 - hospital_system - INFO - 處方籤創建完成，共添加 2 種藥物
-2025-08-07 04:20:37,065 - hospital_system - INFO - ROS2可用，準備創建訂單
-2025-08-07 04:20:37,065 - ros2_mock - INFO - 訂單已加入佇列: ORDER_0003
-2025-08-07 04:20:37,066 - ros2_mock - INFO - 向 ROS2 主控制器傳送訂單: ORDER_0003
-2025-08-07 04:20:37,066 - hospital_system - INFO - ROS2訂單已創建: ORDER_0003
-INFO:     127.0.0.1:47212 - "POST /api/prescription/ HTTP/1.1" 200 OK
-2025-08-07 04:20:37,559 - ros2_mock - INFO - 分配藥物中...
-2025-08-07 04:20:42,559 - ros2_mock - INFO - 包裝藥物中...
-2025-08-07 04:20:45,560 - ros2_mock - INFO - 品質檢查中...
-2025-08-07 04:20:45,738 - hospital_system - INFO - 更新處方籤 3 狀態
-2025-08-07 04:20:45,743 - hospital_system - INFO - 處方籤 3 狀態已更新: active → processing
-2025-08-07 04:20:45,743 - hospital_system - INFO - 處理處方籤 3 庫存變化: active → processing
-2025-08-07 04:20:45,744 - hospital_system - WARNING - 庫存不足: 普拿疼 需要 150，只有 100
-2025-08-07 04:20:45,744 - hospital_system - WARNING - 庫存不足: 阿斯匹靈 需要 80，只有 50
-2025-08-07 04:20:45,744 - hospital_system - INFO - 處方籤 3 庫存變化完成，共 2 項藥物
-2025-08-07 04:20:45,744 - hospital_system - INFO - 觸發 ROS2 處理處方籤 3
-INFO:     127.0.0.1:58002 - "PUT /api/prescription/3/status HTTP/1.1" 200 OK
-2025-08-07 04:20:47,560 - ros2_mock - INFO - 訂單處理完成
-2025-08-07 04:20:48,560 - ros2_mock - INFO - 開始處理訂單: ORDER_0003
-2025-08-07 04:20:48,560 - ros2_mock - INFO - 驗證處方籤中...
-2025-08-07 04:20:50,560 - ros2_mock - INFO - 定位藥物中...
-2025-08-07 04:20:53,561 - ros2_mock - INFO - 移動機器人中...
-2025-08-07 04:20:57,561 - ros2_mock - INFO - 分配藥物中...
-2025-08-07 04:21:02,561 - ros2_mock - INFO - 包裝藥物中...
-2025-08-07 04:21:05,561 - ros2_mock - INFO - 品質檢查中...
-2025-08-07 04:21:07,562 - ros2_mock - INFO - 訂單處理完成
+INFO:     127.0.0.1:42236 - "POST /api/medicine/adjust-stock HTTP/1.1" 200 OK
+2025-08-07 04:23:09,589 - hospital_system - INFO - 系統健康檢查請求
+2025-08-07 04:23:09,589 - hospital_system - INFO - 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'mock', 'ros2_mode': 'mock'}
+INFO:     127.0.0.1:42250 - "GET /api/health HTTP/1.1" 200 OK
+2025-08-07 04:23:17,598 - hospital_system - INFO - 調整藥物 3 庫存
+2025-08-07 04:23:17,602 - hospital_system - INFO - 藥物 普拿疼 庫存調整: 150 → 200 (原因: 新進貨)
+INFO:     127.0.0.1:40236 - "POST /api/medicine/adjust-stock HTTP/1.1" 200 OK
+2025-08-07 04:23:26,520 - hospital_system - INFO - 調整藥物 2 庫存
+2025-08-07 04:23:26,523 - hospital_system - INFO - 藥物 更新後的測試藥物B 庫存調整: 150 → 125 (原因: 過期處理)
+INFO:     127.0.0.1:57630 - "POST /api/medicine/2/adjust-stock HTTP/1.1" 200 OK
+2025-08-07 04:23:34,346 - hospital_system - INFO - 調整藥物 4 庫存
+2025-08-07 04:23:34,351 - hospital_system - INFO - 藥物 阿斯匹靈 庫存調整: 50 → 75 (原因: 庫存盤點修正)
+INFO:     127.0.0.1:54962 - "POST /api/medicine/adjust-stock HTTP/1.1" 200 OK
+2025-08-07 04:23:43,526 - hospital_system - INFO - 調整藥物 4 庫存
+2025-08-07 04:23:43,527 - hospital_system - ERROR - 調整庫存失敗: 400: 庫存不足，現有: 75，嘗試減少: 100
+INFO:     127.0.0.1:34332 - "POST /api/medicine/adjust-stock HTTP/1.1" 500 Internal Server Error
+2025-08-07 04:23:50,789 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 04:23:50,791 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
+2025-08-07 04:23:50,791 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:50278 - "GET /api/medicine/basic HTTP/1.1" 200 OK

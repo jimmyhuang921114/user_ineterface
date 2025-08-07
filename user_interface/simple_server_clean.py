@@ -792,6 +792,34 @@ async def check_prescription_stock(prescription_id: int, db: Session = Depends(g
 
 @app.post("/api/medicine/{medicine_id}/adjust-stock")
 async def adjust_medicine_stock(medicine_id: int, adjustment_data: dict, db: Session = Depends(get_db)):
+    """調整藥物庫存（按ID）"""
+    return await _adjust_medicine_stock_impl(medicine_id, adjustment_data, db)
+
+@app.post("/api/medicine/adjust-stock")
+async def adjust_medicine_stock_by_name(adjustment_data: dict, db: Session = Depends(get_db)):
+    """調整藥物庫存（按名稱或ID）"""
+    medicine_identifier = adjustment_data.get("medicine_id") or adjustment_data.get("medicine_name")
+    if not medicine_identifier:
+        raise HTTPException(status_code=400, detail="必須提供 medicine_id 或 medicine_name")
+    
+    # 嘗試按ID查找
+    try:
+        medicine_id = int(medicine_identifier)
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    except ValueError:
+        # 按名稱查找
+        medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_identifier).first()
+        if medicine:
+            medicine_id = medicine.id
+        else:
+            raise HTTPException(status_code=404, detail=f"找不到藥物: {medicine_identifier}")
+    
+    if not medicine:
+        raise HTTPException(status_code=404, detail=f"找不到藥物: {medicine_identifier}")
+    
+    return await _adjust_medicine_stock_impl(medicine_id, adjustment_data, db)
+
+async def _adjust_medicine_stock_impl(medicine_id: int, adjustment_data: dict, db: Session = Depends(get_db)):
     """調整藥物庫存"""
     logger.info(f"調整藥物 {medicine_id} 庫存")
     

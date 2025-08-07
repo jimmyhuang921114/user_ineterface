@@ -144,3 +144,22 @@
 2025-08-07 04:21:02,561 - ros2_mock - INFO - 包裝藥物中...
 2025-08-07 04:21:05,561 - ros2_mock - INFO - 品質檢查中...
 2025-08-07 04:21:07,562 - ros2_mock - INFO - 訂單處理完成
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 04:22:59,669 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+2025-08-07 04:23:08,730 - hospital_system - INFO - 調整藥物 3 庫存
+2025-08-07 04:23:08,735 - hospital_system - INFO - 藥物 普拿疼 庫存調整: 100 → 150 (原因: 新進貨)
+2025-08-07 04:23:09,589 - hospital_system - INFO - 系統健康檢查請求
+2025-08-07 04:23:09,589 - hospital_system - INFO - 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'mock', 'ros2_mode': 'mock'}
+2025-08-07 04:23:17,598 - hospital_system - INFO - 調整藥物 3 庫存
+2025-08-07 04:23:17,602 - hospital_system - INFO - 藥物 普拿疼 庫存調整: 150 → 200 (原因: 新進貨)
+2025-08-07 04:23:26,520 - hospital_system - INFO - 調整藥物 2 庫存
+2025-08-07 04:23:26,523 - hospital_system - INFO - 藥物 更新後的測試藥物B 庫存調整: 150 → 125 (原因: 過期處理)
+2025-08-07 04:23:34,346 - hospital_system - INFO - 調整藥物 4 庫存
+2025-08-07 04:23:34,351 - hospital_system - INFO - 藥物 阿斯匹靈 庫存調整: 50 → 75 (原因: 庫存盤點修正)
+2025-08-07 04:23:43,526 - hospital_system - INFO - 調整藥物 4 庫存
+2025-08-07 04:23:43,527 - hospital_system - ERROR - 調整庫存失敗: 400: 庫存不足，現有: 75，嘗試減少: 100
+2025-08-07 04:23:50,789 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 04:23:50,791 - hospital_system - INFO - 基本藥物列表構建完成，共 3 種藥物
+2025-08-07 04:23:50,791 - hospital_system - INFO - 藥物資料已發布到ROS2
