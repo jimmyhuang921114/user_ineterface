@@ -46,9 +46,20 @@ def handle_prescription_stock_change(prescription_id: int, old_status: str, new_
         if not medicine:
             continue
             
-        # 根據狀態變化決定庫存操作
-        if old_status in ['active', 'pending'] and new_status == 'processing':
-            # 開始處理：實際扣減庫存
+        # 由於創建處方籤時已經扣減庫存，這裡主要處理取消時的庫存恢復
+        if old_status in ['active', 'pending', 'processing'] and new_status == 'cancelled':
+            # 取消訂單：恢復庫存
+            medicine.amount += pm.quantity
+            stock_changes.append({
+                "medicine_name": medicine.name,
+                "action": "restored",
+                "quantity": pm.quantity,
+                "current": medicine.amount
+            })
+            logger.info(f"取消訂單恢復庫存: {medicine.name} 增加 {pm.quantity}，現有 {medicine.amount}")
+            
+        elif old_status == 'cancelled' and new_status in ['pending', 'processing']:
+            # 從取消變為處理：重新扣減庫存
             if medicine.amount >= pm.quantity:
                 medicine.amount -= pm.quantity
                 stock_changes.append({
@@ -57,7 +68,7 @@ def handle_prescription_stock_change(prescription_id: int, old_status: str, new_
                     "quantity": pm.quantity,
                     "remaining": medicine.amount
                 })
-                logger.info(f"扣減庫存: {medicine.name} 減少 {pm.quantity}，剩餘 {medicine.amount}")
+                logger.info(f"重新啟動訂單扣減庫存: {medicine.name} 減少 {pm.quantity}，剩餘 {medicine.amount}")
             else:
                 stock_changes.append({
                     "medicine_name": medicine.name,
@@ -65,27 +76,15 @@ def handle_prescription_stock_change(prescription_id: int, old_status: str, new_
                     "requested": pm.quantity,
                     "available": medicine.amount
                 })
-                logger.warning(f"庫存不足: {medicine.name} 需要 {pm.quantity}，只有 {medicine.amount}")
-                
-        elif old_status == 'processing' and new_status in ['cancelled', 'pending']:
-            # 取消或退回：恢復庫存
-            medicine.amount += pm.quantity
-            stock_changes.append({
-                "medicine_name": medicine.name,
-                "action": "restored",
-                "quantity": pm.quantity,
-                "current": medicine.amount
-            })
-            logger.info(f"恢復庫存: {medicine.name} 增加 {pm.quantity}，現有 {medicine.amount}")
-            
-        elif old_status in ['active', 'pending'] and new_status == 'cancelled':
-            # 直接取消：無需庫存操作（因為還沒扣減）
+                logger.warning(f"重新啟動失敗，庫存不足: {medicine.name} 需要 {pm.quantity}，只有 {medicine.amount}")
+        else:
+            # 其他狀態變化（pending → processing → completed）：無需庫存變化
             stock_changes.append({
                 "medicine_name": medicine.name,
                 "action": "no_change",
-                "reason": "cancelled_before_processing"
+                "reason": f"status_change_{old_status}_to_{new_status}"
             })
-            logger.info(f"處方籤取消（未開始處理）: {medicine.name} 庫存無變化")
+            logger.info(f"狀態變化無需庫存調整: {medicine.name} ({old_status} → {new_status})")
     
     if stock_changes:
         db.commit()
@@ -577,21 +576,43 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         db.commit()
         logger.info(f"處方籤創建完成，共添加 {added_medicines} 種藥物")
         
-        # 檢查庫存並預留
+        # 檢查庫存並立即扣減
         stock_warnings = []
+        stock_changes = []
         for pm in db.query(PrescriptionMedicine).filter(PrescriptionMedicine.prescription_id == prescription.id).all():
             medicine = db.query(MedicineBasic).filter(MedicineBasic.id == pm.medicine_id).first()
             if medicine:
                 if medicine.amount < pm.quantity:
                     stock_warnings.append(f"{medicine.name}: 庫存不足 (需要:{pm.quantity}, 現有:{medicine.amount})")
+                    logger.warning(f"庫存不足: {medicine.name} 需要 {pm.quantity}，只有 {medicine.amount}")
                 else:
-                    # 預留庫存（狀態為 pending 時不真正扣減，而是標記為預留）
-                    logger.info(f"預留庫存: {medicine.name} 數量 {pm.quantity}")
+                    # 立即扣減庫存（創建處方籤時）
+                    old_amount = medicine.amount
+                    medicine.amount -= pm.quantity
+                    stock_changes.append({
+                        "medicine_name": medicine.name,
+                        "deducted": pm.quantity,
+                        "old_amount": old_amount,
+                        "new_amount": medicine.amount
+                    })
+                    logger.info(f"扣減庫存: {medicine.name} 減少 {pm.quantity} (從 {old_amount} 變為 {medicine.amount})")
+        
+        # 如果有庫存不足，回滾並返回錯誤
+        if stock_warnings:
+            db.rollback()
+            raise HTTPException(status_code=400, detail={
+                "error": "庫存不足，無法創建處方籤",
+                "warnings": stock_warnings
+            })
+        
+        # 提交庫存變化
+        db.commit()
         
         result = {
             "message": "處方籤創建成功", 
             "id": prescription.id,
-            "stock_warnings": stock_warnings if stock_warnings else None
+            "stock_changes": stock_changes,
+            "medicines_added": added_medicines
         }
         
         # 如果ROS2可用，將處方籤加入訂單佇列
