@@ -192,6 +192,120 @@ async def create_unified_medicine(medicine_data: dict, db: Session = Depends(get
         db.rollback()
         raise HTTPException(status_code=400, detail=f"創建失敗: {str(e)}")
 
+@app.delete("/api/medicine/{medicine_identifier}")
+async def delete_medicine(medicine_identifier: str, db: Session = Depends(get_db)):
+    """刪除藥物（支援 ID 或名稱）"""
+    logger.info(f"嘗試刪除藥物: {medicine_identifier}")
+    
+    try:
+        # 嘗試解析為 ID
+        try:
+            medicine_id = int(medicine_identifier)
+            medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+        except ValueError:
+            # 如果不是數字，則按名稱查找
+            medicine = db.query(MedicineBasic).filter(MedicineBasic.name == medicine_identifier).first()
+        
+        if not medicine:
+            raise HTTPException(status_code=404, detail=f"找不到藥物: {medicine_identifier}")
+        
+        medicine_name = medicine.name
+        medicine_id = medicine.id
+        
+        # 檢查是否有相關的處方籤
+        prescription_count = db.query(PrescriptionMedicine).filter(
+            PrescriptionMedicine.medicine_id == medicine_id
+        ).count()
+        
+        if prescription_count > 0:
+            # 如果有處方籤使用此藥物，只標記為無效而不是真正刪除
+            medicine.is_active = False
+            db.commit()
+            logger.info(f"藥物 {medicine_name} (ID: {medicine_id}) 已標記為無效，因為有 {prescription_count} 張處方籤使用此藥物")
+            
+            return {
+                "message": f"藥物已停用（有 {prescription_count} 張處方籤使用此藥物）",
+                "medicine_id": medicine_id,
+                "medicine_name": medicine_name,
+                "action": "deactivated"
+            }
+        else:
+            # 刪除詳細資料
+            detailed = db.query(MedicineDetailed).filter(MedicineDetailed.medicine_id == medicine_id).first()
+            if detailed:
+                db.delete(detailed)
+                logger.info(f"已刪除藥物詳細資料: {medicine_name}")
+            
+            # 刪除基本資料
+            db.delete(medicine)
+            db.commit()
+            logger.info(f"已完全刪除藥物: {medicine_name} (ID: {medicine_id})")
+            
+            # 如果ROS2可用，發布刪除事件
+            if ROS2_AVAILABLE and ros2_node:
+                ros2_node.publish_medicine_data({
+                    "id": medicine_id,
+                    "name": medicine_name,
+                    "action": "deleted"
+                })
+            
+            return {
+                "message": "藥物已成功刪除",
+                "medicine_id": medicine_id,
+                "medicine_name": medicine_name,
+                "action": "deleted"
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"刪除藥物失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"刪除失敗: {str(e)}")
+
+@app.put("/api/medicine/{medicine_id}")
+async def update_medicine(medicine_id: int, medicine_data: dict, db: Session = Depends(get_db)):
+    """更新藥物資訊"""
+    logger.info(f"更新藥物 ID: {medicine_id}")
+    
+    medicine = db.query(MedicineBasic).filter(MedicineBasic.id == medicine_id).first()
+    if not medicine:
+        raise HTTPException(status_code=404, detail="藥物不存在")
+    
+    try:
+        # 更新基本資料
+        for key, value in medicine_data.items():
+            if hasattr(medicine, key) and key not in ['id', 'created_at']:
+                setattr(medicine, key, value)
+        
+        medicine.updated_at = datetime.now()
+        db.commit()
+        
+        logger.info(f"藥物 {medicine.name} (ID: {medicine_id}) 更新成功")
+        
+        # 如果ROS2可用，發布更新事件
+        if ROS2_AVAILABLE and ros2_node:
+            ros2_node.publish_medicine_data({
+                "id": medicine_id,
+                "name": medicine.name,
+                "amount": medicine.amount,
+                "position": medicine.position,
+                "manufacturer": medicine.manufacturer,
+                "dosage": medicine.dosage,
+                "action": "updated"
+            })
+        
+        return {
+            "message": "藥物更新成功",
+            "medicine_id": medicine_id,
+            "medicine_name": medicine.name
+        }
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"更新藥物失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"更新失敗: {str(e)}")
+
 @app.get("/api/medicine/basic")
 async def get_basic_medicines(db: Session = Depends(get_db)):
     """獲取基本藥物列表"""

@@ -1,12 +1,15 @@
 nohup: ignoring input
-2025-08-07 03:42:48,123 - ros2_mock - INFO - 啟動模擬ROS2整合...
-2025-08-07 03:42:48,123 - ros2_mock - INFO - 初始化模擬ROS2節點...
-2025-08-07 03:42:48,123 - ros2_mock - INFO - 模擬ROS2節點初始化完成
-2025-08-07 03:42:48,124 - ros2_mock - INFO - 模擬ROS2整合啟動成功
-INFO:     Started server process [23854]
+2025-08-07 03:49:04,697 - ros2_mock - INFO - 啟動模擬ROS2整合...
+2025-08-07 03:49:04,697 - ros2_mock - INFO - 初始化模擬ROS2節點...
+2025-08-07 03:49:04,698 - ros2_mock - INFO - 模擬ROS2節點初始化完成
+2025-08-07 03:49:04,698 - ros2_mock - INFO - 模擬ROS2整合啟動成功
+INFO:     Started server process [25192]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+2025-08-07 03:49:12,751 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:49:12,758 - hospital_system - INFO - 基本藥物列表構建完成，共 2 種藥物
+2025-08-07 03:49:12,758 - hospital_system - INFO - 藥物資料已發布到ROS2
 使用模擬ROS2模式
 資料庫表格創建完成
 醫院藥物管理系統 - 乾淨版本
@@ -19,9 +22,39 @@ API文檔: http://localhost:8001/docs
 注意：此版本不包含測試資料
 請透過 API 或網頁界面添加藥物資料
 ==================================================
-INFO:     127.0.0.1:53862 - "POST /api/medicine/unified HTTP/1.1" 200 OK
-2025-08-07 03:43:02,969 - hospital_system - INFO - 開始獲取基本藥物列表
-2025-08-07 03:43:02,970 - hospital_system - INFO - 基本藥物列表構建完成，共 2 種藥物
-2025-08-07 03:43:02,970 - hospital_system - INFO - 藥物資料已發布到ROS2
-INFO:     127.0.0.1:53076 - "GET /api/medicine/basic HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53082 - "GET /api/medicine/detailed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41676 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+2025-08-07 03:49:12,768 - hospital_system - INFO - 嘗試刪除藥物: 測試統一藥物
+2025-08-07 03:49:12,773 - hospital_system - INFO - 已刪除藥物詳細資料: 測試統一藥物
+2025-08-07 03:49:12,778 - hospital_system - INFO - 已完全刪除藥物: 測試統一藥物 (ID: 1)
+INFO:     127.0.0.1:41688 - "DELETE /api/medicine/%E6%B8%AC%E8%A9%A6%E7%B5%B1%E4%B8%80%E8%97%A5%E7%89%A9 HTTP/1.1" 200 OK
+2025-08-07 03:49:13,442 - hospital_system - INFO - 系統健康檢查請求
+2025-08-07 03:49:13,443 - hospital_system - INFO - 健康檢查結果: {'status': 'healthy', 'message': '系統運行正常', 'ros2_status': 'mock', 'ros2_mode': 'mock'}
+INFO:     127.0.0.1:41692 - "GET /api/health HTTP/1.1" 200 OK
+2025-08-07 03:49:18,629 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:49:18,630 - hospital_system - INFO - 基本藥物列表構建完成，共 1 種藥物
+2025-08-07 03:49:18,630 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:41708 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+2025-08-07 03:49:25,340 - hospital_system - INFO - 嘗試刪除藥物: 2
+2025-08-07 03:49:25,342 - hospital_system - INFO - 已刪除藥物詳細資料: 測試統一藥物2
+2025-08-07 03:49:25,345 - hospital_system - INFO - 已完全刪除藥物: 測試統一藥物2 (ID: 2)
+INFO:     127.0.0.1:43098 - "DELETE /api/medicine/2 HTTP/1.1" 200 OK
+2025-08-07 03:49:31,082 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:49:31,082 - hospital_system - INFO - 基本藥物列表構建完成，共 0 種藥物
+2025-08-07 03:49:31,082 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:40196 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58840 - "POST /api/medicine/unified HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58846 - "POST /api/medicine/unified HTTP/1.1" 200 OK
+2025-08-07 03:49:45,562 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:49:45,563 - hospital_system - INFO - 基本藥物列表構建完成，共 2 種藥物
+2025-08-07 03:49:45,563 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:58862 - "GET /api/medicine/basic HTTP/1.1" 200 OK
+2025-08-07 03:49:52,775 - hospital_system - INFO - 嘗試刪除藥物: 測試藥物A
+2025-08-07 03:49:52,780 - hospital_system - INFO - 已完全刪除藥物: 測試藥物A (ID: 1)
+INFO:     127.0.0.1:34050 - "DELETE /api/medicine/%E6%B8%AC%E8%A9%A6%E8%97%A5%E7%89%A9A HTTP/1.1" 200 OK
+2025-08-07 03:49:59,602 - hospital_system - INFO - 更新藥物 ID: 2
+2025-08-07 03:49:59,607 - hospital_system - INFO - 藥物 更新後的測試藥物B (ID: 2) 更新成功
+INFO:     127.0.0.1:34058 - "PUT /api/medicine/2 HTTP/1.1" 200 OK
+2025-08-07 03:50:05,619 - hospital_system - INFO - 開始獲取基本藥物列表
+2025-08-07 03:50:05,620 - hospital_system - INFO - 基本藥物列表構建完成，共 1 種藥物
+2025-08-07 03:50:05,620 - hospital_system - INFO - 藥物資料已發布到ROS2
+INFO:     127.0.0.1:48534 - "GET /api/medicine/basic HTTP/1.1" 200 OK
