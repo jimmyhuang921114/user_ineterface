@@ -18,7 +18,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-class MedicineBasic(Base):
+class Medicine(Base):
     """基本藥物資料表"""
     __tablename__ = "medicine_basic"
     
@@ -33,12 +33,12 @@ class MedicineBasic(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
     # 關聯到詳細資料
-    detailed = relationship("MedicineDetailed", back_populates="basic")
+    detailed = relationship("MedicineDetail", back_populates="medicine")
     
     # 關聯到處方籤
     prescriptions = relationship("PrescriptionMedicine", back_populates="medicine")
 
-class MedicineDetailed(Base):
+class MedicineDetail(Base):
     """詳細藥物資料表"""
     __tablename__ = "medicine_detailed"
     
@@ -48,10 +48,10 @@ class MedicineDetailed(Base):
     ingredient = Column(String)
     category = Column(String)
     usage_method = Column(String)
-    unit_dose = Column(String)
+    unit_dose = Column(Float)
     side_effects = Column(Text)
     storage_conditions = Column(String)
-    expiry_date = Column(DateTime)
+    expiry_date = Column(String)
     barcode = Column(String, unique=True)
     appearance_type = Column(String)
     notes = Column(Text)
@@ -59,7 +59,7 @@ class MedicineDetailed(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
     # 關聯到基本資料
-    basic = relationship("MedicineBasic", back_populates="detailed")
+    medicine = relationship("Medicine", back_populates="detailed")
 
 class Prescription(Base):
     """處方籤資料表"""
