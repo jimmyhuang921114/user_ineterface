@@ -17,6 +17,9 @@ import time
 # 使用正式版數據庫
 from database_production import get_db, Medicine, MedicineDetail, Prescription, PrescriptionMedicine, init_production_database
 
+# 導入 ROS2 藥物查詢服務
+from ros2_medicine_query_service import get_medicine_query_service
+
 # 嘗試導入 ROS2 mock
 try:
     from ros2_mock_clean import MockHospitalROS2Node as ROS2Mock
@@ -124,6 +127,10 @@ async def doctor_page():
 @app.get("/Prescription.html")
 async def prescription_page():
     return FileResponse("static/Prescription.html")
+
+@app.get("/ros2_client.html")
+async def ros2_client_page():
+    return FileResponse("static/ros2_client.html")
 
 # 系統狀態 API
 @app.get("/api/system/status")
@@ -596,6 +603,50 @@ def complete_ros2_order(order_data: dict, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"完成訂單失敗: {e}")
         return {"success": False, "message": str(e)}
+
+@app.post("/api/ros2/query-medicine-detail")
+def query_medicine_detail(query: ROS2MedicineQuery):
+    """查詢藥物詳細資訊（YAML 格式）"""
+    try:
+        medicine_service = get_medicine_query_service()
+        result = medicine_service.query_medicine_detail(query.medicine_name)
+        return {"success": True, "detail": result}
+    except Exception as e:
+        logger.error(f"查詢藥物詳細資訊失敗: {e}")
+        return {"success": False, "message": str(e)}
+
+@app.post("/api/ros2/process-order")
+def process_ros2_order(order_data: dict):
+    """處理 ROS2 訂單請求"""
+    try:
+        medicine_service = get_medicine_query_service()
+        result = medicine_service.process_order(order_data)
+        return {"success": True, "message": result}
+    except Exception as e:
+        logger.error(f"處理 ROS2 訂單失敗: {e}")
+        return {"success": False, "message": str(e)}
+
+@app.get("/api/ros2/service-status")
+def get_ros2_service_status():
+    """獲取 ROS2 服務狀態"""
+    try:
+        medicine_service = get_medicine_query_service()
+        status = medicine_service.get_status()
+        return {
+            "service_running": status.get("status") == "running",
+            "current_order": status.get("current_order"),
+            "processing": status.get("processing", False),
+            "base_url": status.get("base_url"),
+            "service_name": status.get("service_name")
+        }
+    except Exception as e:
+        logger.error(f"獲取 ROS2 服務狀態失敗: {e}")
+        return {
+            "service_running": False,
+            "current_order": None,
+            "processing": False,
+            "error": str(e)
+        }
 
 if __name__ == "__main__":
     # 初始化資料庫
