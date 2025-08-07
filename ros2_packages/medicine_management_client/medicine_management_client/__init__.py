@@ -1,1 +1,0 @@
-# Medicine Management Client Package

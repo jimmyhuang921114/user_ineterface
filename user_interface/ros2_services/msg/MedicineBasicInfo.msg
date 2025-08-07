@@ -1,9 +1,0 @@
-int32 id
-string name
-int32 amount
-string position
-string manufacturer
-string dosage
-bool is_active
-string created_at
-string updated_at
