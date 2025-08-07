@@ -1,0 +1,21 @@
+2025-08-07 04:58:26,389 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 04:58:26,389 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 04:58:26,401 - hospital_system - INFO - 處方籤基本資料已創建，ID: 6
+2025-08-07 04:58:26,406 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 04:58:26,408 - hospital_system - INFO - 扣減庫存: 普拿疼 減少 5 (從 190 變為 185)
+2025-08-07 04:58:59,767 - hospital_system - INFO - 獲取處方籤詳細資訊: 6
+2025-08-07 04:58:59,769 - hospital_system - INFO - 返回處方籤 6 詳細資訊，包含 1 種藥物
+2025-08-07 04:59:31,123 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 04:59:31,123 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 04:59:31,134 - hospital_system - INFO - 處方籤基本資料已創建，ID: 7
+2025-08-07 04:59:31,139 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 04:59:31,141 - hospital_system - INFO - 扣減庫存: 普拿疼 減少 3 (從 185 變為 182)
+2025-08-07 05:00:03,728 - hospital_system - INFO - 獲取處方籤詳細資訊: 7
+2025-08-07 05:00:03,730 - hospital_system - INFO - 返回處方籤 7 詳細資訊，包含 1 種藥物
+2025-08-07 05:00:03,744 - hospital_system - INFO - 獲取處方籤列表
+2025-08-07 05:00:03,749 - hospital_system - INFO - 返回 7 張處方籤
+2025-08-07 05:00:50,563 - hospital_system - INFO - 開始創建新處方籤
+2025-08-07 05:00:50,563 - hospital_system - INFO - 處方包含 1 種藥物
+2025-08-07 05:00:50,575 - hospital_system - INFO - 處方籤基本資料已創建，ID: 8
+2025-08-07 05:00:50,579 - hospital_system - INFO - 處方籤創建完成，共添加 1 種藥物
+2025-08-07 05:00:50,582 - hospital_system - INFO - 扣減庫存: 普拿疼 減少 2 (從 182 變為 180)

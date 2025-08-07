@@ -10,6 +10,7 @@ import threading
 from typing import Dict, List, Optional
 from queue import Queue
 import logging
+import requests
 
 logger = logging.getLogger("ros2_mock")
 
@@ -50,6 +51,9 @@ class MockHospitalROS2Node:
                     # 模擬處理時間
                     self._simulate_order_processing()
                     
+                    # 處理完成後自動更新處方籤狀態
+                    self._update_prescription_status_on_completion()
+                    
                     with self.order_lock:
                         self.order_history.append({
                             **self.current_order,
@@ -82,6 +86,35 @@ class MockHospitalROS2Node:
         for stage, duration in stages:
             logger.info(f"{stage}中...")
             time.sleep(duration)
+    
+    def _update_prescription_status_on_completion(self):
+        """處理完成後自動更新處方籤狀態"""
+        if not self.current_order:
+            return
+            
+        prescription_id = self.current_order.get('prescription_id')
+        if not prescription_id:
+            return
+            
+        try:
+            # 調用 API 更新狀態為 completed
+            response = requests.post(
+                f"http://localhost:8001/api/ros2/complete-order",
+                headers={"Content-Type": "application/json"},
+                json={
+                    "prescription_id": prescription_id,
+                    "notes": "ROS2 自動完成處理"
+                },
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"處方籤 {prescription_id} 狀態已自動更新為 completed")
+            else:
+                logger.warning(f"更新處方籤狀態失敗: {response.status_code}")
+                
+        except Exception as e:
+            logger.error(f"自動更新處方籤狀態時發生錯誤: {e}")
     
     def add_order(self, order_data: Dict):
         """添加訂單到處理佇列"""

@@ -531,7 +531,8 @@ async def create_prescription(prescription_data: dict, db: Session = Depends(get
         medicines_list = prescription_data.pop('medicines', [])
         logger.info(f"處方包含 {len(medicines_list)} 種藥物")
         
-        # 創建處方籤
+        # 創建處方籤，預設狀態為 pending
+        prescription_data.setdefault('status', 'pending')
         prescription = Prescription(**prescription_data)
         db.add(prescription)
         db.commit()
