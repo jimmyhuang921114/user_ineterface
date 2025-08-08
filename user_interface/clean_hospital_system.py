@@ -70,7 +70,7 @@ class MedicineCreate(BaseModel):
     prompt: str
     confidence: float
     amount: int = 100
-    content: str  # 詳細內容 - 必須同時提供
+    content: str = ""  # 詳細內容 - 可選
 
 class MedicineDetailCreate(BaseModel):
     medicine_id: int
@@ -198,11 +198,7 @@ async def get_medicine_detail(medicine_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/medicine/")
 async def create_medicine(medicine: MedicineCreate, db: Session = Depends(get_db)):
-    """Create new medicine with both basic and detailed info"""
-    # Validate that both basic info and content are provided
-    if not medicine.content.strip():
-        raise HTTPException(status_code=400, detail="詳細內容為必填項目")
-    
+    """Create new medicine with basic info and optional detailed info"""
     # Validate position format (should be like 1-2, 2-1, etc.)
     import re
     if not re.match(r'^\d+-\d+$', medicine.position):
@@ -220,31 +216,31 @@ async def create_medicine(medicine: MedicineCreate, db: Session = Depends(get_db
     db.commit()
     db.refresh(db_medicine)
     
-    # Create medicine detailed info
-    db_detail = MedicineDetail(
-        medicine_id=db_medicine.id,
-        content=medicine.content
-    )
-    db.add(db_detail)
-    db.commit()
+    # Create medicine detailed info if content is provided
+    if medicine.content.strip():
+        db_detail = MedicineDetail(
+            medicine_id=db_medicine.id,
+            content=medicine.content
+        )
+        db.add(db_detail)
+        db.commit()
+        message = "藥物基本和詳細資訊已成功建立"
+    else:
+        message = "藥物基本資訊已成功建立"
     
     return {
         "id": db_medicine.id, 
         "name": db_medicine.name, 
-        "message": "藥物基本和詳細資訊已成功建立"
+        "message": message
     }
 
 @app.put("/api/medicine/{medicine_id}")
 async def update_medicine(medicine_id: int, medicine: MedicineCreate, db: Session = Depends(get_db)):
-    """Update medicine with both basic and detailed info"""
+    """Update medicine with basic info and optional detailed info"""
     # Find existing medicine
     db_medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
     if not db_medicine:
         raise HTTPException(status_code=404, detail="Medicine not found")
-    
-    # Validate that both basic info and content are provided
-    if not medicine.content.strip():
-        raise HTTPException(status_code=400, detail="詳細內容為必填項目")
     
     # Validate position format
     import re
@@ -260,11 +256,15 @@ async def update_medicine(medicine_id: int, medicine: MedicineCreate, db: Sessio
     
     # Update detailed info
     detail = db.query(MedicineDetail).filter(MedicineDetail.medicine_id == medicine_id).first()
-    if detail:
-        detail.content = medicine.content
-    else:
-        db_detail = MedicineDetail(medicine_id=medicine_id, content=medicine.content)
-        db.add(db_detail)
+    if medicine.content.strip():
+        if detail:
+            detail.content = medicine.content
+        else:
+            db_detail = MedicineDetail(medicine_id=medicine_id, content=medicine.content)
+            db.add(db_detail)
+    elif detail:
+        # If content is empty but detail exists, remove it
+        db.delete(detail)
     
     db.commit()
     
@@ -424,12 +424,13 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
         "medicine": medicines
     }
     
-    logger.info(f"Sending order {prescription.id} to ROS2 for processing")
-    
-    return {
-        "order": order,
-        "yaml": yaml.safe_dump(order, allow_unicode=True, default_flow_style=False)
-    }
+          logger.info(f"Sending order {prescription.id} to ROS2 for processing")
+      
+      return {
+          "order": order,
+          "yaml": yaml.safe_dump(order, allow_unicode=True, default_flow_style=False),
+          "prescription_id": prescription.id
+      }
 
 @app.post("/api/ros2/order/complete")
 async def complete_order_from_ros2(payload: Dict[str, Any], db: Session = Depends(get_db)):
@@ -842,8 +843,8 @@ async def medicine_page():
             <p>基本和詳細藥物資訊同時管理</p>
         </div>
 
-        <div class="content-card">
-            <h2>新增藥物 <span class="required">*基本和詳細資訊必須同時填寫</span></h2>
+                 <div class="content-card">
+            <h2>新增藥物</h2>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="medicineName">藥物名稱 <span class="required">*</span></label>
@@ -868,14 +869,14 @@ async def medicine_page():
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="medicineContent">詳細內容 <span class="required">*</span></label>
-                <textarea id="medicineContent" rows="4" placeholder="請輸入詳細藥物資訊（必填）"></textarea>
-            </div>
+                         <div class="form-group">
+                 <label for="medicineContent">詳細內容 (可選)</label>
+                 <textarea id="medicineContent" rows="4" placeholder="請輸入詳細藥物資訊（可選）"></textarea>
+             </div>
             
-            <button class="btn btn-primary" onclick="addMedicine()">
-                <span>➕</span> 新增藥物（基本+詳細）
-            </button>
+                         <button class="btn btn-primary" onclick="addMedicine()">
+                 <span>➕</span> 新增藥物
+             </button>
         </div>
 
         <div class="content-card">
@@ -938,11 +939,11 @@ async def medicine_page():
             const amount = parseInt(document.getElementById('medicineAmount').value) || 0;
             const content = document.getElementById('medicineContent').value.trim();
 
-            // Validate required fields
-            if (!name || !position || !prompt || isNaN(confidence) || !content) {
-                showAlert('請填寫所有必要欄位，包括詳細內容', 'error');
-                return;
-            }
+                         // Validate required fields
+             if (!name || !position || !prompt || isNaN(confidence)) {
+                 showAlert('請填寫所有必要欄位', 'error');
+                 return;
+             }
 
             // Validate position format
             const positionRegex = /^\d+-\d+$/;
@@ -972,12 +973,12 @@ async def medicine_page():
                     body: JSON.stringify(data)
                 });
                 
-                if (response.ok) {
-                    const result = await response.json();
-                    showAlert('藥物基本和詳細資訊新增成功: ' + result.name, 'success');
-                    clearMedicineForm();
-                    loadMedicines();
-                } else {
+                                 if (response.ok) {
+                     const result = await response.json();
+                     showAlert('藥物新增成功: ' + result.name + ' - ' + result.message, 'success');
+                     clearMedicineForm();
+                     loadMedicines();
+                 } else {
                     const error = await response.json();
                     throw new Error(error.detail || '新增失敗');
                 }
