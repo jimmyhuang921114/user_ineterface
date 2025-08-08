@@ -1,7 +1,7 @@
-/**
- * 整合藥物管理系統 JavaScript
- * Integrated Medicine Management System
- */
+/
+  整合藥物管理系統 JavaScript
+  Integrated Medicine Management System
+ /
 
 // 全域變數
 let basicMedicines = [];
@@ -18,17 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAllData();
 });
 
-/**
- * 系統初始化
- */
+/
+  系統初始化
+ /
 function initializeSystem() {
-    console.log('🏥 整合藥物管理系統初始化...');
+    console.log(' 整合藥物管理系統初始化...');
     updateStatistics();
 }
 
-/**
- * 設置事件監聽器
- */
+/
+  設置事件監聽器
+ /
 function setupEventListeners() {
     // 表單提交
     document.getElementById('medicineForm').addEventListener('submit', handleMedicineSubmit);
@@ -42,9 +42,9 @@ function setupEventListeners() {
     document.getElementById('categoryFilter').addEventListener('change', filterMedicineList);
 }
 
-/**
- * 標籤切換
- */
+/
+  標籤切換
+ /
 function switchTab(tabName) {
     // 移除所有活動狀態
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -65,9 +65,9 @@ function switchTab(tabName) {
     }
 }
 
-/**
- * 載入所有數據
- */
+/
+  載入所有數據
+ /
 async function loadAllData() {
     try {
         await Promise.all([
@@ -81,9 +81,9 @@ async function loadAllData() {
     }
 }
 
-/**
- * 載入基本藥物數據
- */
+/
+  載入基本藥物數據
+ /
 async function loadBasicMedicines() {
     try {
         const response = await fetch(`${API_BASE}/medicine/basic`);
@@ -97,9 +97,9 @@ async function loadBasicMedicines() {
     }
 }
 
-/**
- * 載入詳細藥物數據
- */
+/
+  載入詳細藥物數據
+ /
 async function loadDetailedMedicines() {
     try {
         const response = await fetch(`${API_BASE}/medicine/detailed`);
@@ -115,9 +115,9 @@ async function loadDetailedMedicines() {
 
 
 
-/**
- * 處理藥物表單提交
- */
+/
+  處理藥物表單提交
+ /
 async function handleMedicineSubmit(event) {
     event.preventDefault();
     
@@ -148,7 +148,7 @@ async function handleMedicineSubmit(event) {
         const result = await response.json();
         
         if (response.ok) {
-            showStatus('✅ ' + result.message, 'success', 'addMedicineStatus');
+            showStatus(' ' + result.message, 'success', 'addMedicineStatus');
             document.getElementById('medicineForm').reset();
             await loadAllData(); // 重新載入數據
             // 更新當前顯示的標籤
@@ -167,18 +167,18 @@ async function handleMedicineSubmit(event) {
         
     } catch (error) {
         const errorMessage = error.message || error.toString() || '未知錯誤';
-        showStatus('❌ 錯誤: ' + errorMessage, 'error', 'addMedicineStatus');
+        showStatus(' 錯誤: ' + errorMessage, 'error', 'addMedicineStatus');
         console.error('藥物提交錯誤:', error);
     }
 }
 
-/**
- * 更新統計資訊
- */
+/
+  更新統計資訊
+ /
 function updateStatistics() {
     const totalMedicines = basicMedicines.length;
-    const totalStock = basicMedicines.reduce((sum, med) => sum + (med.amount || 0), 0);
-    const lowStockCount = basicMedicines.filter(med => (med.amount || 0) < 10).length;
+    const totalStock = basicMedicines.reduce((sum, med) => sum + (med.amount || ), );
+    const lowStockCount = basicMedicines.filter(med => (med.amount || ) < ).length;
     const detailedCount = detailedMedicines.length;
     
     document.getElementById('totalMedicines').textContent = totalMedicines;
@@ -187,24 +187,24 @@ function updateStatistics() {
     document.getElementById('detailedCount').textContent = detailedCount;
 }
 
-/**
- * 刷新庫存管理
- */
+/
+  刷新庫存管理
+ /
 async function refreshInventory() {
     await loadBasicMedicines();
     renderInventoryList();
     updateStatistics();
 }
 
-/**
- * 渲染庫存列表
- */
+/
+  渲染庫存列表
+ /
 function renderInventoryList(filteredMedicines = null) {
     const container = document.getElementById('inventoryList');
     const medicines = filteredMedicines || basicMedicines;
     
-    if (medicines.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 50px; color: #7f8c8d;">📭 暫無庫存資料</div>';
+    if (medicines.length === ) {
+        container.innerHTML = '<div style="text-align: center; padding: px; color: fcd;"> 暫無庫存資料</div>';
         return;
     }
     
@@ -217,24 +217,24 @@ function renderInventoryList(filteredMedicines = null) {
                 </div>
             </div>
             <div class="medicine-stock">
-                <div class="stock-number ${medicine.amount < 10 ? 'stock-low' : ''}">${medicine.amount}</div>
-                <div style="font-size: 12px; color: #7f8c8d;">庫存</div>
+                <div class="stock-number ${medicine.amount <  ? 'stock-low' : ''}">${medicine.amount}</div>
+                <div style="font-size: px; color: fcd;">庫存</div>
             </div>
             <div class="medicine-actions">
-                <button class="btn btn-primary btn-sm" onclick="adjustStock('${medicine.name}', 'add')">➕</button>
-                <button class="btn btn-warning btn-sm" onclick="adjustStock('${medicine.name}', 'subtract')">➖</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteMedicine('${medicine.name}')">🗑️</button>
+                <button class="btn btn-primary btn-sm" onclick="adjustStock('${medicine.name}', 'add')"></button>
+                <button class="btn btn-warning btn-sm" onclick="adjustStock('${medicine.name}', 'subtract')"></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteMedicine('${medicine.name}')"></button>
             </div>
         </div>
     `).join('');
 }
 
-/**
- * 調整庫存
- */
+/
+  調整庫存
+ /
 async function adjustStock(medicineName, action) {
-    const amount = prompt(`請輸入要${action === 'add' ? '增加' : '減少'}的數量:`, '1');
-    if (!amount || isNaN(amount) || parseInt(amount) <= 0) {
+    const amount = prompt(`請輸入要${action === 'add' ? '增加' : '減少'}的數量:`, '');
+    if (!amount || isNaN(amount) || parseInt(amount) <= ) {
         alert('請輸入有效的數量');
         return;
     }
@@ -255,7 +255,7 @@ async function adjustStock(medicineName, action) {
         const result = await response.json();
         
         if (response.ok) {
-            showStatus(`✅ ${medicineName} 庫存已${action === 'add' ? '增加' : '減少'} ${amount}`, 'success', 'inventoryStatus');
+            showStatus(` ${medicineName} 庫存已${action === 'add' ? '增加' : '減少'} ${amount}`, 'success', 'inventoryStatus');
             await refreshInventory();
         } else {
             const errorMessage = typeof result.detail === 'string' ? result.detail : 
@@ -266,14 +266,14 @@ async function adjustStock(medicineName, action) {
         
     } catch (error) {
         const errorMessage = error.message || error.toString() || '庫存調整失敗';
-        showStatus('❌ 庫存調整失敗: ' + errorMessage, 'error', 'inventoryStatus');
+        showStatus(' 庫存調整失敗: ' + errorMessage, 'error', 'inventoryStatus');
         console.error('庫存調整錯誤:', error);
     }
 }
 
-/**
- * 刪除藥物
- */
+/
+  刪除藥物
+ /
 async function deleteMedicine(medicineName) {
     if (!confirm(`確定要刪除藥物 "${medicineName}" 嗎？此操作不可恢復。`)) {
         return;
@@ -287,7 +287,7 @@ async function deleteMedicine(medicineName) {
         const result = await response.json();
         
         if (response.ok) {
-            showStatus(`✅ 藥物 "${medicineName}" 已刪除`, 'success', 'inventoryStatus');
+            showStatus(` 藥物 "${medicineName}" 已刪除`, 'success', 'inventoryStatus');
             await loadAllData();
             renderInventoryList();
             renderMedicineList();
@@ -300,28 +300,28 @@ async function deleteMedicine(medicineName) {
         
     } catch (error) {
         const errorMessage = error.message || error.toString() || '刪除失敗';
-        showStatus('❌ 刪除失敗: ' + errorMessage, 'error', 'inventoryStatus');
+        showStatus(' 刪除失敗: ' + errorMessage, 'error', 'inventoryStatus');
         console.error('刪除藥物錯誤:', error);
     }
 }
 
-/**
- * 刷新藥物清單
- */
+/
+  刷新藥物清單
+ /
 async function refreshMedicineList() {
     await Promise.all([loadBasicMedicines(), loadDetailedMedicines()]);
     renderMedicineList();
 }
 
-/**
- * 渲染藥物清單
- */
+/
+  渲染藥物清單
+ /
 function renderMedicineList(filteredMedicines = null) {
     const container = document.getElementById('medicineListContainer');
     const medicines = filteredMedicines || basicMedicines;
     
-    if (medicines.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 50px; color: #7f8c8d;">📭 暫無藥物資料</div>';
+    if (medicines.length === ) {
+        container.innerHTML = '<div style="text-align: center; padding: px; color: fcd;"> 暫無藥物資料</div>';
         return;
     }
     
@@ -337,22 +337,22 @@ function renderMedicineList(filteredMedicines = null) {
                     </div>
                 </div>
                 <div class="medicine-stock">
-                    <div class="stock-number ${medicine.amount < 10 ? 'stock-low' : ''}">${medicine.amount}</div>
-                    <div style="font-size: 12px; color: #7f8c8d;">庫存</div>
+                    <div class="stock-number ${medicine.amount <  ? 'stock-low' : ''}">${medicine.amount}</div>
+                    <div style="font-size: px; color: fcd;">庫存</div>
                 </div>
                 <div class="medicine-actions">
-                    <button class="btn btn-primary btn-sm" onclick="editMedicine('${medicine.name}')">✏️</button>
-                    <button class="btn btn-warning btn-sm" onclick="viewMedicineDetails('${medicine.name}')">👁️</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteMedicine('${medicine.name}')">🗑️</button>
+                    <button class="btn btn-primary btn-sm" onclick="editMedicine('${medicine.name}')"></button>
+                    <button class="btn btn-warning btn-sm" onclick="viewMedicineDetails('${medicine.name}')"></button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteMedicine('${medicine.name}')"></button>
                 </div>
             </div>
         `;
     }).join('');
 }
 
-/**
- * 編輯藥物
- */
+/
+  編輯藥物
+ /
 function editMedicine(medicineName) {
     const medicine = basicMedicines.find(m => m.name === medicineName);
     const detailed = detailedMedicines.find(d => d.medicine_name === medicineName);
@@ -390,13 +390,13 @@ function editMedicine(medicineName) {
     currentEditingMedicine = medicineName;
     
     // 更改按鈕文字
-    const submitBtn = document.querySelector('#medicineForm button[type="submit"]');
-    submitBtn.textContent = '💾 更新藥物資料';
+    const submitBtn = document.querySelector('medicineForm button[type="submit"]');
+    submitBtn.textContent = ' 更新藥物資料';
 }
 
-/**
- * 查看藥物詳細資訊
- */
+/
+  查看藥物詳細資訊
+ /
 function viewMedicineDetails(medicineName) {
     const medicine = basicMedicines.find(m => m.name === medicineName);
     const detailed = detailedMedicines.find(d => d.medicine_name === medicineName);
@@ -407,11 +407,11 @@ function viewMedicineDetails(medicineName) {
     }
     
     const detailsHTML = `
-        <div style="max-width: 600px; margin: 0 auto;">
-            <h3 style="color: #2c3e50; margin-bottom: 20px;">💊 ${medicine.name} - 詳細資訊</h3>
+        <div style="max-width: px; margin:  auto;">
+            <h style="color: ce; margin-bottom: px;"> ${medicine.name} - 詳細資訊</h>
             
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
-                <h4 style="color: #3498db;">基本資訊</h4>
+            <div style="background: fffa; padding: px; border-radius: px; margin-bottom: px;">
+                <h style="color: db;">基本資訊</h>
                 <p><strong>庫存數量:</strong> ${medicine.amount}</p>
                 <p><strong>儲存位置:</strong> ${medicine.position}</p>
                 <p><strong>製造商:</strong> ${medicine.manufacturer || '未指定'}</p>
@@ -420,8 +420,8 @@ function viewMedicineDetails(medicineName) {
             </div>
             
             ${detailed ? `
-                <div style="background: #e8f5e8; padding: 15px; border-radius: 5px;">
-                    <h4 style="color: #27ae60;">詳細資訊</h4>
+                <div style="background: efe; padding: px; border-radius: px;">
+                    <h style="color: ae;">詳細資訊</h>
                     <p><strong>分類:</strong> ${detailed.category || '未分類'}</p>
                     <p><strong>主要成分:</strong> ${detailed.ingredient || '未指定'}</p>
                     <p><strong>描述:</strong> ${detailed.description || '無'}</p>
@@ -433,7 +433,7 @@ function viewMedicineDetails(medicineName) {
                     <p><strong>外觀:</strong> ${detailed.appearance_type || '未描述'}</p>
                     <p><strong>備註:</strong> ${detailed.notes || '無'}</p>
                 </div>
-            ` : '<div style="background: #fff3cd; padding: 15px; border-radius: 5px; color: #856404;">⚠️ 尚未建立詳細資料</div>'}
+            ` : '<div style="background: fffcd; padding: px; border-radius: px; color: ;"> 尚未建立詳細資料</div>'}
         </div>
     `;
     
@@ -449,9 +449,9 @@ function viewMedicineDetails(medicineName) {
 
 
 
-/**
- * 篩選功能
- */
+/
+  篩選功能
+ /
 function filterInventory() {
     const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
     const stockFilter = document.getElementById('stockFilter').value;
@@ -461,19 +461,19 @@ function filterInventory() {
         let matchesStock = true;
         
         if (stockFilter) {
-            const amount = medicine.amount || 0;
+            const amount = medicine.amount || ;
             switch(stockFilter) {
                 case 'sufficient':
-                    matchesStock = amount > 20;
+                    matchesStock = amount > ;
                     break;
                 case 'medium':
-                    matchesStock = amount >= 10 && amount <= 20;
+                    matchesStock = amount >=  && amount <= ;
                     break;
                 case 'low':
-                    matchesStock = amount > 0 && amount < 10;
+                    matchesStock = amount >  && amount < ;
                     break;
                 case 'empty':
-                    matchesStock = amount === 0;
+                    matchesStock = amount === ;
                     break;
             }
         }
@@ -505,57 +505,57 @@ function filterMedicineList() {
 
 
 
-/**
- * 顯示狀態訊息
- */
+/
+  顯示狀態訊息
+ /
 function showStatus(message, type = 'success', elementId = 'addMedicineStatus') {
     const statusDiv = document.getElementById(elementId);
     statusDiv.className = `status-message status-${type}`;
     statusDiv.textContent = message;
     statusDiv.style.display = 'block';
     
-    // 3秒後自動隱藏
+    // 秒後自動隱藏
     setTimeout(() => {
         statusDiv.style.display = 'none';
-    }, 3000);
+    }, );
 }
 
-/**
- * 顯示模態框
- */
+/
+  顯示模態框
+ /
 function showModal(content) {
     // 創建模態框
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
+        top: ;
+        left: ;
+        width: %;
+        height: %;
+        background: rgba(,,,.);
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: ;
     `;
     
     const modalContent = document.createElement('div');
     modalContent.style.cssText = `
         background: white;
-        padding: 30px;
-        border-radius: 10px;
-        max-width: 90%;
-        max-height: 90%;
+        padding: px;
+        border-radius: px;
+        max-width: %;
+        max-height: %;
         overflow-y: auto;
         position: relative;
     `;
     
     modalContent.innerHTML = content + `
         <button onclick="this.closest('.modal').remove()" 
-                style="position: absolute; top: 10px; right: 15px; 
-                       background: #e74c3c; color: white; border: none; 
-                       border-radius: 50%; width: 30px; height: 30px; 
-                       cursor: pointer;">✕</button>
+                style="position: absolute; top: px; right: px; 
+                       background: ecc; color: white; border: none; 
+                       border-radius: %; width: px; height: px; 
+                       cursor: pointer;"></button>
     `;
     
     modal.className = 'modal';

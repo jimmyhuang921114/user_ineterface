@@ -1,7 +1,7 @@
 //  JavaScript
 class EnhancedMedicineManager {
     constructor() {
-        this.apiBase = 'http://localhost:8000/api';
+        this.apiBase = 'http://localhost:/api';
         this.hot = null;
         this.basicData = [];
         this.currentEditingMedicine = null;
@@ -49,13 +49,13 @@ class EnhancedMedicineManager {
                 { type: 'text', placeholder: '' },
                 { type: 'numeric', placeholder: '' },
                 { type: 'numeric', placeholder: '' },
-                { type: 'text', placeholder: ' A1-01' },
+                { type: 'text', placeholder: ' A-' },
                 { type: 'text', readOnly: true, renderer: this.actionButtonRenderer.bind(this) }
             ],
             stretchH: 'all',
             rowHeaders: true,
-            minSpareRows: 1,
-            height: 400,
+            minSpareRows: ,
+            height: ,
             licenseKey: 'non-commercial-and-evaluation',
             afterChange: this.handleCellChange.bind(this),
             contextMenu: ['remove_row'],
@@ -65,7 +65,7 @@ class EnhancedMedicineManager {
 
     actionButtonRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.innerHTML = '';
-        if (row < this.basicData.length && this.basicData[row].length >= 5) {
+        if (row < this.basicData.length && this.basicData[row].length >= ) {
             const saveBtn = document.createElement('button');
             saveBtn.textContent = '';
             saveBtn.className = 'action-btn save-btn';
@@ -79,7 +79,7 @@ class EnhancedMedicineManager {
             const viewBtn = document.createElement('button');
             viewBtn.textContent = '';
             viewBtn.className = 'action-btn btn-info';
-            viewBtn.onclick = () => this.viewMedicineDetails(this.basicData[row][0]);
+            viewBtn.onclick = () => this.viewMedicineDetails(this.basicData[row][]);
 
             td.appendChild(saveBtn);
             td.appendChild(deleteBtn);
@@ -99,11 +99,11 @@ class EnhancedMedicineManager {
 
         for (const change of changes) {
             const [row, col, oldValue, newValue] = change;
-            if (this.basicData[row] && this.basicData[row].length >= 5 && this.basicData[row][4]) {
+            if (this.basicData[row] && this.basicData[row].length >=  && this.basicData[row][]) {
                 clearTimeout(this.saveTimeout);
                 this.saveTimeout = setTimeout(() => {
                     this.saveBasicMedicine(row);
-                }, 1000);
+                }, );
             }
         }
     }
@@ -180,7 +180,7 @@ class EnhancedMedicineManager {
 
     async deleteBasicMedicine(row) {
         const rowData = this.hot.getDataAtRow(row);
-        const id = rowData[4];
+        const id = rowData[];
 
         if (!id) {
             this.hot.alter('remove_row', row);
@@ -198,7 +198,7 @@ class EnhancedMedicineManager {
 
             if (response.ok) {
                 this.hot.alter('remove_row', row);
-                this.basicData.splice(row, 1);
+                this.basicData.splice(row, );
                 this.showMessage('', 'success');
                 await this.loadMedicineSelect(); //
             } else {
@@ -286,9 +286,9 @@ class EnhancedMedicineManager {
         document.getElementById('drugFullName').value = data.?. || '';
 
         //
-        document.getElementById('code1').value = data.?.1 || '';
-        document.getElementById('code2').value = data.?.2 || '';
-        document.getElementById('code3').value = data.?.3 || '';
+        document.getElementById('code').value = data.?. || '';
+        document.getElementById('code').value = data.?. || '';
+        document.getElementById('code').value = data.?. || '';
 
         //
         document.getElementById('indications').value = data. || '';
@@ -303,7 +303,7 @@ class EnhancedMedicineManager {
         const inputs = [
             'medicineName', 'dosage', 'manufacturer', 'usageMethod', 'unitDose',
             'color', 'shape', 'expiryDate', 'barcode', 'companyFullName', 'drugFullName',
-            'code1', 'code2', 'code3', 'indications', 'sideEffects', 'usage',
+            'code', 'code', 'code', 'indications', 'sideEffects', 'usage',
             'precautions', 'pregnancyClass', 'storageConditions'
         ];
 
@@ -337,9 +337,9 @@ class EnhancedMedicineManager {
                 : document.getElementById('drugFullName').value
             },
             : {
-                1: document.getElementById('code1').value,
-                2: document.getElementById('code2').value,
-                3: document.getElementById('code3').value
+                : document.getElementById('code').value,
+                : document.getElementById('code').value,
+                : document.getElementById('code').value
             },
             : document.getElementById('indications').value,
             : document.getElementById('sideEffects').value,
@@ -433,12 +433,12 @@ class EnhancedMedicineManager {
 
     formatIntegratedMedicineInfo(data) {
         let html = `<div class="medicine-info">
-            <h3>${data.medicine_name}</h3>`;
+            <h>${data.medicine_name}</h>`;
 
         //
         if (data.basic_info) {
             html += `<div class="info-section inventory-info">
-                <h4></h4>
+                <h></h>
                 <div class="info-item">
                     <span class="info-label"></span>
                     <span class="info-value">${data.basic_info.amount}</span>
@@ -461,7 +461,7 @@ class EnhancedMedicineManager {
             //
             if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4></h4>`;
+                    <h></h>`;
                 Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
@@ -476,7 +476,7 @@ class EnhancedMedicineManager {
             //
             if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4></h4>`;
+                    <h></h>`;
                 Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
@@ -491,7 +491,7 @@ class EnhancedMedicineManager {
             //
             if (detailed.) {
                 html += `<div class="info-section detailed-info">
-                    <h4></h4>`;
+                    <h></h>`;
                 Object.entries(detailed.).forEach(([key, value]) => {
                     if (value) {
                         html += `<div class="info-item">
@@ -516,7 +516,7 @@ class EnhancedMedicineManager {
             importantFields.forEach(field => {
                 if (detailed[field.key]) {
                     html += `<div class="info-section detailed-info">
-                        <h4>${field.label}</h4>
+                        <h>${field.label}</h>
                         <div class="info-item">
                             <span class="info-value">${detailed[field.key]}</span>
                         </div>
@@ -530,11 +530,11 @@ class EnhancedMedicineManager {
     }
 
     formatSearchResults(results) {
-        let html = '<div class="medicine-info"><h3></h3>';
+        let html = '<div class="medicine-info"><h></h>';
 
         Object.entries(results).forEach(([name, data]) => {
             html += `<div class="info-section">
-                <h4>${name}</h4>`;
+                <h>${name}</h>`;
 
             if (data.matched_code) {
                 html += `<div class="info-item">
@@ -572,7 +572,7 @@ class EnhancedMedicineManager {
             ...medicineData
         };
 
-        document.getElementById('jsonPreview').textContent = JSON.stringify(jsonData, null, 2);
+        document.getElementById('jsonPreview').textContent = JSON.stringify(jsonData, null, );
         document.getElementById('jsonModal').style.display = 'block';
     }
 
@@ -594,7 +594,7 @@ class EnhancedMedicineManager {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${medicineName}_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `${medicineName}_${new Date().toISOString().split('T')[]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -609,11 +609,11 @@ class EnhancedMedicineManager {
             if (response.ok) {
                 const data = await response.json();
 
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const blob = new Blob([JSON.stringify(data, null, )], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `detailed_medicines_${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `detailed_medicines_${new Date().toISOString().split('T')[]}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -744,20 +744,20 @@ class EnhancedMedicineManager {
 
     exportBasicJSON() {
         const jsonData = this.basicData
-            .filter(row => row.length >= 4 && row[0])
+            .filter(row => row.length >=  && row[])
             .map(row => ({
-                name: row[0],
-                amount: row[1],
-                usage_days: row[2],
-                position: row[3],
-                id: row[4] || null
+                name: row[],
+                amount: row[],
+                usage_days: row[],
+                position: row[],
+                id: row[] || null
             }));
 
-        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(jsonData, null, )], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `basic_medicines_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `basic_medicines_${new Date().toISOString().split('T')[]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -775,15 +775,15 @@ class EnhancedMedicineManager {
             messageDiv.id = 'message';
             messageDiv.style.cssText = `
                 position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 5px;
+                top: px;
+                right: px;
+                padding: px px;
+                border-radius: px;
                 color: white;
-                z-index: 3000;
-                transition: opacity 0.3s;
-                font-weight: 500;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: ;
+                transition: opacity .s;
+                font-weight: ;
+                box-shadow:  px px rgba(,,,.);
             `;
             document.body.appendChild(messageDiv);
         }
@@ -792,30 +792,30 @@ class EnhancedMedicineManager {
         messageDiv.className = `message-${type}`;
 
         const colors = {
-            success: '#27ae60',
-            error: '#e74c3c',
-            info: '#3498db'
+            success: 'ae',
+            error: 'ecc',
+            info: 'db'
         };
         messageDiv.style.backgroundColor = colors[type] || colors.info;
-        messageDiv.style.opacity = '1';
+        messageDiv.style.opacity = '';
 
         setTimeout(() => {
             if (messageDiv) {
-                messageDiv.style.opacity = '0';
+                messageDiv.style.opacity = '';
                 setTimeout(() => {
                     if (messageDiv && messageDiv.parentNode) {
                         messageDiv.parentNode.removeChild(messageDiv);
                     }
-                }, 300);
+                }, );
             }
-        }, 3000);
+        }, );
     }
 
     async handleRowDelete(index, amount) {
-        for (let i = 0; i < amount; i++) {
+        for (let i = ; i < amount; i++) {
             const rowIndex = index + i;
-            if (this.basicData[rowIndex] && this.basicData[rowIndex][4]) {
-                await this.deleteMedicineById(this.basicData[rowIndex][4]);
+            if (this.basicData[rowIndex] && this.basicData[rowIndex][]) {
+                await this.deleteMedicineById(this.basicData[rowIndex][]);
             }
         }
         await this.loadMedicineSelect();

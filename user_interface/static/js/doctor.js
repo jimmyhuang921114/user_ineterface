@@ -1,11 +1,11 @@
-/**
- * 醫生工作台 JavaScript
- * Doctor Workstation JavaScript
- */
+/
+  醫生工作台 JavaScript
+  Doctor Workstation JavaScript
+ /
 
 // 全域變數
 let availableMedicines = [];
-let medicineCounter = 1;
+let medicineCounter = ;
 
 // API基礎URL
 const API_BASE = '/api';
@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     generateAutoFields();
 });
 
-/**
- * 系統初始化
- */
+/
+  系統初始化
+ /
 function initializeSystem() {
-    console.log('👨‍⚕️ 醫生工作台初始化...');
+    console.log(' 醫生工作台初始化...');
     
     // 初始化處方時間
     updatePrescriptionTime();
@@ -31,9 +31,9 @@ function initializeSystem() {
     addMedicineItem();
 }
 
-/**
- * 設置事件監聽器
- */
+/
+  設置事件監聽器
+ /
 function setupEventListeners() {
     // 處方籤表單提交
     document.getElementById('prescriptionForm').addEventListener('submit', handlePrescriptionSubmit);
@@ -44,12 +44,12 @@ function setupEventListeners() {
 
 // 醫生頁面已簡化為只有處方籤功能，無需標籤切換
 
-/**
- * 載入可用藥物清單
- */
+/
+  載入可用藥物清單
+ /
 async function loadAvailableMedicines() {
     try {
-        console.log('🔄 正在載入藥物清單...');
+        console.log(' 正在載入藥物清單...');
         const response = await fetch(`${API_BASE}/medicine/basic`);
         
         if (!response.ok) {
@@ -63,16 +63,16 @@ async function loadAvailableMedicines() {
         // 更新所有藥物下拉選單
         updateMedicineSelects();
         
-        console.log('✅ 已載入', availableMedicines.length, '種可用藥物');
+        console.log(' 已載入', availableMedicines.length, '種可用藥物');
     } catch (error) {
-        console.error('❌ 載入藥物清單失敗:', error);
+        console.error(' 載入藥物清單失敗:', error);
         availableMedicines = [];
     }
 }
 
-/**
- * 更新藥物下拉選單
- */
+/
+  更新藥物下拉選單
+ /
 function updateMedicineSelects() {
     const selects = document.querySelectorAll('.medicine-select select');
     
@@ -86,8 +86,8 @@ function updateMedicineSelects() {
             option.textContent = `${medicine.name} (庫存: ${medicine.amount}, 位置: ${medicine.position})`;
             
             // 如果庫存不足，標記為紅色
-            if (medicine.amount < 10) {
-                option.style.color = '#e74c3c';
+            if (medicine.amount < ) {
+                option.style.color = 'ecc';
                 option.textContent += ' [庫存不足]';
             }
             
@@ -103,9 +103,9 @@ function updateMedicineSelects() {
 
 // 藥物管理功能已移至專門的藥物管理頁面
 
-/**
- * 處理處方籤表單提交
- */
+/
+  處理處方籤表單提交
+ /
 async function handlePrescriptionSubmit(event) {
     event.preventDefault();
     
@@ -119,8 +119,8 @@ async function handlePrescriptionSubmit(event) {
             throw new Error('請填寫完整的病患資訊');
         }
         
-        if (patientIdCard.length !== 10) {
-            throw new Error('身份證號必須為10位數');
+        if (patientIdCard.length !== ) {
+            throw new Error('身份證號必須為位數');
         }
         
         // 收集處方用藥
@@ -129,9 +129,9 @@ async function handlePrescriptionSubmit(event) {
         
         medicineItems.forEach(item => {
             const medicineSelect = item.querySelector('.medicine-select select');
-            const quantityInput = item.querySelector('input[placeholder*="個數"]') || item.querySelector('input[type="number"]');
-            const durationInput = item.querySelector('input[placeholder*="天數"]') || item.querySelectorAll('input[type="number"]')[1];
-            const notesInput = item.querySelector('input[placeholder*="備註"]') || item.querySelector('input[type="text"]:not([placeholder*="個數"]):not([placeholder*="天數"])');
+            const quantityInput = item.querySelector('input[placeholder="個數"]') || item.querySelector('input[type="number"]');
+            const durationInput = item.querySelector('input[placeholder="天數"]') || item.querySelectorAll('input[type="number"]')[];
+            const notesInput = item.querySelector('input[placeholder="備註"]') || item.querySelector('input[type="text"]:not([placeholder="個數"]):not([placeholder="天數"])');
             
             const medicineName = medicineSelect ? medicineSelect.value : '';
             const quantity = quantityInput ? quantityInput.value.trim() : '';
@@ -148,7 +148,7 @@ async function handlePrescriptionSubmit(event) {
             }
         });
         
-        if (medicines.length === 0) {
+        if (medicines.length === ) {
             throw new Error('請至少選擇一種處方用藥');
         }
         
@@ -173,7 +173,7 @@ async function handlePrescriptionSubmit(event) {
         const result = await response.json();
         
         if (response.ok) {
-            showStatus('✅ 處方籤已成功開立', 'success', 'prescriptionStatus');
+            showStatus(' 處方籤已成功開立', 'success', 'prescriptionStatus');
             
             // 重置表單
             document.getElementById('prescriptionForm').reset();
@@ -188,45 +188,45 @@ async function handlePrescriptionSubmit(event) {
         }
         
     } catch (error) {
-        showStatus('❌ 錯誤: ' + error.message, 'error', 'prescriptionStatus');
+        showStatus(' 錯誤: ' + error.message, 'error', 'prescriptionStatus');
     }
 }
 
-/**
- * 生成自動欄位
- */
+/
+  生成自動欄位
+ /
 function generateAutoFields() {
     updatePrescriptionTime();
     // 病患編號會在輸入身份證號時自動生成
     document.getElementById('patientNumber').textContent = '請先輸入身份證號';
 }
 
-/**
- * 更新處方時間
- */
+/
+  更新處方時間
+ /
 function updatePrescriptionTime() {
     const now = new Date();
     const timeString = now.toLocaleString('zh-TW', {
         year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        month: '-digit',
+        day: '-digit',
+        hour: '-digit',
+        minute: '-digit',
+        second: '-digit'
     });
     document.getElementById('prescriptionTime').textContent = timeString;
 }
 
-/**
- * 根據身份證號生成病患編號
- */
+/
+  根據身份證號生成病患編號
+ /
 function generatePatientNumber() {
     const idCard = document.getElementById('patientIdCard').value.trim();
     
-    if (idCard.length >= 4) {
-        // 使用身份證號後4位 + 時間戳生成唯一編號
-        const timestamp = Date.now().toString().slice(-6);
-        const lastFour = idCard.slice(-4);
+    if (idCard.length >= ) {
+        // 使用身份證號後位 + 時間戳生成唯一編號
+        const timestamp = Date.now().toString().slice(-);
+        const lastFour = idCard.slice(-);
         const patientNumber = `P${lastFour}${timestamp}`;
         
         document.getElementById('patientNumber').textContent = patientNumber;
@@ -235,9 +235,9 @@ function generatePatientNumber() {
     }
 }
 
-/**
- * 新增藥物項目
- */
+/
+  新增藥物項目
+ /
 function addMedicineItem() {
     const medicineList = document.getElementById('medicineList');
     const itemId = `medicine-${medicineCounter++}`;
@@ -248,25 +248,25 @@ function addMedicineItem() {
     
     medicineItem.innerHTML = `
         <div class="medicine-select">
-            <label>藥物名稱 *</label>
+            <label>藥物名稱 </label>
             <select required onchange="updateMedicineInfo(this)">
                 <option value="">請選擇藥物</option>
             </select>
         </div>
         <div class="medicine-input">
-            <label>個數 *</label>
-            <input type="number" placeholder="例：30" min="1" required>
+            <label>個數 </label>
+            <input type="number" placeholder="例：" min="" required>
         </div>
         <div class="medicine-input">
-            <label>天數 *</label>
-            <input type="number" placeholder="例：7" min="1" required>
+            <label>天數 </label>
+            <input type="number" placeholder="例：" min="" required>
         </div>
         <div class="medicine-input">
             <label>備註</label>
             <input type="text" placeholder="特殊說明">
         </div>
         <button type="button" class="remove-medicine" onclick="removeMedicineItem('${itemId}')" title="移除此藥物">
-            ✕
+            
         </button>
     `;
     
@@ -275,29 +275,29 @@ function addMedicineItem() {
     // 更新新增的下拉選單
     updateMedicineSelects();
     
-    console.log('✅ 已新增藥物項目:', itemId);
+    console.log(' 已新增藥物項目:', itemId);
 }
 
-/**
- * 移除藥物項目
- */
+/
+  移除藥物項目
+ /
 function removeMedicineItem(itemId) {
     const item = document.getElementById(itemId);
     if (item) {
         item.remove();
-        console.log('🗑️ 已移除藥物項目:', itemId);
+        console.log(' 已移除藥物項目:', itemId);
         
         // 如果沒有藥物項目了，至少保留一個
         const medicineList = document.getElementById('medicineList');
-        if (medicineList.children.length === 0) {
+        if (medicineList.children.length === ) {
             addMedicineItem();
         }
     }
 }
 
-/**
- * 當選擇藥物時更新藥物資訊
- */
+/
+  當選擇藥物時更新藥物資訊
+ /
 function updateMedicineInfo(selectElement) {
     const selectedMedicine = availableMedicines.find(med => med.name === selectElement.value);
     
@@ -306,7 +306,7 @@ function updateMedicineInfo(selectElement) {
         
         // 自動填入建議劑量
         if (selectedMedicine.dosage) {
-            const dosageInput = medicineItem.querySelector('input[placeholder*="劑量"]');
+            const dosageInput = medicineItem.querySelector('input[placeholder="劑量"]');
             if (dosageInput && !dosageInput.value) {
                 dosageInput.value = selectedMedicine.dosage;
             }
@@ -314,59 +314,59 @@ function updateMedicineInfo(selectElement) {
         
         // 自動填入建議使用天數
         if (selectedMedicine.usage_days) {
-            const durationInput = medicineItem.querySelector('input[placeholder*="天數"]');
+            const durationInput = medicineItem.querySelector('input[placeholder="天數"]');
             if (durationInput && !durationInput.value) {
                 durationInput.value = selectedMedicine.usage_days;
             }
         }
         
         // 檢查庫存警告
-        if (selectedMedicine.amount < 10) {
-            selectElement.style.borderColor = '#e74c3c';
+        if (selectedMedicine.amount < ) {
+            selectElement.style.borderColor = 'ecc';
             selectElement.title = `警告：此藥物庫存不足 (剩餘: ${selectedMedicine.amount})`;
         } else {
-            selectElement.style.borderColor = '#27ae60';
+            selectElement.style.borderColor = 'ae';
             selectElement.title = `庫存充足 (剩餘: ${selectedMedicine.amount})`;
         }
     }
 }
 
-/**
- * 顯示狀態訊息
- */
+/
+  顯示狀態訊息
+ /
 function showStatus(message, type = 'success', elementId) {
     const statusDiv = document.getElementById(elementId);
     statusDiv.className = `status-message status-${type}`;
     statusDiv.textContent = message;
     statusDiv.style.display = 'block';
     
-    // 3秒後自動隱藏
+    // 秒後自動隱藏
     setTimeout(() => {
         statusDiv.style.display = 'none';
-    }, 3000);
+    }, );
 }
 
-/**
- * 驗證身份證號格式
- */
+/
+  驗證身份證號格式
+ /
 function validateIdCard(idCard) {
     // 台灣身份證號格式驗證
-    const pattern = /^[A-Z][12]\d{8}$/;
+    const pattern = /^[A-Z][]\d{}$/;
     return pattern.test(idCard);
 }
 
-/**
- * 格式化日期時間
- */
+/
+  格式化日期時間
+ /
 function formatDateTime(date) {
     return date.toLocaleString('zh-TW', {
         year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+        month: '-digit',
+        day: '-digit',
+        hour: '-digit',
+        minute: '-digit'
     });
 }
 
 // 定期更新處方時間 (每分鐘)
-setInterval(updatePrescriptionTime, 60000);
+setInterval(updatePrescriptionTime, );

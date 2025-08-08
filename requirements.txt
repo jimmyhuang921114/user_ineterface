@@ -1,7 +1,7 @@
-# ROS2 醫院藥物管理系統 - 必要套件
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
-pydantic==2.5.0
-requests==2.31.0
-pyyaml==6.0.1
+ ROS 醫院藥物管理系統 - 必要套件
+fastapi==..
+uvicorn[standard]==..
+sqlalchemy==..
+pydantic==..
+requests==..
+pyyaml==..
