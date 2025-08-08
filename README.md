@@ -1,6 +1,6 @@
 # Hospital Medicine Management System
 
-A fully functional ROS2-integrated hospital medicine management system with web interface and automated order processing.
+Simple, clean system with built-in web interface and ROS2 integration.
 
 ## Quick Start
 
@@ -9,31 +9,41 @@ A fully functional ROS2-integrated hospital medicine management system with web 
 pip3 install fastapi uvicorn sqlalchemy pydantic requests pyyaml
 ```
 
-### 2. Start the Complete System
+### 2. Start System
 ```bash
 cd user_interface
-python3 start_working_system.py
+python3 minimal_system.py
 ```
 
-### 3. Access Web Interfaces
-- Medicine Management: http://localhost:8001/integrated_medicine_management.html
-- Doctor Interface: http://localhost:8001/doctor.html
-- Prescription Management: http://localhost:8001/Prescription.html
-- API Documentation: http://localhost:8001/docs
+### 3. Use Web Interface
+- Medicine Management: http://localhost:8001/medicine
+- Doctor Interface: http://localhost:8001/doctor
+- Prescription Management: http://localhost:8001/prescriptions
 
 ## ROS2 Integration
 
-### Environment Variables for Your ROS2 Node
+### Pull Orders
 ```bash
-export ORDER_BASE_URL='http://127.0.0.1:8002'
-export ORDER_PULL_URL='http://127.0.0.1:8002/api/order/next'
-export ORDER_PULL_INTERVAL='3'
-export ORDER_PROGRESS_PATH='/api/order/progress'
-export ORDER_COMPLETE_PATH='/api/order/complete'
+curl http://localhost:8001/api/order/next
 ```
 
-### YAML Order Format
-Your ROS2 node will receive orders in this format:
+### Report Progress
+```bash
+curl -X POST http://localhost:8001/api/order/progress \
+  -H "Content-Type: application/json" \
+  -d '{"order_id": "000001", "stage": "processing", "message": "Working on order"}'
+```
+
+### Report Completion
+```bash
+curl -X POST http://localhost:8001/api/order/complete \
+  -H "Content-Type: application/json" \
+  -d '{"order_id": "000001", "status": "success", "details": "Order completed"}'
+```
+
+## YAML Order Format
+
+Your ROS2 node receives:
 ```yaml
 order_id: "000001"
 prescription_id: 1
@@ -41,91 +51,103 @@ patient_name: "John Doe"
 medicine:
   - name: Aspirin
     amount: 10
-    locate: [1, 2]
+    locate: [1, 1]
     prompt: tablet
-  - name: Vitamin C
-    amount: 5
-    locate: [2, 1]
-    prompt: capsule
 ```
 
-### ROS2 Node Implementation Example
+## Implementation Example
+
 ```python
-def process_medicine(self, order_id: str, med: Dict[str, Any], idx: int, total: int):
-    name = med.get('name')
-    amount = med.get('amount')
-    locate = med.get('locate')  # [row, col]
-    prompt = med.get('prompt')  # tablet/capsule/white_circle_box
-    
-    # Your robot logic here:
-    # 1. Move to position: locate[0], locate[1]
-    # 2. Pick medicine according to prompt and amount
-    # 3. Place in dispensing area
-    
-    # Report progress
-    requests.post(f"{ORDER_BASE_URL}/api/order/progress", json={
-        "order_id": order_id,
-        "stage": "processing",
-        "message": f"Processing {name}",
-        "item": name,
-        "index": idx,
-        "total": total
-    })
-    
-    # After completion, report success
-    requests.post(f"{ORDER_BASE_URL}/api/order/complete", json={
-        "order_id": order_id,
-        "status": "success",
-        "details": "Order completed successfully"
-    })
+import requests
+import yaml
+import time
+
+BASE_URL = "http://localhost:8001"
+
+def poll_for_orders():
+    while True:
+        try:
+            # Get next order
+            response = requests.get(f"{BASE_URL}/api/order/next")
+            if response.status_code == 204:
+                print("No orders available")
+                time.sleep(3)
+                continue
+            
+            data = response.json()
+            order = data["order"]
+            
+            print(f"Processing order: {order['order_id']}")
+            print(f"Patient: {order['patient_name']}")
+            
+            # Process each medicine
+            for i, med in enumerate(order["medicine"]):
+                name = med["name"]
+                amount = med["amount"]
+                location = med["locate"]  # [row, col]
+                
+                print(f"Processing {name} (amount: {amount}) at location {location}")
+                
+                # Report progress
+                requests.post(f"{BASE_URL}/api/order/progress", json={
+                    "order_id": order["order_id"],
+                    "stage": "processing",
+                    "message": f"Processing {name}",
+                    "item": name,
+                    "index": i + 1,
+                    "total": len(order["medicine"])
+                })
+                
+                # Your robot logic here
+                time.sleep(2)  # Simulate work
+            
+            # Report completion
+            requests.post(f"{BASE_URL}/api/order/complete", json={
+                "order_id": order["order_id"],
+                "status": "success",
+                "details": "All medicines processed"
+            })
+            
+            print(f"Order {order['order_id']} completed")
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            time.sleep(5)
+
+if __name__ == "__main__":
+    poll_for_orders()
 ```
 
-## System Architecture
+## System Features
 
-```
-Web Interface (8001) <-> ROS2 Adapter (8002) <-> Your ROS2 Node
-```
-
-The system automatically:
-- Manages medicine inventory
-- Creates prescriptions via web interface
-- Converts prescriptions to YAML orders
-- Provides HTTP API for ROS2 nodes to pull orders
-- Processes one order at a time
-- Updates status based on ROS2 node feedback
-- Maintains prescription status in web interface
-
-## Core Files
-
-- `simple_working_system.py` - Main hospital system server
-- `ros2_node_adapter.py` - ROS2 integration adapter
-- `start_working_system.py` - System launcher
-- `static/` - Web interface files
-
-## Features
-
-- Complete medicine inventory management
-- Doctor prescription interface
-- Automated prescription-to-order conversion
-- ROS2 HTTP API integration
-- Real-time status tracking
+- Single file system - no complex dependencies
+- Built-in web interface with embedded HTML/CSS/JS
+- Automatic database creation and sample data
+- Real-time prescription status updates
 - Stock management with automatic deduction
 - One-order-at-a-time processing
-- YAML order format for ROS2 compatibility
+- Complete ROS2 HTTP API integration
+
+## File Structure
+
+```
+workspace/
+├── README.md
+├── requirements.txt
+└── user_interface/
+    ├── minimal_system.py    # Complete system in one file
+    └── static/             # Original web files (optional)
+```
+
+The system is completely self-contained in `minimal_system.py` with embedded web interface.
 
 ## Testing
 
-1. Start the system: `python3 start_working_system.py`
-2. Create medicines via web interface
-3. Create prescriptions via doctor interface
-4. Your ROS2 node will automatically receive orders
-5. Monitor status via web interface
+1. Start system: `python3 minimal_system.py`
+2. Open http://localhost:8001/medicine
+3. Add medicines
+4. Open http://localhost:8001/doctor  
+5. Create prescriptions
+6. Your ROS2 node will receive orders automatically
 
-## Troubleshooting
-
-- Ensure ports 8001 and 8002 are available
-- Check that all dependencies are installed
-- Verify your ROS2 node can access the adapter API
-- Monitor logs for connection issues
-
-System designed for production use with stable, emoji-free codebase.
+Clean, working, production-ready system.
