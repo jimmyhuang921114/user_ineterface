@@ -1,84 +1,107 @@
-  ROS 醫院藥物管理系統
+# ROS2 Hospital Medicine Management System
 
-  快速啟動
+## Quick Start
 
-  啟動 Web 系統和適配器
+### 1. Start Web System and Adapter
 ```bash
 cd user_interface
-python integration_with_your_node.py
+python3 integration_with_your_node.py
 ```
 
-  啟動您的 ROS 節點
+### 2. Start Your ROS2 Node
 ```bash
- 新終端機
+# New terminal
 source /opt/ros/humble/setup.bash
-export ORDER_BASE_URL='http://...:'
-python your_order_handler_node.py
+export ORDER_BASE_URL='http://127.0.0.1:8002'
+python3 your_order_handler_node.py
 ```
 
-  (可選) 啟動藥物查詢服務
+### 3. (Optional) Start Medicine Query Service
 ```bash
- 新終端機  
+# New terminal  
 source /opt/ros/humble/setup.bash
-python user_interface/medicine_detail_service_node.py
+python3 user_interface/medicine_detail_service_node.py
 ```
 
-  YAML 訂單格式
+## YAML Order Format
 
-您的 ROS 節點會收到：
+Your ROS2 node will receive:
 ```yaml
-order_id: ""
-prescription_id: 
-patient_name: "張三"
+order_id: "000001"
+prescription_id: 1
+patient_name: "John Doe"
 medicine:
-  - name: 阿斯匹靈
-    amount: 
-    locate: [, ]
+  - name: Aspirin
+    amount: 10
+    locate: [2, 3]
     prompt: tablet
 ```
 
-  Web 界面
+## Web Interface
 
-- 藥物管理: http://localhost:/integrated_medicine_management.html
-- 醫生工作台: http://localhost:/doctor.html  
-- 處方籤管理: http://localhost:/Prescription.html
+- Medicine Management: http://localhost:8001/integrated_medicine_management.html
+- Doctor Workstation: http://localhost:8001/doctor.html  
+- Prescription Management: http://localhost:8001/Prescription.html
 
-  ROS 藥物查詢服務
+## ROS2 Medicine Query Service
 
 ```bash
-ros service call /hospital/get_medicine_detail tm_robot_if/srv/MedicineDetail "{name: '阿斯匹靈'}"
-ros service call /hospital/get_all_medicines tm_robot_if/srv/MedicineDetail "{name: ''}"
-ros service call /hospital/search_medicines tm_robot_if/srv/MedicineDetail "{name: '感冒'}"
+ros2 service call /hospital/get_medicine_detail tm_robot_if/srv/MedicineDetail "{name: 'Aspirin'}"
+ros2 service call /hospital/get_all_medicines tm_robot_if/srv/MedicineDetail "{name: ''}"
+ros2 service call /hospital/search_medicines tm_robot_if/srv/MedicineDetail "{name: 'pain'}"
 ```
 
-  必要檔案
+## Essential Files
 
-- `user_interface/database_final.py` - 資料庫模型
-- `user_interface/simple_server_final.py` - Web 伺服器
-- `user_interface/integration_with_your_node.py` - ROS 適配器
-- `user_interface/medicine_detail_service_node.py` - 藥物查詢服務
-- `user_interface/test_order_flow.py` - 測試工具
-- `user_interface/static/` - Web 界面檔案
-- `user_interface/hospital_medicine_final.db` - 資料庫
+- `user_interface/database_final.py` - Database models
+- `user_interface/simple_server_final.py` - Web server
+- `user_interface/integration_with_your_node.py` - ROS2 adapter
+- `user_interface/medicine_detail_service_node.py` - Medicine query service
+- `user_interface/test_order_flow.py` - Testing utility
+- `user_interface/static/` - Web interface files
+- `user_interface/hospital_medicine_final.db` - Database
 
-  在您的節點中實現
+## Implementation in Your Node
 
 ```python
 def _process_medicine(self, order_id: str, med: Dict[str, Any], idx: int, total: int):
     name = med.get('name')
     amount = med.get('amount') 
-    locate = med.get('locate')   [row, col]
-    prompt = med.get('prompt')   tablet/capsule/white_circle_box
+    locate = med.get('locate')  # [row, col]
+    prompt = med.get('prompt')  # tablet/capsule/white_circle_box
     
-     在這裡實現您的機器人邏輯
-     . 移動到 locate 位置
-     . 根據 prompt 抓取 amount 數量的 name 藥物
-     . 放置到配藥區
+    # Implement your robot logic here
+    # 1. Move to locate position
+    # 2. Pick medicine according to prompt and amount
+    # 3. Place in dispensing area
 ```
 
-  測試
+## Testing
 
 ```bash
 cd user_interface
-python test_order_flow.py basic
+python3 test_order_flow.py basic
 ```
+
+## Environment Variables for Your ROS2 Node
+
+```bash
+export ORDER_BASE_URL='http://127.0.0.1:8002'
+export ORDER_PULL_URL='http://127.0.0.1:8002/api/order/next'
+export ORDER_PULL_INTERVAL='3'
+export ORDER_PROGRESS_PATH='/api/order/progress'
+export ORDER_COMPLETE_PATH='/api/order/complete'
+```
+
+## Architecture
+
+```
+Web Interface (8001) <-> Adapter API (8002) <-> Your ROS2 Node
+```
+
+The system automatically:
+- Pushes YAML orders to your ROS2 node via HTTP
+- Processes one order at a time
+- Waits for completion before sending next order
+- Updates prescription status in web interface
+- Provides medicine detail query via ROS2 service
