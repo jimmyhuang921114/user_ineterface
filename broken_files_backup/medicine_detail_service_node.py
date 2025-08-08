@@ -36,9 +36,9 @@ class MedicineDetailServiceNode(Node):
         self.auth_token = os.getenv('MEDICINE_HTTP_TOKEN', '')
 
         if requests is None:
-# self.get_logger().warn("requests 不可用：將使用模擬資料。")
+            self.get_logger().warn("requests not available: will use demo data.")
 
-         # ROS2 Services
+        # ROS2 Services
         self.detail_srv = self.create_service(
             MedicineDetail, '/hospital/get_medicine_detail', self._get_medicine_detail_cb
         )

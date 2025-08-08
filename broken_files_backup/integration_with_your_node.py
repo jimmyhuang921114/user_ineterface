@@ -81,7 +81,7 @@ class YourNodeIntegration:
                 
             except Exception as e:
                 print(f" Failed to get order: {e}")
-                raise HTTPException(status_code=, detail=str(e))
+                raise HTTPException(status_code=500, detail=str(e))
         
         @self.adapter_app.post("/api/order/progress")
         async def report_progress(payload: Dict[str, Any]):
