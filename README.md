@@ -1,6 +1,17 @@
 # Hospital Medicine Management System
 
-Simple, clean system with built-in web interface and ROS2 integration.
+Complete hospital medicine management system with original UI style and ROS2 integration.
+
+## Features
+
+- **Original Professional UI Design** - Beautiful gradient backgrounds and modern interface
+- **Single File System** - Everything embedded in one Python file
+- **Complete Medicine Management** - Add, view, search, and manage medicine inventory
+- **Doctor Interface** - Create prescriptions with medicine selection
+- **Prescription Management** - Real-time status tracking and updates
+- **ROS2 Integration** - HTTP API for order pulling and status reporting
+- **Automatic Database Setup** - Sample data included
+- **Stock Management** - Automatic deduction on prescription creation
 
 ## Quick Start
 
@@ -12,13 +23,37 @@ pip3 install fastapi uvicorn sqlalchemy pydantic requests pyyaml
 ### 2. Start System
 ```bash
 cd user_interface
-python3 minimal_system.py
+python3 hospital_system_with_ui.py
 ```
 
-### 3. Use Web Interface
-- Medicine Management: http://localhost:8001/medicine
-- Doctor Interface: http://localhost:8001/doctor
-- Prescription Management: http://localhost:8001/prescriptions
+### 3. Access Web Interfaces
+- **Medicine Management**: http://localhost:8001/integrated_medicine_management.html
+- **Doctor Interface**: http://localhost:8001/doctor.html
+- **Prescription Management**: http://localhost:8001/Prescription.html
+
+## Web Interface Features
+
+### Medicine Management
+- Sidebar navigation with beautiful styling
+- Tabbed interface for different functions
+- Add new medicines with categories and dosages
+- Stock adjustment with interactive cards
+- Medicine search functionality
+- System status monitoring
+
+### Doctor Interface
+- Professional header design
+- Medicine selection with visual cards
+- Real-time stock information
+- Selected medicines tracking
+- Easy prescription creation
+
+### Prescription Management
+- Statistical dashboard
+- Real-time prescription status
+- Auto-refresh functionality
+- Status update controls
+- Medicine list display
 
 ## ROS2 Integration
 
@@ -43,7 +78,7 @@ curl -X POST http://localhost:8001/api/order/complete \
 
 ## YAML Order Format
 
-Your ROS2 node receives:
+Your ROS2 node receives orders in this format:
 ```yaml
 order_id: "000001"
 prescription_id: 1
@@ -52,6 +87,10 @@ medicine:
   - name: Aspirin
     amount: 10
     locate: [1, 1]
+    prompt: tablet
+  - name: Vitamin C
+    amount: 5
+    locate: [1, 2]
     prompt: tablet
 ```
 
@@ -118,15 +157,15 @@ if __name__ == "__main__":
     poll_for_orders()
 ```
 
-## System Features
+## UI Design Features
 
-- Single file system - no complex dependencies
-- Built-in web interface with embedded HTML/CSS/JS
-- Automatic database creation and sample data
-- Real-time prescription status updates
-- Stock management with automatic deduction
-- One-order-at-a-time processing
-- Complete ROS2 HTTP API integration
+- **Professional Gradient Backgrounds** - Beautiful blue-purple gradients
+- **Modern Card Design** - Rounded corners and subtle shadows
+- **Responsive Layout** - Works on desktop and tablet
+- **Interactive Elements** - Hover effects and smooth transitions
+- **Status Badges** - Color-coded for easy recognition
+- **Sidebar Navigation** - Fixed navigation with icons
+- **Tab Interface** - Organized content sections
 
 ## File Structure
 
@@ -135,19 +174,50 @@ workspace/
 ├── README.md
 ├── requirements.txt
 └── user_interface/
-    ├── minimal_system.py    # Complete system in one file
-    └── static/             # Original web files (optional)
+    ├── hospital_system_with_ui.py    # Complete system with original UI
+    ├── hospital_medicine.db          # Database (auto-created)
+    └── static/                       # Original web files (optional)
 ```
 
-The system is completely self-contained in `minimal_system.py` with embedded web interface.
+## API Endpoints
+
+- `GET /` - System status
+- `GET /api/medicine/` - Get all medicines
+- `POST /api/medicine/` - Create medicine
+- `GET /api/prescription/` - Get all prescriptions
+- `POST /api/prescription/` - Create prescription
+- `PUT /api/prescription/{id}/status` - Update prescription status
+- `GET /api/order/next` - Pull next order (ROS2)
+- `POST /api/order/progress` - Report progress (ROS2)
+- `POST /api/order/complete` - Report completion (ROS2)
+
+## Sample Data
+
+The system includes sample medicines:
+- Aspirin (Pain Relief) - 100 units at A1
+- Vitamin C (Vitamins) - 50 units at A2
+- Ibuprofen (Pain Relief) - 75 units at B1
+- Paracetamol (Pain Relief) - 120 units at B2
+- Calcium (Supplements) - 60 units at C1
 
 ## Testing
 
-1. Start system: `python3 minimal_system.py`
-2. Open http://localhost:8001/medicine
-3. Add medicines
-4. Open http://localhost:8001/doctor  
-5. Create prescriptions
+1. Start system: `python3 hospital_system_with_ui.py`
+2. Open medicine management interface
+3. Add new medicines or adjust stock
+4. Use doctor interface to create prescriptions
+5. Monitor prescription status in management interface
 6. Your ROS2 node will receive orders automatically
 
-Clean, working, production-ready system.
+## Production Ready
+
+- Clean, professional UI with original styling
+- Complete functionality in single file
+- Embedded HTML/CSS/JavaScript
+- Automatic database initialization
+- Real-time updates and status tracking
+- Full ROS2 HTTP API integration
+- Stock management and deduction
+- Error handling and validation
+
+Perfect for hospital environments requiring both web interface and ROS2 integration.
