@@ -377,7 +377,7 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
     global current_processing_order, order_queue
     
     if current_processing_order:
-        return JSONResponse(status_code=204, content={"message": "Order currently being processed"})
+        return JSONResponse(status_code=204, content=None)
     
     if not order_queue:
         pending_prescriptions = db.query(Prescription).filter(
@@ -387,7 +387,7 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
         order_queue = [p.id for p in pending_prescriptions]
     
     if not order_queue:
-        return JSONResponse(status_code=204, content={"message": "No orders to process"})
+        return JSONResponse(status_code=204, content=None)
     
     prescription_id = order_queue.pop(0)
     current_processing_order = prescription_id
