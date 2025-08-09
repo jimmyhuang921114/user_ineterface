@@ -1,0 +1,454 @@
+/ =================================
+    -
+   Hospital Management System - Unified Style
+   ================================= /
+
+/  /
+ {
+    margin: ;
+    padding: ;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft JhengHei', 'PingFang TC', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(deg, eea %, ba %);
+    background-attachment: fixed;
+    color: ce;
+    line-height: .;
+    min-height: vh;
+}
+
+/  /
+.sidebar {
+    position: fixed;
+    left: ;
+    top: ;
+    width: px;
+    height: vh;
+    background: rgba(, , , .);
+    backdrop-filter: blur(px);
+    color: white;
+    padding: px;
+    box-shadow: px  px rgba(, , , .);
+    z-index: ;
+    border-right: px solid db;
+}
+
+.sidebar h {
+    text-align: center;
+    margin-bottom: px;
+    font-size: .em;
+    color: ecff;
+    border-bottom: px solid db;
+    padding-bottom: px;
+    letter-spacing: px;
+}
+
+.sidebar button {
+    width: %;
+    padding: px px;
+    margin: px ;
+    border: none;
+    border-radius: px;
+    background: linear-gradient(deg, rgba(, , , .), rgba(, , , .));
+    color: white;
+    cursor: pointer;
+    font-size: px;
+    font-weight: ;
+    transition: all .s ease;
+    border: px solid rgba(, , , .);
+}
+
+.sidebar button:hover {
+    background: linear-gradient(deg, db, bb);
+    transform: translateX(px);
+    box-shadow: px px px rgba(, , , .);
+}
+
+.sidebar button.active {
+    background: linear-gradient(deg, ecc, cb);
+    transform: translateX(px);
+}
+
+/  /
+.main-content {
+    margin-left: px;
+    padding: px;
+    min-height: vh;
+}
+
+/  /
+.header {
+    background: rgba(, , , .);
+    backdrop-filter: blur(px);
+    padding: px;
+    border-radius: px;
+    box-shadow:  px px rgba(, , , .);
+    margin-bottom: px;
+    border: px solid rgba(, , , .);
+}
+
+.header h {
+    color: ce;
+    font-size: .rem;
+    margin-bottom: px;
+    background: linear-gradient(deg, ce, db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header p {
+    color: fcd;
+    font-size: .rem;
+    margin: ;
+}
+
+/  /
+.card, .section, .tab-container {
+    background: rgba(, , , .);
+    backdrop-filter: blur(px);
+    border-radius: px;
+    box-shadow:  px px rgba(, , , .);
+    margin-bottom: px;
+    border: px solid rgba(, , , .);
+    overflow: hidden;
+}
+
+/  /
+.tab-buttons {
+    display: flex;
+    background: rgba(, , , .);
+    border-bottom: px solid rgba(, , , .);
+}
+
+.tab-button {
+    flex: ;
+    padding: px px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: px;
+    font-weight: ;
+    color: cd;
+    transition: all .s ease;
+    border-bottom: px solid transparent;
+}
+
+.tab-button:hover {
+    background: rgba(, , , .);
+    color: db;
+}
+
+.tab-button.active {
+    background: rgba(, , , .);
+    color: ce;
+    border-bottom: px solid db;
+    font-weight: ;
+}
+
+/  /
+.tab-content {
+    display: none;
+    padding: px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/  /
+.form-section {
+    margin-bottom: px;
+    padding: px;
+    background: rgba(, , , .);
+    border-radius: px;
+    border-left: px solid db;
+}
+
+.form-section h, .form-section h {
+    color: ce;
+    margin-bottom: px;
+    font-weight: ;
+}
+
+.form-section h {
+    font-size: .rem;
+    border-bottom: px solid ecff;
+    padding-bottom: px;
+}
+
+.form-section h {
+    font-size: .rem;
+    margin-top: px;
+    color: e;
+}
+
+/  /
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(px, fr));
+    gap: px;
+    margin-bottom: px;
+}
+
+/  /
+.form-group {
+    margin-bottom: px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: px;
+    font-weight: ;
+    color: ce;
+    font-size: px;
+}
+
+.form-group label.required::after {
+    content: " ";
+    color: ecc;
+}
+
+/  /
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: %;
+    padding: px px;
+    border: px solid ecff;
+    border-radius: px;
+    font-size: px;
+    font-family: inherit;
+    transition: all .s ease;
+    background: rgba(, , , .);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: db;
+    box-shadow:    px rgba(, , , .);
+    background: white;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: px;
+}
+
+/  /
+.btn {
+    padding: px px;
+    margin: px;
+    border: none;
+    border-radius: px;
+    cursor: pointer;
+    font-size: px;
+    font-weight: ;
+    transition: all .s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    min-width: px;
+}
+
+.btn-primary {
+    background: linear-gradient(deg, db, b);
+    color: white;
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(deg, b, db);
+    transform: translateY(-px);
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-success {
+    background: linear-gradient(deg, ae, );
+    color: white;
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-success:hover {
+    background: linear-gradient(deg, , ae);
+    transform: translateY(-px);
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-warning {
+    background: linear-gradient(deg, fc, ee);
+    color: white;
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(deg, ee, fc);
+    transform: translateY(-px);
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-danger {
+    background: linear-gradient(deg, ecc, cb);
+    color: white;
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(deg, cb, ecc);
+    transform: translateY(-px);
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-info {
+    background: linear-gradient(deg, ab, );
+    color: white;
+    box-shadow:  px px rgba(, , , .);
+}
+
+.btn-info:hover {
+    background: linear-gradient(deg, , ab);
+    transform: translateY(-px);
+    box-shadow:  px px rgba(, , , .);
+}
+
+/  /
+.message {
+    padding: px px;
+    margin: px ;
+    border-radius: px;
+    display: none;
+    font-weight: ;
+    border-left: px solid;
+}
+
+.message.success {
+    background: rgba(, , , .);
+    color: ;
+    border-left-color: a;
+}
+
+.message.error {
+    background: rgba(, , , .);
+    color: c;
+    border-left-color: dc;
+}
+
+.message.warning {
+    background: rgba(, , , .);
+    color: ;
+    border-left-color: ffc;
+}
+
+.message.info {
+    background: rgba(, , , .);
+    color: c;
+    border-left-color: ab;
+}
+
+/  /
+.table-container, .hot-container {
+    margin: px ;
+    background: white;
+    border-radius: px;
+    padding: px;
+    box-shadow:  px px rgba(, , , .);
+    border: px solid rgba(, , , .);
+}
+
+/ Handsontable  /
+.handsontable {
+    font-family: inherit !important;
+}
+
+.handsontable .htCore {
+    border: px solid deee !important;
+}
+
+.handsontable th {
+    background: linear-gradient(deg, fffa, eecef) !important;
+    color:  !important;
+    font-weight:  !important;
+}
+
+/  /
+@media (max-width: px) {
+    .sidebar {
+        width: px;
+    }
+
+    .main-content {
+        margin-left: px;
+    }
+
+    .form-grid {
+        grid-template-columns: fr;
+    }
+}
+
+@media (max-width: px) {
+    .sidebar {
+        transform: translateX(-%);
+        transition: transform .s ease;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX();
+    }
+
+    .main-content {
+        margin-left: ;
+    }
+
+    .header h {
+        font-size: .rem;
+    }
+
+    .tab-buttons {
+        flex-direction: column;
+    }
+
+    .tab-button {
+        border-bottom: px solid rgba(, , , .);
+        border-right: none;
+    }
+}
+
+/  /
+@keyframes fadeIn {
+    from {
+        opacity: ;
+        transform: translateY(px);
+    }
+    to {
+        opacity: ;
+        transform: translateY();
+    }
+}
+
+.fade-in {
+    animation: fadeIn .s ease forwards;
+}
+
+/  /
+::-webkit-scrollbar {
+    width: px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(, , , .);
+    border-radius: px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(deg, bdcc, aa);
+    border-radius: px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(deg, aa, fcd);
+}

@@ -1,0 +1,7 @@
+ ROS 醫院藥物管理系統 - 必要套件
+fastapi==..
+uvicorn[standard]==..
+sqlalchemy==..
+pydantic==..
+requests==..
+pyyaml==..

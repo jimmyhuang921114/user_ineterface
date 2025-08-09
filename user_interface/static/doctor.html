@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-">
+    <meta name="viewport" content="width=device-width, initial-scale=.">
+    <title> 醫生工作台 - 醫院管理系統</title>
+    <link rel="stylesheet" href="/static/css/unified_style.css">
+    <style>
+        .doctor-container {
+            max-width: px;
+            margin:  auto;
+            padding: px;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: px px  ;
+            box-shadow:  px px rgba(,,,.);
+            margin-bottom: ;
+        }
+
+        .tab {
+            flex: ;
+            padding: px px;
+            text-align: center;
+            cursor: pointer;
+            background: fffa;
+            border: none;
+            font-size: px;
+            font-weight: ;
+            transition: all .s;
+            border-bottom: px solid transparent;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom-color: db;
+            color: db;
+        }
+
+        .tab:hover {
+            background: eecef;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius:   px px;
+            box-shadow:  px px rgba(,,,.);
+            padding: px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        / 統一藥物表單樣式 /
+        .unified-medicine-form {
+            display: grid;
+            grid-template-columns: fr fr;
+            gap: px;
+        }
+
+        .form-section {
+            border: px solid eeed;
+            border-radius: px;
+            padding: px;
+        }
+
+        .section-title {
+            font-size: .em;
+            font-weight: bold;
+            color: ce;
+            margin-bottom: px;
+            padding-bottom: px;
+            border-bottom: px solid db;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: fr fr;
+            gap: px;
+            margin-bottom: px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column:  / -;
+        }
+
+        .form-group label {
+            margin-bottom: px;
+            font-weight: ;
+            color: e;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: px;
+            border: px solid bdcc;
+            border-radius: px;
+            font-size: px;
+            transition: border-color .s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: db;
+            outline: none;
+            box-shadow:   px rgba(, , , .);
+        }
+
+        / 處方籤樣式 /
+        .prescription-form {
+            background: linear-gradient(deg, fffa %, eecef %);
+            border-radius: px;
+            padding: px;
+            margin-bottom: px;
+        }
+
+        .patient-info {
+            background: white;
+            border-radius: px;
+            padding: px;
+            margin-bottom: px;
+            box-shadow:  px px rgba(,,,.);
+        }
+
+        .auto-field {
+            background: efe;
+            color: ae;
+            font-weight: bold;
+            text-align: center;
+            padding: px;
+            border-radius: px;
+            border: px solid ae;
+        }
+
+        .medicine-selector {
+            background: white;
+            border-radius: px;
+            padding: px;
+            margin: px ;
+            border: px solid db;
+        }
+
+        .medicine-item {
+            display: flex;
+            align-items: center;
+            gap: px;
+            padding: px;
+            background: fffa;
+            border-radius: px;
+            margin-bottom: px;
+            border-left: px solid db;
+        }
+
+        .medicine-item:last-child {
+            margin-bottom: ;
+        }
+
+        .medicine-select {
+            flex: ;
+        }
+
+        .medicine-input {
+            flex: ;
+        }
+
+        .remove-medicine {
+            background: ecc;
+            color: white;
+            border: none;
+            border-radius: %;
+            width: px;
+            height: px;
+            cursor: pointer;
+            font-size: px;
+        }
+
+        .add-medicine-btn {
+            background: ae;
+            color: white;
+            border: none;
+            border-radius: px;
+            padding: px px;
+            cursor: pointer;
+            font-size: px;
+            margin-top: px;
+        }
+
+        / 按鈕樣式 /
+        .btn-group {
+            display: flex;
+            gap: px;
+            justify-content: center;
+            margin-top: px;
+        }
+
+        .btn {
+            padding: px px;
+            border: none;
+            border-radius: px;
+            cursor: pointer;
+            font-size: px;
+            font-weight: ;
+            transition: all .s;
+            min-width: px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(deg, db, ecc);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(deg, ae, ecc);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(deg, fc, ee);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-px);
+            box-shadow:  px px rgba(,,,.);
+        }
+
+        .required {
+            color: ecc;
+        }
+
+        / 狀態訊息 /
+        .status-message {
+            padding: px;
+            border-radius: px;
+            margin: px ;
+            display: none;
+        }
+
+        .status-success {
+            background: dedda;
+            color: ;
+            border: px solid cecb;
+        }
+
+        .status-error {
+            background: fdda;
+            color: c;
+            border: px solid fccb;
+        }
+
+        / 響應式設計 /
+        @media (max-width: px) {
+            .unified-medicine-form {
+                grid-template-columns: fr;
+            }
+            
+            .form-row {
+                grid-template-columns: fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .medicine-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h> 系統選單</h>
+        <button onclick="location.href='doctor.html'" class="active"> 醫生工作台</button>
+                    <button onclick="location.href='integrated_medicine_management.html'"> 整合管理</button>
+            <button onclick="location.href='Prescription.html'"> 處方籤管理</button>
+            <button onclick="location.href='integrated_medicine_management.html'"> 藥物管理</button>
+    </div>
+
+    <div class="main-content">
+        <div class="doctor-container">
+            <h style="text-align: center; color: ce; margin-bottom: px;">
+                 醫生工作台
+            </h>
+
+                         <!-- 處方籤系統 (專注於醫師核心功能) -->
+            <div id="prescription" class="tab-content active">
+                <div class="prescription-form">
+                    <h style="text-align: center; color: ce; margin-bottom: px;"> 開立處方籤</h>
+                    
+                    <form id="prescriptionForm">
+                        <!-- 病患資訊 -->
+                        <div class="patient-info">
+                            <h style="color: db; margin-bottom: px;"> 病患資訊</h>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="patientName">病患姓名 <span class="required"></span></label>
+                                    <input type="text" id="patientName" name="patientName" required placeholder="請輸入病患姓名">
+                                </div>
+                                <div class="form-group">
+                                    <label for="patientIdCard">身份證號 <span class="required"></span></label>
+                                    <input type="text" id="patientIdCard" name="patientIdCard" required placeholder="請輸入身份證號" maxlength="">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>病患編號</label>
+                                    <div class="auto-field" id="patientNumber">系統將自動生成</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>處方時間</label>
+                                    <div class="auto-field" id="prescriptionTime">系統將自動生成</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 處方用藥 -->
+                        <div class="medicine-selector">
+                            <h style="color: db; margin-bottom: px;"> 處方用藥</h>
+                            
+                            <div id="medicineList">
+                                <!-- 藥物項目將在此動態生成 -->
+                            </div>
+                            
+                            <button type="button" class="add-medicine-btn" onclick="addMedicineItem()">
+                                 新增藥物
+                            </button>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary"> 開立處方籤</button>
+                            <button type="reset" class="btn btn-warning"> 重置表單</button>
+                        </div>
+                    </form>
+                    
+                    <div id="prescriptionStatus" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/doctor.js"></script>
+</body>
+</html>
