@@ -424,13 +424,13 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
         "medicine": medicines
     }
     
-          logger.info(f"Sending order {prescription.id} to ROS2 for processing")
-      
-      return {
-          "order": order,
-          "yaml": yaml.safe_dump(order, allow_unicode=True, default_flow_style=False),
-          "prescription_id": prescription.id
-      }
+    logger.info(f"Sending order {prescription.id} to ROS2 for processing")
+    
+    return {
+        "order": order,
+        "yaml": yaml.safe_dump(order, allow_unicode=True, default_flow_style=False),
+        "prescription_id": prescription.id
+    }
 
 @app.post("/api/ros2/order/complete")
 async def complete_order_from_ros2(payload: Dict[str, Any], db: Session = Depends(get_db)):
@@ -946,7 +946,7 @@ async def medicine_page():
              }
 
             // Validate position format
-            const positionRegex = /^\d+-\d+$/;
+                         const positionRegex = /^\\d+-\\d+$/;
             if (!positionRegex.test(position)) {
                 showAlert('位置格式錯誤，應為 1-2 或 2-1 的格式', 'error');
                 return;
