@@ -45,11 +45,12 @@ python3 complete_hospital_system.py
 
 ```mermaid
 flowchart LR
-  subgraph UI[Hospital Medicine Management UI]
-    M[Medicine Management]
-    D[Doctor Interface]
-    P[Prescription Management]
+  subgraph ROS2[ROS2 System]
+    R1[Order Client Node\\n(poll /api/order/next)]
+    R2[Perception & Grasp]
+    R3[Arm Controller]
   end
+
 
   subgraph API[FastAPI :8001]
     A1[/REST Endpoints/]
