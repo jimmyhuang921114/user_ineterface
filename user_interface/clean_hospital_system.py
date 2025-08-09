@@ -8,7 +8,7 @@ Clean Hospital Medicine Management System
 """
 
 from fastapi import FastAPI, HTTPException, Depends, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 from pydantic import BaseModel
@@ -377,7 +377,7 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
     global current_processing_order, order_queue
     
     if current_processing_order:
-        return JSONResponse(status_code=204, content=None)
+        return Response(status_code=204)
     
     if not order_queue:
         pending_prescriptions = db.query(Prescription).filter(
@@ -387,7 +387,7 @@ async def get_next_order_for_ros2(db: Session = Depends(get_db)):
         order_queue = [p.id for p in pending_prescriptions]
     
     if not order_queue:
-        return JSONResponse(status_code=204, content=None)
+        return Response(status_code=204)
     
     prescription_id = order_queue.pop(0)
     current_processing_order = prescription_id
