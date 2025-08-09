@@ -15,44 +15,35 @@ Complete hospital medicine management system with original UI and ROS2 integrati
 - Production mode (clean, no sample): `clean_hospital_medicine.db`
 
 ## Dependencies
-
-```bash
 pip3 install fastapi uvicorn sqlalchemy pydantic requests pyyaml
-```
 
 ## Quick Start
 
 Test mode (sample data)
-```bash
 cd user_interface
 python3 complete_hospital_system.py
-```
 
 Production mode (clean DB)
-```bash
 cd user_interface
 python3 clear_database.py
 python3 complete_hospital_system.py
-```
 
 ## Web Interfaces
 
-- Medicine Management: `http://localhost:8001/integrated_medicine_management.html`  
-- Doctor Interface: `http://localhost:8001/doctor.html`  
-- Prescription Management: `http://localhost:8001/prescription.html`
+- Medicine Management: http://localhost:8001/integrated_medicine_management.html
+- Doctor Interface: http://localhost:8001/doctor.html
+- Prescription Management: http://localhost:8001/prescription.html
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  %% ---------- UI ----------
   subgraph UI[Hospital Medicine Management UI]
     M[Integrated Medicine Management]
     D[Doctor Interface]
     P[Prescription Management]
   end
 
-  %% ---------- API ----------
   subgraph API[FastAPI :8001]
     A1[/REST Endpoints/]
     A3[Order Queue & Scheduler]
@@ -60,58 +51,80 @@ flowchart LR
     A2p[(clean_hospital_medicine.db)]
   end
 
-  %% ---------- ROS2 ----------
   subgraph ROS[ROS2 System]
     R1[Order Client Node<br/>(poll /api/order/next)]
     R2[Perception & Grasp]
     R3[Arm Controller]
   end
 
-  %% ---------- UI -> API ----------
   M -->|HTTP| A1
   D -->|HTTP| A1
   P -->|HTTP| A1
 
-  %% ---------- ROS2 <-> API ----------
   R1 <-->|GET /api/order/next| A1
   R2 -->|POST /api/order/progress| A1
   R2 -->|POST /api/order/complete| A1
 
-  %% ---------- API internals ----------
   A1 <--> A3
   A3 --> A2t
   A3 --> A2p
 
-  %% ---------- Styles ----------
   classDef db fill:#eef,stroke:#88a,stroke-width:1px;
   class A2t,A2p db;
+```
 
+## Processing Flow
+
+```mermaid
+flowchart TB
+  U[Doctor / UI]
+  F[FastAPI<br/>REST Endpoints]
+  Q[Order Queue & Scheduler]
+  DB[(SQLite DB)]
+  R1[ROS2 Order Client<br/>poll /api/order/next]
+  R2[ROS2 Perception & Grasp]
+  R3[ROS2 Arm Controller]
+
+  U -->|Create Prescription| F
+  F -->|Insert/Update| DB
+  F --> Q
+  Q -->|enqueue order| DB
+
+  R1 -->|GET /api/order/next| F
+  F -->|next pending order| R1
+
+  R1 --> R2 --> R3
+  R2 -->|POST /api/order/progress| F
+  F --> U
+
+  R2 -->|on completion -> POST /api/order/complete| F
+  F -->|update status| DB
+  F --> U
 ```
 
 ## API Endpoints
 
-- `GET /` — System status  
-- `GET /api/medicine/` — Get all medicines  
-- `POST /api/medicine/` — Create medicine  
-- `GET /api/prescription/` — Get all prescriptions  
-- `POST /api/prescription/` — Create prescription  
-- `PUT /api/prescription/{id}/status` — Update prescription status  
-- `GET /api/order/next` — Pull next order (ROS2)  
-- `POST /api/order/progress` — Report progress (ROS2)  
+- `GET /` — System status
+- `GET /api/medicine/` — Get all medicines
+- `POST /api/medicine/` — Create medicine
+- `GET /api/prescription/` — Get all prescriptions
+- `POST /api/prescription/` — Create prescription
+- `PUT /api/prescription/{id}/status` — Update prescription status
+- `GET /api/order/next` — Pull next order (ROS2)
+- `POST /api/order/progress` — Report progress (ROS2)
 - `POST /api/order/complete` — Report completion (ROS2)
 
 ## ROS2 Integration (three functions)
 
-1. Pull Order — `GET /api/order/next`  
-   - Returns the next pending order; `204 No Content` if none.  
-2. Report Progress — `POST /api/order/progress`  
-   - Body: `order_id`, `stage`, `message`, `item`, `index`, `total`.  
-3. Report Completion — `POST /api/order/complete`  
+1. Pull Order — `GET /api/order/next`
+   - Returns the next pending order; `204 No Content` if none.
+2. Report Progress — `POST /api/order/progress`
+   - Body: `order_id`, `stage`, `message`, `item`, `index`, `total`.
+3. Report Completion — `POST /api/order/complete`
    - Body: `order_id`, `status`, `details`.
 
 ## YAML Order Format
 
-```yaml
 order_id: "000001"
 prescription_id: 1
 patient_name: "John Doe"
@@ -124,11 +137,9 @@ medicine:
     amount: 5
     locate: [1, 2]
     prompt: tablet
-```
 
 ## Reference ROS2 Polling Example
 
-```python
 import requests
 import time
 
@@ -153,7 +164,6 @@ def poll_for_orders():
                     "index": i + 1,
                     "total": len(order["medicine"])
                 })
-                # robot work here
                 time.sleep(2)
 
             requests.post(f"{BASE_URL}/api/order/complete", json={
@@ -167,4 +177,3 @@ def poll_for_orders():
 
 if __name__ == "__main__":
     poll_for_orders()
-```
