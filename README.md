@@ -38,12 +38,14 @@ python3 complete_hospital_system.py
 
 ```mermaid
 flowchart LR
+  %% ---------- UI ----------
   subgraph UI[Hospital Medicine Management UI]
     M[Integrated Medicine Management]
     D[Doctor Interface]
     P[Prescription Management]
   end
 
+  %% ---------- API ----------
   subgraph API[FastAPI :8001]
     A1[/REST Endpoints/]
     A3[Order Queue & Scheduler]
@@ -51,55 +53,82 @@ flowchart LR
     A2p[(clean_hospital_medicine.db)]
   end
 
+  %% ---------- ROS2 ----------
   subgraph ROS[ROS2 System]
-    R1[Order Client Node\\npoll /api/order/next]
+    R1["Order Client Node\\npoll /api/order/next"]
     R2[Perception & Grasp]
     R3[Arm Controller]
   end
 
+  %% ---------- UI -> API ----------
   M -->|HTTP| A1
   D -->|HTTP| A1
   P -->|HTTP| A1
 
+  %% ---------- ROS2 <-> API ----------
   R1 <-->|GET /api/order/next| A1
   R2 -->|POST /api/order/progress| A1
   R2 -->|POST /api/order/complete| A1
 
+  %% ---------- API internals ----------
   A1 <--> A3
   A3 --> A2t
   A3 --> A2p
 
-  classDef db fill:#eef,stroke:#88a,stroke-width:1px;
+  %% ---------- Styles ----------
+  classDef ui fill:#f6f9ff,stroke:#7aa2ff,stroke-width:1px;
+  classDef api fill:#f8fff6,stroke:#6bbf59,stroke-width:1px;
+  classDef ros fill:#fff7f6,stroke:#ff8b7a,stroke-width:1px;
+  classDef db fill:#eef2ff,stroke:#7a88ff,stroke-width:1px;
+
+  class M,D,P ui;
+  class A1,A3 api;
+  class R1,R2,R3 ros;
   class A2t,A2p db;
+
 ```
 
 ## Processing Flow
 
 ```mermaid
 flowchart TB
+  %% ---------- Nodes ----------
   U[Doctor / UI]
-  F[FastAPI<br/>REST Endpoints]
+  F["FastAPI\\nREST Endpoints"]
   Q[Order Queue & Scheduler]
   DB[(SQLite DB)]
-  R1[ROS2 Order Client<br/>poll /api/order/next]
-  R2[ROS2 Perception & Grasp]
-  R3[ROS2 Arm Controller]
+  C["ROS2 Order Client\\nGET /api/order/next"]
+  G[ROS2 Perception & Grasp]
+  A[ROS2 Arm Controller]
 
+  %% ---------- Flow ----------
   U -->|Create Prescription| F
-  F -->|Insert/Update| DB
+  F -->|Insert / Update| DB
   F --> Q
   Q -->|enqueue order| DB
 
-  R1 -->|GET /api/order/next| F
-  F -->|next pending order| R1
+  C -->|pull next| F
+  F -->|next pending order| C
 
-  R1 --> R2 --> R3
-  R2 -->|POST /api/order/progress| F
-  F --> U
+  C --> G --> A
+  G -->|POST /api/order/progress| F
+  F -->|push status| U
 
-  R2 -->|on completion -> POST /api/order/complete| F
+  G -->|POST /api/order/complete| F
   F -->|update status| DB
-  F --> U
+  F -->|notify| U
+
+  %% ---------- Styles ----------
+  classDef ui fill:#f6f9ff,stroke:#7aa2ff,stroke-width:1px;
+  classDef api fill:#f8fff6,stroke:#6bbf59,stroke-width:1px;
+  classDef ros fill:#fff7f6,stroke:#ff8b7a,stroke-width:1px;
+  classDef db fill:#eef2ff,stroke:#7a88ff,stroke-width:1px;
+
+  class U ui;
+  class F,Q api;
+  class C,G,A ros;
+  class DB db;
+
 ```
 
 ## API Endpoints
