@@ -76,15 +76,16 @@ flowchart LR
   A3 --> A2p
 
   %% ---------- Styles ----------
-  classDef ui fill:#f6f9ff,stroke:#7aa2ff,stroke-width:1px;
-  classDef api fill:#f8fff6,stroke:#6bbf59,stroke-width:1px;
-  classDef ros fill:#fff7f6,stroke:#ff8b7a,stroke-width:1px;
-  classDef db fill:#eef2ff,stroke:#7a88ff,stroke-width:1px;
+  classDef ui fill:#d6e4ff,stroke:#0044cc,stroke-width:1px,color:#000;
+  classDef api fill:#d9f7be,stroke:#237804,stroke-width:1px,color:#000;
+  classDef ros fill:#ffe7ba,stroke:#ad4e00,stroke-width:1px,color:#000;
+  classDef db fill:#f0f5ff,stroke:#2f54eb,stroke-width:1px,color:#000;
 
   class M,D,P ui;
   class A1,A3 api;
   class R1,R2,R3 ros;
   class A2t,A2p db;
+
 
 ```
 
@@ -119,10 +120,10 @@ flowchart TB
   F -->|notify| U
 
   %% ---------- Styles ----------
-  classDef ui fill:#f6f9ff,stroke:#7aa2ff,stroke-width:1px;
-  classDef api fill:#f8fff6,stroke:#6bbf59,stroke-width:1px;
-  classDef ros fill:#fff7f6,stroke:#ff8b7a,stroke-width:1px;
-  classDef db fill:#eef2ff,stroke:#7a88ff,stroke-width:1px;
+  classDef ui fill:#d6e4ff,stroke:#0044cc,stroke-width:1px,color:#000;
+  classDef api fill:#d9f7be,stroke:#237804,stroke-width:1px,color:#000;
+  classDef ros fill:#ffe7ba,stroke:#ad4e00,stroke-width:1px,color:#000;
+  classDef db fill:#f0f5ff,stroke:#2f54eb,stroke-width:1px,color:#000;
 
   class U ui;
   class F,Q api;
