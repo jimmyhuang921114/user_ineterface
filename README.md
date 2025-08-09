@@ -45,34 +45,47 @@ python3 complete_hospital_system.py
 
 ```mermaid
 flowchart LR
-  subgraph ROS2[ROS2 System]
-    R1[Order Client Node\\n(poll /api/order/next)]
-    R2[Perception & Grasp]
-    R3[Arm Controller]
+  %% ---------- UI ----------
+  subgraph UI[Hospital Medicine Management UI]
+    M[Integrated Medicine Management]
+    D[Doctor Interface]
+    P[Prescription Management]
   end
 
-
+  %% ---------- API ----------
   subgraph API[FastAPI :8001]
     A1[/REST Endpoints/]
-    A2[(SQLite DB\ncomplete_hospital_medicine.db\nclean_hospital_medicine.db)]
-    A3[Order Queue / Scheduler]
+    A3[Order Queue & Scheduler]
+    A2t[(complete_hospital_medicine.db)]
+    A2p[(clean_hospital_medicine.db)]
   end
 
-  subgraph ROS2[ROS2 System]
-    R1[Order Client Node\n(poll /api/order/next)]
+  %% ---------- ROS2 ----------
+  subgraph ROS[ROS2 System]
+    R1[Order Client Node<br/>(poll /api/order/next)]
     R2[Perception & Grasp]
     R3[Arm Controller]
   end
 
+  %% ---------- UI -> API ----------
   M -->|HTTP| A1
   D -->|HTTP| A1
   P -->|HTTP| A1
 
-  R1 <-->|HTTP JSON| A1
-  R2 -->|HTTP: progress/complete| A1
+  %% ---------- ROS2 <-> API ----------
+  R1 <-->|GET /api/order/next| A1
+  R2 -->|POST /api/order/progress| A1
+  R2 -->|POST /api/order/complete| A1
 
+  %% ---------- API internals ----------
   A1 <--> A3
-  A3 <--> A2
+  A3 --> A2t
+  A3 --> A2p
+
+  %% ---------- Styles ----------
+  classDef db fill:#eef,stroke:#88a,stroke-width:1px;
+  class A2t,A2p db;
+
 ```
 
 ## API Endpoints
