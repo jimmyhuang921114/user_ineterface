@@ -52,7 +52,7 @@ flowchart LR
   end
 
   subgraph ROS[ROS2 System]
-    R1[Order Client Node<br/>(poll /api/order/next)]
+    R1[Order Client Node\\n(poll /api/order/next)]
     R2[Perception & Grasp]
     R3[Arm Controller]
   end
