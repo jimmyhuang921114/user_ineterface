@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+<html translate="no"></html>
 <head>
     <meta charset="UTF-">
     <meta name="viewport" content="width=device-width, initial-scale=.">
@@ -132,102 +133,103 @@
         /* / 按鈕樣式 / */
         .btn-group {
             display: flex;
-            gap: px;
+            gap: 12px;
             justify-content: center;
-            margin-top: px;
+            margin-top: 16px;
         }
-        
-        .btn {
-            padding: px px;
+
+            .btn {
+            padding: 8px 14px;
             border: none;
-            border-radius: px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: px;
-            font-weight: ;
-            transition: all .s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(deg, db, ecc);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all .2s ease;
+            }
+
+            .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
             color: white;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(deg, fc, ee);
+            }
+
+            .btn-warning {
+            background: linear-gradient(135deg, #facc15, #eab308);
             color: white;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(deg, ecc, cb);
+            }
+
+            .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-px);
-            box-shadow:  px px rgba(,,,.);
-        }
-        
-        /* / 藥物列表樣式 / */
-        .medicine-list {
-            max-height: px;
+            }
+
+            .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+            /* 藥物列表樣式 */
+            .medicine-list {
+            max-height: 300px;
             overflow-y: auto;
-            border: px solid deee;
-            border-radius: px;
-        }
-        
-        .medicine-item {
+            border: 1px solid #dee;
+            border-radius: 6px;
+            background: white;
+            }
+
+            .medicine-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: px;
-            border-bottom: px solid eecef;
-            transition: background-color .s;
-        }
-        
-        .medicine-item:hover {
-            background-color: fffa;
-        }
-        
-        .medicine-info {
-            flex: ;
-        }
-        
-        .medicine-name {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eeceff;
+            transition: background-color .2s ease;
+            }
+
+            .medicine-item:hover {
+            background-color: #fffaf0;
+            }
+
+            .medicine-info {
+            flex: 1;
+            }
+
+            .medicine-name {
             font-weight: bold;
-            color: ce;
-            margin-bottom: px;
-        }
-        
-        .medicine-details {
-            font-size: px;
-            color: fcd;
-        }
-        
-        .medicine-stock {
+            color: #333;
+            margin-bottom: 4px;
+            }
+
+            .medicine-details {
+            font-size: 13px;
+            color: #666;
+            }
+
+            .medicine-stock {
             text-align: center;
-            margin:  px;
-        }
-        
-        .stock-number {
-            font-size: px;
+            margin: 0 8px;
+            }
+
+            .stock-number {
+            font-size: 14px;
             font-weight: bold;
-            color: ae;
-        }
-        
-        .stock-low {
-            color: ecc;
-        }
-        
-        .medicine-actions {
+            color: #00aa66;
+            }
+
+            .stock-low {
+            color: #ee4444;
+            }
+
+            .medicine-actions {
             display: flex;
-            gap: px;
-        }
-        
-        .btn-sm {
-            padding: px px;
-            font-size: px;
-        }
-        
+            gap: 8px;
+            }
+
+            .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            }
+
         /* / 狀態訊息 / */
         .status-message {
             padding: px;

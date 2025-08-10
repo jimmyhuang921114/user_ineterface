@@ -31,9 +31,9 @@ function initializeSystem() {
     addMedicineItem();
 }
 
-/
-  設置事件監聽器
- /
+// /
+//   設置事件監聽器
+//  /
 function setupEventListeners() {
     // 處方籤表單提交
     document.getElementById('prescriptionForm').addEventListener('submit', handlePrescriptionSubmit);
