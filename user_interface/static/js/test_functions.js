@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     addLog(' 測試系統已啟動', 'info');
 });
 
-/
-  添加日誌到顯示區域
- /
+// /
+//   添加日誌到顯示區域
+//  /
 function addLog(message, type = 'info') {
     const logDisplay = document.getElementById('systemLogs');
     const timestamp = new Date().toLocaleTimeString('zh-TW');

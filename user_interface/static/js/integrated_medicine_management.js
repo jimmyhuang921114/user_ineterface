@@ -1,7 +1,7 @@
-/
-  整合藥物管理系統 JavaScript
-  Integrated Medicine Management System
- /
+// /
+//   整合藥物管理系統 JavaScript
+//   Integrated Medicine Management System
+//  /
 
 // 全域變數
 let basicMedicines = [];
@@ -448,41 +448,48 @@ function viewMedicineDetails(medicineName) {
 
 
 
-
-/
-  篩選功能
- /
+// 篩選功能
 function filterInventory() {
-    const searchTerm = document.getElementById('inventorySearch').value.toLowerCase();
-    const stockFilter = document.getElementById('stockFilter').value;
-    
-    let filtered = basicMedicines.filter(medicine => {
-        const matchesSearch = medicine.name.toLowerCase().includes(searchTerm);
-        let matchesStock = true;
-        
-        if (stockFilter) {
-            const amount = medicine.amount || ;
-            switch(stockFilter) {
-                case 'sufficient':
-                    matchesStock = amount > ;
-                    break;
-                case 'medium':
-                    matchesStock = amount >=  && amount <= ;
-                    break;
-                case 'low':
-                    matchesStock = amount >  && amount < ;
-                    break;
-                case 'empty':
-                    matchesStock = amount === ;
-                    break;
-            }
-        }
-        
-        return matchesSearch && matchesStock;
-    });
-    
-    renderInventoryList(filtered);
+  const searchTerm = (document.getElementById('inventorySearch')?.value || '')
+    .trim()
+    .toLowerCase();
+  const stockFilter = (document.getElementById('stockFilter')?.value || '');
+
+  const filtered = (basicMedicines || []).filter(medicine => {
+    const name = (medicine?.name || '').toString().toLowerCase();
+    const matchesSearch = !searchTerm || name.includes(searchTerm);
+
+    const amount = Number.parseInt(medicine?.amount ?? 0) || 0;
+    let matchesStock = true;
+
+    switch (stockFilter) {
+      case 'sufficient':
+        // 充足：> 50
+        matchesStock = amount > 50;
+        break;
+      case 'medium':
+        // 中等：20 ~ 50
+        matchesStock = amount >= 20 && amount <= 50;
+        break;
+      case 'low':
+        // 低量：1 ~ 19
+        matchesStock = amount >= 1 && amount < 20;
+        break;
+      case 'empty':
+        // 無庫存：0
+        matchesStock = amount === 0;
+        break;
+      // '', 'all' 或其他值 -> 不過濾庫存
+      default:
+        matchesStock = true;
+    }
+
+    return matchesSearch && matchesStock;
+  });
+
+  renderInventoryList(filtered);
 }
+
 
 function filterMedicineList() {
     const searchTerm = document.getElementById('medicineSearch').value.toLowerCase();

@@ -73,37 +73,37 @@
                 </div>
             </div>
         </div>
-
-        <!--  -->
-        <div class="card fade-in">
-            <div style="padding: px;">
-                <h>處方籤列表</h>
-                <div class="table-container">
-                    <div id="prescriptionTable" style="width: %; overflow-x: auto;">
-                        <table style="width: %; border-collapse: collapse; margin-top: px;">
-                            <thead>
-                                <tr style="background: linear-gradient(deg, fffa, eecef);">
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">處方籤編號</th>
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">患者姓名</th>
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">藥物數量</th>
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">狀態</th>
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">建立時間</th>
-                                    <th style="padding: px; border: px solid deee; font-weight: ;">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="prescriptionTableBody">
-                                <tr>
-                                    <td colspan="" style="padding: px; text-align: center; color: fcd;">
-                                                                <div>目前沒有符合條件的處方籤</div>
-                        <div style="margin-top: px; font-size: px;">請調整篩選條件或由醫生開立新處方籤</div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- 處方籤列表卡片 -->
+    <div class="card fade-in">
+        <div style="padding: 16px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 700;">處方籤列表</h2>
+            <div class="table-container">
+                <div id="prescriptionTable" style="width: 100%; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #fffaf0, #eeceff);">
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">處方籤編號</th>
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">患者姓名</th>
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">藥物數量</th>
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">狀態</th>
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">建立時間</th>
+                                <th style="padding: 8px; border: 1px solid #ddeeee; font-weight: 600;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prescriptionTableBody">
+                            <tr>
+                                <td colspan="6" style="padding: 12px; text-align: center; color: #999;">
+                                    <div>目前沒有符合條件的處方籤</div>
+                                    <div style="margin-top: 6px; font-size: 14px;">請調整篩選條件或由醫生開立新處方籤</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
+
 
         <!--  -->
         <div id="prescriptionModal" style="display: none; position: fixed; top: ; left: ; width: %; height: %; background: rgba(,,,.); z-index: ;">

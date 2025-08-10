@@ -54,8 +54,8 @@ class EnhancedMedicineManager {
             ],
             stretchH: 'all',
             rowHeaders: true,
-            minSpareRows: ,
-            height: ,
+            minSpareRows: 1,
+            height: 400,
             licenseKey: 'non-commercial-and-evaluation',
             afterChange: this.handleCellChange.bind(this),
             contextMenu: ['remove_row'],
@@ -268,35 +268,30 @@ class EnhancedMedicineManager {
     }
 
     populateDetailedForm(medicineName, data) {
-        //
-        document.getElementById('medicineName').value = data.?. || medicineName;
-        document.getElementById('dosage').value = data.?. || '';
-        document.getElementById('manufacturer').value = data.?. || '';
-        document.getElementById('usageMethod').value = data.?. || '';
-        document.getElementById('unitDose').value = data.?. || '';
+        document.getElementById('medicineName').value = data?.medicine_name || medicineName;
+        document.getElementById('dosage').value = data?.dosage || '';
+        document.getElementById('manufacturer').value = data?.manufacturer || '';
+        document.getElementById('usageMethod').value = data?.usage_method || '';
+        document.getElementById('unitDose').value = data?.unit_dose || '';
 
-        //
-        document.getElementById('color').value = data.?. || '';
-        document.getElementById('shape').value = data.?. || '';
+        document.getElementById('color').value = data?.color || '';
+        document.getElementById('shape').value = data?.shape || '';
 
-        //
-        document.getElementById('expiryDate').value = data.?. || '';
-        document.getElementById('barcode').value = data.?. || data. || '';
-        document.getElementById('companyFullName').value = data.?. || '';
-        document.getElementById('drugFullName').value = data.?. || '';
+        document.getElementById('expiryDate').value = data?.expiry_date || '';
+        document.getElementById('barcode').value = data?.barcode || '';
+        document.getElementById('companyFullName').value = data?.company_full_name || '';
+        document.getElementById('drugFullName').value = data?.drug_full_name || '';
 
-        //
-        document.getElementById('code').value = data.?. || '';
-        document.getElementById('code').value = data.?. || '';
-        document.getElementById('code').value = data.?. || '';
+        document.getElementById('code1').value = data?.code1 || '';
+        document.getElementById('code2').value = data?.code2 || '';
+        document.getElementById('code3').value = data?.code3 || '';
 
-        //
-        document.getElementById('indications').value = data. || '';
-        document.getElementById('sideEffects').value = data. || data. || '';
-        document.getElementById('usage').value = data. || '';
-        document.getElementById('precautions').value = data. || '';
-        document.getElementById('pregnancyClass').value = data. || '';
-        document.getElementById('storageConditions').value = data. || '';
+        document.getElementById('indications').value = data?.indications || '';
+        document.getElementById('sideEffects').value = data?.side_effects || '';
+        document.getElementById('usage').value = data?.usage || '';
+        document.getElementById('precautions').value = data?.precautions || '';
+        document.getElementById('pregnancyClass').value = data?.pregnancy_class || '';
+        document.getElementById('storageConditions').value = data?.storage_conditions || '';
     }
 
     clearDetailedForm() {
@@ -318,37 +313,38 @@ class EnhancedMedicineManager {
     }
 
     getDetailedFormData() {
-        return {
-            : {
-                : document.getElementById('medicineName').value,
-                : document.getElementById('dosage').value,
-                : document.getElementById('manufacturer').value,
-                : document.getElementById('usageMethod').value,
-                : document.getElementById('unitDose').value
-            },
-            : {
-                : document.getElementById('color').value,
-                : document.getElementById('shape').value
-            },
-            : {
-                : document.getElementById('expiryDate').value,
-                : document.getElementById('barcode').value,
-                : document.getElementById('companyFullName').value,
-                : document.getElementById('drugFullName').value
-            },
-            : {
-                : document.getElementById('code').value,
-                : document.getElementById('code').value,
-                : document.getElementById('code').value
-            },
-            : document.getElementById('indications').value,
-            : document.getElementById('sideEffects').value,
-            : document.getElementById('usage').value,
-            : document.getElementById('precautions').value,
-            : document.getElementById('pregnancyClass').value,
-            : document.getElementById('storageConditions').value
-        };
-    }
+    return {
+        basic_info: {
+            medicine_name: document.getElementById('medicineName').value,
+            dosage: document.getElementById('dosage').value,
+            manufacturer: document.getElementById('manufacturer').value,
+            usage_method: document.getElementById('usageMethod').value,
+            unit_dose: document.getElementById('unitDose').value
+        },
+        appearance: {
+            color: document.getElementById('color').value,
+            shape: document.getElementById('shape').value
+        },
+        packaging: {
+            expiry_date: document.getElementById('expiryDate').value,
+            barcode: document.getElementById('barcode').value,
+            company_full_name: document.getElementById('companyFullName').value,
+            drug_full_name: document.getElementById('drugFullName').value
+        },
+        codes: {
+            code1: document.getElementById('code1').value,
+            code2: document.getElementById('code2').value,
+            code3: document.getElementById('code3').value
+        },
+        indications: document.getElementById('indications').value,
+        side_effects: document.getElementById('sideEffects').value,
+        usage: document.getElementById('usage').value,
+        precautions: document.getElementById('precautions').value,
+        pregnancy_class: document.getElementById('pregnancyClass').value,
+        storage_conditions: document.getElementById('storageConditions').value
+    };
+}
+
 
     async saveDetailedMedicineInfo() {
         const medicineName = document.getElementById('medicineName').value;
@@ -456,77 +452,55 @@ class EnhancedMedicineManager {
 
         //
         if (data.detailed_info) {
-            const detailed = data.detailed_info;
+            const d = data.detailed_info;
 
-            //
-            if (detailed.) {
-                html += `<div class="info-section detailed-info">
-                    <h></h>`;
-                Object.entries(detailed.).forEach(([key, value]) => {
-                    if (value) {
-                        html += `<div class="info-item">
-                            <span class="info-label">${key}</span>
-                            <span class="info-value">${value}</span>
-                        </div>`;
-                    }
-                });
-                html += '</div>';
-            }
+            // 小工具：把物件渲染成一個區塊（只顯示有值的欄位）
+            const renderSection = (title, obj) => {
+                if (!obj || typeof obj !== 'object') return '';
+                const rows = Object.entries(obj)
+                    .filter(([_, v]) => v !== undefined && v !== null && String(v).trim() !== '')
+                    .map(([k, v]) => `
+                        <div class="info-item">
+                            <span class="info-label">${k}</span>
+                            <span class="info-value">${v}</span>
+                        </div>
+                    `).join('');
+                return rows ? `<div class="info-section detailed-info"><h3>${title}</h3>${rows}</div>` : '';
+            };
 
-            //
-            if (detailed.) {
-                html += `<div class="info-section detailed-info">
-                    <h></h>`;
-                Object.entries(detailed.).forEach(([key, value]) => {
-                    if (value) {
-                        html += `<div class="info-item">
-                            <span class="info-label">${key}</span>
-                            <span class="info-value">${value}</span>
-                        </div>`;
-                    }
-                });
-                html += '</div>';
-            }
+            // 分組（物件）
+            html += renderSection('外觀', d.appearance);  // e.g. { color, shape, ... }
+            html += renderSection('包裝', d.packaging);   // e.g. { unit_dose, expiry_date, ... }
+            html += renderSection('代碼', d.codes);       // e.g. { barcode, nh_code, atc_code, ... }
 
-            //
-            if (detailed.) {
-                html += `<div class="info-section detailed-info">
-                    <h></h>`;
-                Object.entries(detailed.).forEach(([key, value]) => {
-                    if (value) {
-                        html += `<div class="info-item">
-                            <span class="info-label">${key}</span>
-                            <span class="info-value">${value}</span>
-                        </div>`;
-                    }
-                });
-                html += '</div>';
-            }
-
-            //
+            // 重要單欄位（字串）
             const importantFields = [
-                { key: '', label: '' },
-                { key: '', label: '' },
-                { key: '', label: '' },
-                { key: '', label: '' },
-                { key: '', label: '' },
-                { key: '', label: '' }
+                ['適應症', d.indications],
+                ['副作用', d.side_effects],
+                ['用法用量', d.usage],
+                ['注意事項', d.precautions],
+                ['孕期分級', d.pregnancy_class],
+                ['儲存條件', d.storage_conditions],
             ];
 
-            importantFields.forEach(field => {
-                if (detailed[field.key]) {
-                    html += `<div class="info-section detailed-info">
-                        <h>${field.label}</h>
-                        <div class="info-item">
-                            <span class="info-value">${detailed[field.key]}</span>
+            importantFields.forEach(([label, value]) => {
+                if (value !== undefined && value !== null && String(value).trim() !== '') {
+                    html += `
+                        <div class="info-section detailed-info">
+                            <h3>${label}</h3>
+                            <div class="info-item">
+                                <span class="info-value">${value}</span>
+                            </div>
                         </div>
-                    </div>`;
+                    `;
                 }
             });
         }
 
+        // 原本結尾保留
         html += '</div>';
         return html;
+
     }
 
     formatSearchResults(results) {
@@ -563,18 +537,19 @@ class EnhancedMedicineManager {
         const medicineName = document.getElementById('medicineName').value;
 
         if (!medicineName) {
-            this.showMessage('', 'error');
+            this.showMessage('請先輸入藥品名稱', 'error');
             return;
         }
 
         const jsonData = {
-            : medicineName,
+            medicine_name: medicineName,
             ...medicineData
         };
 
-        document.getElementById('jsonPreview').textContent = JSON.stringify(jsonData, null, );
+        document.getElementById('jsonPreview').textContent = JSON.stringify(jsonData, null, 2);
         document.getElementById('jsonModal').style.display = 'block';
     }
+
 
     copyJSON() {
         const jsonText = document.getElementById('jsonPreview').textContent;
@@ -743,28 +718,30 @@ class EnhancedMedicineManager {
     }
 
     exportBasicJSON() {
+        // 只輸出有資料的列（name 或 id 有其一即可）
         const jsonData = this.basicData
-            .filter(row => row.length >=  && row[])
+            .filter(row => Array.isArray(row) && row.length >= 4 && (row[0] || row[4]))
             .map(row => ({
-                name: row[],
-                amount: row[],
-                usage_days: row[],
-                position: row[],
-                id: row[] || null
+                name: (row[0] || '').toString().trim(),
+                amount: Number.parseInt(row[1] ?? 0) || 0,
+                usage_days: Number.parseInt(row[2] ?? 0) || 0,
+                position: (row[3] || '').toString().trim(),
+                id: row[4] ?? null
             }));
 
-        const blob = new Blob([JSON.stringify(jsonData, null, )], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `basic_medicines_${new Date().toISOString().split('T')[]}.json`;
+        a.download = `basic_medicines_${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        this.showMessage('', 'success');
+        this.showMessage('基本藥品清單已匯出', 'success');
     }
+
 
     // ====================  ====================
 

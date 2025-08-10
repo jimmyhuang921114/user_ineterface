@@ -1,7 +1,7 @@
-/
-  醫生工作台 JavaScript
-  Doctor Workstation JavaScript
- /
+// /
+//   醫生工作台 JavaScript
+//   Doctor Workstation JavaScript
+//  /
 
 // 全域變數
 let availableMedicines = [];
@@ -18,9 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     generateAutoFields();
 });
 
-/
-  系統初始化
- /
+// /
+//   系統初始化
+//  /
 function initializeSystem() {
     console.log(' 醫生工作台初始化...');
     
@@ -44,9 +44,9 @@ function setupEventListeners() {
 
 // 醫生頁面已簡化為只有處方籤功能，無需標籤切換
 
-/
-  載入可用藥物清單
- /
+// 
+//   載入可用藥物清單
+//  
 async function loadAvailableMedicines() {
     try {
         console.log(' 正在載入藥物清單...');
@@ -70,9 +70,9 @@ async function loadAvailableMedicines() {
     }
 }
 
-/
-  更新藥物下拉選單
- /
+// /
+//   更新藥物下拉選單
+//  /
 function updateMedicineSelects() {
     const selects = document.querySelectorAll('.medicine-select select');
     
@@ -103,9 +103,9 @@ function updateMedicineSelects() {
 
 // 藥物管理功能已移至專門的藥物管理頁面
 
-/
-  處理處方籤表單提交
- /
+// /
+//   處理處方籤表單提交
+//  /
 async function handlePrescriptionSubmit(event) {
     event.preventDefault();
     
@@ -192,18 +192,18 @@ async function handlePrescriptionSubmit(event) {
     }
 }
 
-/
-  生成自動欄位
- /
+// /
+//   生成自動欄位
+//  /
 function generateAutoFields() {
     updatePrescriptionTime();
     // 病患編號會在輸入身份證號時自動生成
     document.getElementById('patientNumber').textContent = '請先輸入身份證號';
 }
 
-/
-  更新處方時間
- /
+// /
+//   更新處方時間
+//  /
 function updatePrescriptionTime() {
     const now = new Date();
     const timeString = now.toLocaleString('zh-TW', {
@@ -217,9 +217,9 @@ function updatePrescriptionTime() {
     document.getElementById('prescriptionTime').textContent = timeString;
 }
 
-/
-  根據身份證號生成病患編號
- /
+// /
+//   根據身份證號生成病患編號
+//  /
 function generatePatientNumber() {
     const idCard = document.getElementById('patientIdCard').value.trim();
     
@@ -235,9 +235,9 @@ function generatePatientNumber() {
     }
 }
 
-/
-  新增藥物項目
- /
+// /
+//   新增藥物項目
+//  /
 function addMedicineItem() {
     const medicineList = document.getElementById('medicineList');
     const itemId = `medicine-${medicineCounter++}`;
@@ -278,9 +278,9 @@ function addMedicineItem() {
     console.log(' 已新增藥物項目:', itemId);
 }
 
-/
-  移除藥物項目
- /
+// /
+//   移除藥物項目
+//  /
 function removeMedicineItem(itemId) {
     const item = document.getElementById(itemId);
     if (item) {
@@ -295,9 +295,9 @@ function removeMedicineItem(itemId) {
     }
 }
 
-/
-  當選擇藥物時更新藥物資訊
- /
+// /
+//   當選擇藥物時更新藥物資訊
+//  /
 function updateMedicineInfo(selectElement) {
     const selectedMedicine = availableMedicines.find(med => med.name === selectElement.value);
     
@@ -331,9 +331,9 @@ function updateMedicineInfo(selectElement) {
     }
 }
 
-/
-  顯示狀態訊息
- /
+// /
+//   顯示狀態訊息
+//  /
 function showStatus(message, type = 'success', elementId) {
     const statusDiv = document.getElementById(elementId);
     statusDiv.className = `status-message status-${type}`;
@@ -346,18 +346,18 @@ function showStatus(message, type = 'success', elementId) {
     }, );
 }
 
-/
-  驗證身份證號格式
- /
+// /
+//   驗證身份證號格式
+//  /
 function validateIdCard(idCard) {
     // 台灣身份證號格式驗證
     const pattern = /^[A-Z][]\d{}$/;
     return pattern.test(idCard);
 }
 
-/
-  格式化日期時間
- /
+// /
+//   格式化日期時間
+//  /
 function formatDateTime(date) {
     return date.toLocaleString('zh-TW', {
         year: 'numeric',
